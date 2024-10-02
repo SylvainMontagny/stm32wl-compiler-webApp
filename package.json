@@ -1,0 +1,15 @@
+{
+  "name": "iot-formations-webapp",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.21.0"
+  },
+  "scripts": {
+    "start": "node app.js"
+  },
+  "version": "1.0.0",
+  "description": "Application web de générations de firmware pour formation IOT",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
