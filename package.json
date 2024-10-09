@@ -2,7 +2,8 @@
   "name": "iot-formations-webapp",
   "main": "app.js",
   "dependencies": {
-    "express": "^4.21.0"
+    "express": "^4.21.0",
+    "iot-formations-webapp": "file:"
   },
   "scripts": {
     "start": "node app.js"
