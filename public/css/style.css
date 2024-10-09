@@ -129,3 +129,12 @@ select {
     padding: 5px;
     width: 100%;
 }
+
+.page-container {
+    display: flex;
+    justify-content: center;
+}
+
+.lorawan-container {
+    width: 100px;
+}
