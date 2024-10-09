@@ -2,6 +2,7 @@
   "name": "iot-formations-webapp",
   "main": "app.js",
   "dependencies": {
+    "dockerode": "^4.0.2",
     "express": "^4.21.0",
     "iot-formations-webapp": "file:"
   },
