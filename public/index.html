@@ -7,7 +7,83 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1>Hello world !</h1>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="/img/logo.png" alt="Site Logo">
+            </div>
+            <h1> LoRaWAN Firmware Generation </h1>
+        </div>
+    </header>
+
+    <div class="form-container">
+
+        <div class="lorawan-container">
+
+            <div class="title-container">
+                <h2>LoRaWAN Configuration</h2>
+                <a href="" id="restore" class="restore">Restore default</a>
+            </div>
+
+            <div class="lorawan-form">
+                
+                <div class="activation-mode">
+                    <h3>Activation Mode</h3>
+                    <select id="activation-mode" name="activation-mode">
+                        <option value="otaa">OTAA</option>
+                        <option value="abp">ABP</option>
+                    </select>
+                </div>
+
+                <div class="class">
+                    <h3>Class</h3>
+                    <select id="class" name="class">
+                        <option value="class-a">Class_A</option>
+                        <option value="class-b">Class_B</option>
+                        <option value="class-c">Class_C</option>
+                    </select>
+                </div>
+
+                <div class="spreading-factor">
+                    <h3>Spreading Factor</h3>
+                    <select id="spreading-factor" name="spreading-factor">
+                        <option value="sf7">SF7</option>
+                        <option value="sf8">SF8</option>
+                        <option value="sf9">SF9</option>
+                        <option value="sf10">SF10</option>
+                        <option value="sf11">SF11</option>
+                        <option value="sf12">SF12</option>
+                    </select>
+                </div>
+
+                <div class="adaptative-dr">
+                    <h3>Adaptative DR</h3>
+                    <div class="radio-buttons">
+                        <input type="radio" id="adaptative-dr-on" name="adaptative-dr" value="on">
+                        <label for="adaptative-dr-on">On</label>
+                        <input type="radio" id="adaptative-dr-off" name="adaptative-dr" value="off">
+                        <label for="adaptative-dr-off">Off</label>
+                    </div>
+                </div>
+
+                <div class="confirmation">
+                    <h3>Confirmation</h3>
+                    <div class="radio-buttons">
+                        <input type="radio" id="confirmation-on" name="confirmation" value="on">
+                        <label for="confirmation-on">Confirmed</label>
+                        <input type="radio" id="confirmation-off" name="confirmation" value="off">
+                        <label for="confirmation-off">Unconfirmed</label>
+                    </div>
+                </div>
+
+                <div class="app_port">
+                    <h3>App Port</h3>
+                    <input type="number" id="app_port" name="app_port" min="1" max="255" value="15">
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 <script src="/js/script.js"></script>
 </html>
