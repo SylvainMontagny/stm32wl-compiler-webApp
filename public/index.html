@@ -24,7 +24,7 @@
     
                 <div class="title-container">
                     <h2>LoRaWAN Configuration</h2>
-                    <a href="" id="restore" class="restore">Restore default</a>
+                    <div id="restore-lorawan" class="restore">Restore default</div>
                 </div>
     
                 <div class="lorawan-form">
@@ -88,7 +88,7 @@
     
                     <div class="app_port">
                         <h3>App Port</h3>
-                        <input type="number" id="app_port" name="app_port" min="1" max="255" value="15">
+                        <input type="number" id="app_port" name="app_port" min="0" max="255" value="15">
                     </div>
                 </div>
             </div>
@@ -97,7 +97,7 @@
 
                 <div class="title-container">
                     <h2>Application Configuration</h2>
-                    <a href="" id="restore" class="restore">Restore default</a>
+                    <div id="restore-app" class="restore">Restore default</div>
                 </div>
 
                 <div class="application-form">
@@ -118,22 +118,22 @@
 
                     <div class="frame-delay">
                         <h3>Frame Delay</h3>
-                        <input type="number" id="frame-delay" name="frame-delay" min="1" max="255" value="10">
+                        <input type="number" id="frame-delay" name="frame-delay" min="7" max="255" value="10">
                     </div>
 
                     <div class="payload-configuration">
                         <h3>Payload Configuration</h3>
                         <div class="radio-buttons">
                             <div class="radio-button">
-                                <input type="radio" id="hello" name="payload-configuration" value="hello" checked>
+                                <input type="checkbox" id="hello" name="payload-configuration" value="hello" checked>
                                 <label for="hello">Hello</label>
                             </div>
                             <div class="radio-button">
-                                <input type="radio" id="temperature" name="payload-configuration" value="temperature">
+                                <input type="checkbox" id="temperature" name="payload-configuration" value="temperature" disabled>
                                 <label for="temperature">Temperature</label>
                             </div>
                             <div class="radio-button">
-                                <input type="radio" id="humidity" name="payload-configuration" value="humidity">
+                                <input type="checkbox" id="humidity" name="payload-configuration" value="humidity" disabled>
                                 <label for="humidity">Humidity</label>
                             </div>
                         </div>
@@ -157,11 +157,11 @@
                         <h3>Cayenne LPP</h3>
                         <div class="radio-buttons">
                             <div class="radio-button">
-                                <input type="radio" id="cayenne-lpp-enabled" name="cayenne-lpp" value="enabled">
+                                <input type="radio" id="cayenne-lpp-enabled" name="cayenne-lpp" value="enabled" disabled>
                                 <label for="cayenne-lpp-enabled">Enabled</label>
                             </div>
                             <div class="radio-button">
-                                <input type="radio" id="cayenne-lpp-disabled" name="cayenne-lpp" value="disabled" checked>
+                                <input type="radio" id="cayenne-lpp-disabled" name="cayenne-lpp" value="disabled" checked disabled>
                                 <label for="cayenne-lpp-disabled">Disabled</label>
                             </div>
                         </div>
@@ -183,7 +183,7 @@
 
                 <div class="title-container">
                     <h2>OTAA Configuration</h2>
-                    <a href="" id="restore" class="restore">Restore default</a>
+                    <div id="restore-otaa" class="restore">Restore default</div>
                 </div>
 
                 <div class="otaa-form">
@@ -212,7 +212,7 @@
 
                 <div class="title-container">
                     <h2>ABP Configuration</h2>
-                    <a href="" id="restore" class="restore">Restore default</a>
+                    <div id="restore-abp" class="restore">Restore default</div>
                 </div>
 
                 <div class="abp-form">
@@ -254,7 +254,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" height="33px" viewBox="0 -960 960 960" width="33px" fill="#333"><path d="M521.33-480.67 328-674l47.33-47.33L616-480.67 375.33-240 328-287.33l193.33-193.34Z"/></svg>
                         </div>
                     </div>
-                    <a href="" id="restore" class="restore">Restore default</a>
+                    <div id="restore-adv" class="restore">Restore default</div>
                 </div>
 
                 <div class="advanced-settings-form">

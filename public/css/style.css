@@ -108,6 +108,7 @@ header {
 .restore {
     text-decoration: none;
     color : var(--primary-color);
+    cursor: pointer;
 }
 
 
@@ -187,6 +188,13 @@ select {
 .send-mode .radio-buttons {
     display: flex; 
     gap: 15px; 
+}
+
+label[for="cayenne-lpp-enabled"],
+label[for="temperature"],
+label[for="humidity"],
+label[for="cayenne-lpp-disabled"] {
+    color: #D1D1D1;
 }
 
 .payload-configuration,
