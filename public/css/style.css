@@ -202,7 +202,10 @@ select {
 .dev-eui-container,
 .appkey-container,
 .appeui-joineui-container,
-.admin-gen-app-key-container {
+.admin-gen-app-key-container,
+.devaddr-container,
+.nwkskey-container,
+.appskey-container {
     display: flex;
     gap: 10px;
 }
@@ -210,7 +213,10 @@ select {
 button.generate-dev-eui,
 button.generate-appkey,
 button.generate-appeui,
-button.generate-admin-gen-app-key {
+button.generate-admin-gen-app-key,
+button.generate-devaddr,
+button.generate-nwkskey,
+button.generate-appskey {
     padding: 10px;
     display: flex;
     align-items: center;
@@ -233,6 +239,18 @@ button.generate-admin-gen-app-key {
     grid-template-columns: 1fr;
     gap: 2vw;
     margin: 20px;
+}
+
+/* abp Form Styles */
+.abp-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2vw;
+    margin: 20px;
+}
+
+.abp-container {
+    display : none;
 }
 
 /* Advanced Settings Styles */
@@ -269,16 +287,17 @@ button.generate-admin-gen-app-key {
 
 .closed-advance-container {
     display: flex;
-    gap: 20px;
+    gap: 10px;
     align-items: center;
 }
 
-.closed-advance-container p {
-    font-size: 0.8em;
-    color: gray;
-    margin-top: 2px;
+.svg {
+    height: 40px;
+    display: flex;
+    align-items: flex-end;
+    transform-origin: 20px 22px;
+    transition: transform 0.2s ease;
 }
-
 
 /* Generate Firmware Button */
 .generate-firmware {
