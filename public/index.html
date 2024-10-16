@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LoRaWAN Firmware Generation</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header>
         <div class="header-container">
             <div class="logo">
-                <img src="/img/logo.png" alt="Site Logo">
+                <img src="img/logo.png" alt="Site Logo">
             </div>
             <h1> LoRaWAN Firmware Generation </h1>
         </div>
@@ -208,12 +208,51 @@
 
             </div>
 
+            <div class="abp-container">
+
+                <div class="title-container">
+                    <h2>ABP Configuration</h2>
+                    <a href="" id="restore" class="restore">Restore default</a>
+                </div>
+
+                <div class="abp-form">
+
+                    <div class="devaddr">
+                        <h3>DevAddr</h3>
+                        <div class="devaddr-container">
+                            <input type="text" id="devaddr" name="devaddr" value="00000000">
+                            <button id="generate-devaddr" class="generate-devaddr"><i class="fa-solid fa-shuffle"></i>Generate</button>
+                        </div>
+                    </div>
+
+                    <div class="nwkskey">
+                        <h3>NwkSKey</h3>
+                        <div class="nwkskey-container">
+                            <input type="text" id="nwkskey" name="nwkskey" value="00000000000000000000000000000000">
+                            <button id="generate-nwkskey" class="generate-nwkskey"><i class="fa-solid fa-shuffle"></i>Generate</button>
+                        </div>
+                    </div>
+
+                    <div class="appskey">
+                        <h3>AppSKey</h3>
+                        <div class="appskey-container">
+                            <input type="text" id="appskey" name="appskey" value="00000000000000000000000000000000">
+                            <button id="generate-appskey" class="generate-appskey"><i class="fa-solid fa-shuffle"></i>Generate</button>
+                        </div>
+                    </div>
+
+                </div>
+            
+            </div>
+
             <div class="advance-container">
 
                 <div class="title-container">
                     <div class="closed-advance-container">
                         <h2>Advance Settings</h2>
-                        <p>Click to open.</p>
+                        <div class="svg">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="33px" viewBox="0 -960 960 960" width="33px" fill="#333"><path d="M521.33-480.67 328-674l47.33-47.33L616-480.67 375.33-240 328-287.33l193.33-193.34Z"/></svg>
+                        </div>
                     </div>
                     <a href="" id="restore" class="restore">Restore default</a>
                 </div>
@@ -270,5 +309,5 @@
 
 
 </body>
-<script src="/js/script.js"></script>
+<script src="js/script.js"></script>
 </html>
