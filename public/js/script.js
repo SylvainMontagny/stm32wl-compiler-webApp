@@ -331,30 +331,43 @@ document.querySelectorAll('input, select').forEach(input => {
 // Restaurer les données au chargement de la page
 window.addEventListener('load', restoreFormData);
 
+function formatEUI(str){
+    return `0x${str.match(/.{1,2}/g).join(', 0x')}`
+}
+
+function formatAddr(str){
+    return "0x"+str;
+}
+
+function formatKey(str){
+    return str.match(/.{1,2}/g).join(',');
+}
+
 function getFormJsonString(){
     let formData = {
-        activationMode: document.getElementById('activation-mode').value,
-        class: document.getElementById('class').value,
-        spreadingFactor: document.getElementById('spreading-factor').value,
-        adaptativeDr: document.querySelector('input[name="adaptative-dr"]:checked').value,
-        confirmation: document.querySelector('input[name="confirmation"]:checked').value,
-        appPort: document.getElementById('app_port').value,
-        sendMode: document.querySelector('input[name="send-mode"]:checked').value,
-        frameDelay: document.getElementById('frame-delay').value,
-        hello: document.getElementById('hello').checked,
-        temperature: document.getElementById('temperature').checked,
-        humidity: document.getElementById('humidity').checked,
-        lowPower: document.querySelector('input[name="low-power"]:checked').value,
-        cayenneLpp: document.querySelector('input[name="cayenne-lpp"]:checked').value,
-        devEui: document.getElementById('dev-eui').value,
-        appKey: document.getElementById('appkey').value,
-        appEui: document.getElementById('appeui').value,
-        devAddr: document.getElementById('devaddr').value,
-        nwkSKey: document.getElementById('nwkskey').value,
-        appSKey: document.getElementById('appskey').value,
-        adminAppKey: document.getElementById('admin-gen-app-key').value,
-        mrlSim: document.querySelector('input[name="mrl003-sim"]:checked').value,
-        mrlAppPort: document.getElementById('mrl003-app-port').value,
+        ACTIVATION_MODE: document.getElementById('activation-mode').value.toUpperCase(),
+        CLASS: document.getElementById('class').value.toUpperCase(),
+        SPREADING_FACTOR: document.getElementById('spreading-factor').value.toUpperCase(),
+        ADAPTIVE_DR: (document.querySelector('input[name="adaptative-dr"]:checked').value == 'on').toString(),
+        CONFIRMED: (document.querySelector('input[name="confirmation"]:checked').value.toString() == 'on').toString(),
+        APP_PORT: document.getElementById('app_port').value,
+        SEND_BY_PUSH_BUTTON: (document.querySelector('input[name="send-mode"]:checked').value == 'push-button').toString(),
+        FRAME_DELAY: document.getElementById('frame-delay').value,
+        PAYLOAD_HELLO: document.getElementById('hello').checked.toString(),
+        PAYLOAD_TEMPERATURE: document.getElementById('temperature').checked.toString(),
+        PAYLOAD_HUMIDITY: document.getElementById('humidity').checked.toString(),
+        LOW_POWER: (document.querySelector('input[name="low-power"]:checked').value == 'enabled').toString(),
+        CAYENNE_LPP_: (document.querySelector('input[name="cayenne-lpp"]:checked').value == 'enabled').toString(),
+        devEUI_: formatEUI(document.getElementById('dev-eui').value),
+        appKey_: formatKey(document.getElementById('appkey').value.toUpperCase()),
+        appEUI_: formatEUI(document.getElementById('appeui').value),
+        devAddr_: formatAddr(document.getElementById('devaddr').value),
+        nwkSKey_: formatKey(document.getElementById('nwkskey').value),
+        appSKey_: formatKey(document.getElementById('appskey').value),
+        ADMIN_SENSOR: (document.querySelector('input[name="admin-sensor"]:checked').value == 'enabled').toString(),
+        ADMIN_GEN_APP_KEY: formatKey(document.getElementById('admin-gen-app-key').value),
+        MLR003_SIMU: (document.querySelector('input[name="mrl003-sim"]:checked').value == 'on').toString(),
+        MLR003_APP_PORT: document.getElementById('mrl003-app-port').value,
     };
 
     return JSON.stringify(formData, null, 2);
@@ -363,6 +376,7 @@ function getFormJsonString(){
 // Button to compile
 document.getElementById('generate-firmware').addEventListener('click', function() {
     let jsonString = getFormJsonString();
+    console.log(jsonString);
     compileFirmware(jsonString);
 } );
 

@@ -15,8 +15,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-startCompilerContainer(15);
-
 // Route compile
 app.post('/compile', (req, res) => {
     const formData = req.body;
