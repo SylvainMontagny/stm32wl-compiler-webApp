@@ -331,9 +331,7 @@ document.querySelectorAll('input, select').forEach(input => {
 // Restaurer les données au chargement de la page
 window.addEventListener('load', restoreFormData);
 
-
-// génère un json avec les données du formulaire
-document.getElementById('generate-firmware').addEventListener('click', function() {
+function getFormJsonString(){
     let formData = {
         activationMode: document.getElementById('activation-mode').value,
         class: document.getElementById('class').value,
@@ -359,14 +357,42 @@ document.getElementById('generate-firmware').addEventListener('click', function(
         mrlAppPort: document.getElementById('mrl003-app-port').value,
     };
 
-    let json = JSON.stringify(formData, null, 2);
-    let blob = new Blob([json], {type: "application/json"});
-    let url = URL.createObjectURL(blob);
-    let a = document.createElement('a');
-    a.href = url;
-    a.download = 'firmware.json';
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    return JSON.stringify(formData, null, 2);
+}
+
+// Button to compile
+document.getElementById('generate-firmware').addEventListener('click', function() {
+    let jsonString = getFormJsonString();
+    compileFirmware(jsonString);
 } );
+
+// function compile firmware from jsonString of all form data
+function compileFirmware(jsonString){
+    console.log(jsonString);
+    fetch('/compile', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: jsonString
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.blob();
+        }
+        throw new Error('Erreur lors du téléchargement du fichier.');
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'STM32WL-standalone.bin';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url); 
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+    });
+}

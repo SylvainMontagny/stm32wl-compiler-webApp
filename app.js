@@ -17,8 +17,8 @@ app.get('/', (req, res) => {
 
 // Route compile
 app.post('/compile', (req, res) => {
-    const filename = req.body.filename;
-    console.log(filename);
+    const formData = req.body;
+    console.log(formData);
 
     //simulate compilation
     setTimeout(() => {
