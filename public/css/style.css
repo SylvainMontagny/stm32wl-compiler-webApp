@@ -268,7 +268,7 @@ button.generate-appskey {
     display: none;
 }
 
-.advance-container .title-container {
+.advance-container .title-container .closed-advance-container{
     cursor: pointer;
 }
 
