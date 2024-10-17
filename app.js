@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { dockerfunctions, createContainer } = require('./docker/dockerfunctions');
+const { dockerfunctions, createContainer, startCompilerContainer } = require('./docker/dockerfunctions');
 
 const app = express();
 const port = process.env.PORT || 4050;
@@ -11,6 +11,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
+startCompilerContainer(15);
 
 // Start serveur sur port 4050
 app.listen(port, () => {
