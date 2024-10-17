@@ -4,7 +4,7 @@ const path = require('path');
 var stream = require('stream');
 
 const fs = require('fs-extra');
-const homepath = '/home/elias' // path where configs and results should be stored
+const volumepath = '/home' // path where configs and results should be stored
 
 //jsonTest = ["ACTIVATION_MODE" : "OTAA","CLASS" : "CLASS_A"]
 
@@ -34,8 +34,8 @@ async function startCompilerContainer(id){
         Image: 'stm32wl', // Compiler image
         HostConfig: {
             Binds: [
-            `${homepath}/configs/${id}:/workspace/config`, // Config folder
-            `${homepath}/results/${id}:/result`            // Result folder
+            `${volumepath}/configs/${id}:/workspace/config`, // Config folder
+            `${volumepath}/results/${id}:/result`            // Result folder
             ]
         }
         });

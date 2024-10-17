@@ -15,6 +15,8 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+startCompilerContainer(15);
+
 // Route compile
 app.post('/compile', (req, res) => {
     const formData = req.body;
@@ -22,10 +24,10 @@ app.post('/compile', (req, res) => {
 
     //simulate compilation
     setTimeout(() => {
-        fs.readFile(path.join(__dirname, `../../../results/STM32WL-standalone.bin`), 'utf8', (err, data) => {
+        fs.readFile(path.join(__dirname, `../../../results/15/STM32WL-standalone.bin`), 'utf8', (err, data) => {
 
             // Send file
-            res.download(path.join(__dirname, `../../../results/STM32WL-standalone.bin`), (err) => {
+            res.download(path.join(__dirname, `../../../results/15/STM32WL-standalone.bin`), (err) => {
                 if (err) {
                     return res.status(500).send('Error sending file');
                 }
