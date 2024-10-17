@@ -2,7 +2,6 @@ const Docker = require('dockerode');
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 const path = require('path');
 var stream = require('stream');
-const path = require('path');
 const fs = require('fs').promises;
 
 async function compile(jsonConfig) {
@@ -24,6 +23,12 @@ async function createRepoDirs(id_random) {
     createDir('./results', id_random)
 }
 
+async function processCFile(id_random, jsonConfig) {
+    await addCFiles(id_random)  
+    const source = await renameCFile(id_random)
+    await modifyCFile(source, jsonConfig); 
+}
+
 async function createDir(parentDir, id) {
     const newDir = path.join(parentDir, id);
     try {
@@ -36,12 +41,6 @@ async function createDir(parentDir, id) {
             console.error(`Erreur lors de la vérification du dossier: ${err}`);
         }
     }
-}
-
-async function processCFile(id_random, jsonConfig) {
-    await addCFiles(id_random)  
-    const source = await renameCFile(id_random)
-    await modifyCFile(source, jsonConfig); 
 }
 
 async function addCFiles(id_random) {
@@ -170,5 +169,6 @@ function containerLogs(container) {
 }
 
 module.exports = {
-    startCompilerContainer
+    //startCompilerContainer
+    compile
 };

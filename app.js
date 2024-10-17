@@ -20,6 +20,7 @@ app.get('/', (req, res) => {
 app.post('/compile', (req, res) => {
     const formData = req.body;
     console.log(formData);
+    compile(formData)
 
     //simulate compilation
     setTimeout(() => {
