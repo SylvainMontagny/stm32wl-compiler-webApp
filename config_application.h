@@ -17,11 +17,11 @@
 #define devEUI_						{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
 
 // Configuration for ABP Activation Mode
-#define devAddr_ 					( uint32_t )0x00000000
-#define nwkSKey_ 					00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00
-#define appSKey_ 					00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00
+#define devAddr_ 					( uint32_t ){0x00000000}
+#define nwkSKey_ 					{00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00}
+#define appSKey_ 					{00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00}
 
 
 // Configuration for OTAA Activation Mode
-#define appKey_						00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00
+#define appKey_						{00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00}
 #define appEUI_						{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
