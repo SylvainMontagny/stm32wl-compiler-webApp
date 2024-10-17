@@ -164,6 +164,12 @@ select {
     gap: 10px;
 }
 
+.radio-button input[type="radio"],
+.radio-button input[type="checkbox"],
+.radio-button label {
+    cursor: pointer;
+}
+
 /* Application Form Styles */
 .application-form {
     display: grid;
