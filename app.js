@@ -37,6 +37,8 @@ app.post('/compile', (req, res) => {
 
 });
 
+compile();
+
 
 // Start serveur on port 4050
 app.listen(port, () => {

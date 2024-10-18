@@ -160,8 +160,8 @@ sim_off.addEventListener('change', sim_offError);
 let r_lorawan = document.getElementById('restore-lorawan');
 r_lorawan.addEventListener('click', function() {
     document.getElementById('activation-mode').value = 'otaa';
-    document.getElementById('class').value = 'class-a';
-    document.getElementById('spreading-factor').value = 'sf7';
+    document.getElementById('class').value = 'class_a';
+    document.getElementById('spreading-factor').value = '7';
     document.getElementById('adaptative-dr-off').checked = true;
     document.getElementById('confirmation-off').checked = true;
     document.getElementById('app_port').value = '15';
@@ -299,8 +299,8 @@ function restoreFormData() {
         const formData = JSON.parse(savedData);
 
         document.getElementById('activation-mode').value = formData.activationMode || 'otaa';
-        document.getElementById('class').value = formData.class || 'class-a';
-        document.getElementById('spreading-factor').value = formData.spreadingFactor || 'sf7';
+        document.getElementById('class').value = formData.class || 'class_a';
+        document.getElementById('spreading-factor').value = formData.spreadingFactor || '7';
         document.querySelector(`input[name="adaptative-dr"][value="${formData.adaptativeDr || 'off'}"]`).checked = true;
         document.querySelector(`input[name="confirmation"][value="${formData.confirmation || 'off'}"]`).checked = true;
         document.getElementById('app_port').value = formData.appPort || '15';
@@ -364,10 +364,10 @@ function getFormJsonString(){
         devAddr_: formatAddr(document.getElementById('devaddr').value),
         nwkSKey_: formatKey(document.getElementById('nwkskey').value),
         appSKey_: formatKey(document.getElementById('appskey').value),
-        ADMIN_SENSOR: (document.querySelector('input[name="admin-sensor"]:checked').value == 'enabled').toString(),
-        ADMIN_GEN_APP_KEY: formatKey(document.getElementById('admin-gen-app-key').value),
+        ADMIN_SENSOR_ENABLED: (document.querySelector('input[name="admin-sensor"]:checked').value == 'enabled').toString(),
         MLR003_SIMU: (document.querySelector('input[name="mrl003-sim"]:checked').value == 'on').toString(),
         MLR003_APP_PORT: document.getElementById('mrl003-app-port').value,
+        ADMIN_GEN_APP_KEY: formatKey(document.getElementById('admin-gen-app-key').value),
     };
 
     return JSON.stringify(formData, null, 2);
@@ -377,12 +377,11 @@ function getFormJsonString(){
 document.getElementById('generate-firmware').addEventListener('click', function() {
     let jsonString = getFormJsonString();
     console.log(jsonString);
-    compileFirmware(jsonString);
+    //compileFirmware(jsonString);
 } );
 
 // function compile firmware from jsonString of all form data
 function compileFirmware(jsonString){
-    console.log(jsonString);
     fetch('/compile', {
         method: 'POST',
         headers: {
