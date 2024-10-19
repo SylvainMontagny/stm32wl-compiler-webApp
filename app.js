@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 
 const fs = require('fs');
-const { dockerfunctions, initSharedVolume, compile } = require('./docker/dockerfunctions');
+const { dockerfunctions, initSharedVolume, compile, randomId, volName, compiledFile } = require('./docker/dockerfunctions');
 
 const app = express();
 const port = process.env.PORT || 4050;
@@ -19,23 +19,25 @@ app.get('/', (req, res) => {
 });
 
 // Route compile
-app.post('/compile', (req, res) => {
+app.post('/compile', async (req, res) => {
     const formData = req.body;
-    console.log(formData);
-    compile(formData)
 
-    //simulate compilation
-    setTimeout(() => {
-        fs.readFile(path.join(__dirname, `../../../results/15/STM32WL-standalone.bin`), 'utf8', (err, data) => {
+    let id = randomId()
+    let compiledPath = `/${volName}/results/${id}/${compiledFile}`
 
-            // Send file
-            res.download(path.join(__dirname, `../../../results/15/STM32WL-standalone.bin`), (err) => {
-                if (err) {
-                    return res.status(500).send('Error sending file');
-                }
-            });
+    let status = await compile(id, formData)
+    if (status === 0) {
+        // Send compiled file data to client
+        res.download(compiledPath, (err) => {
+            if (err) {
+                console.error(err);
+                res.status(500).send('Error downloading the file');
+            }
         });
-    }, 2000);
+    } else {
+        // Send an error response
+        res.status(400).send('Compilation Error');
+    }
 
 });
 

@@ -173,7 +173,7 @@ r_lorawan.addEventListener('click', function() {
 let r_app = document.getElementById('restore-app');
 r_app.addEventListener('click', function() {
     document.getElementById('send-every-frame-delay').checked = true;
-    document.getElementById('frame-delay').value = '10';
+    document.getElementById('frame-delay').value = '10000';
     document.getElementById('temperature').checked = false;
     document.getElementById('humidity').checked = false;
     document.getElementById('cayenne-lpp-disabled').checked = true;
@@ -377,35 +377,35 @@ function getFormJsonString(){
 document.getElementById('generate-firmware').addEventListener('click', function() {
     let jsonString = getFormJsonString();
     console.log(jsonString);
-    //compileFirmware(jsonString);
+    compileFirmware(jsonString);
 } );
 
 // function compile firmware from jsonString of all form data
-function compileFirmware(jsonString){
-    fetch('/compile', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: jsonString
-    })
-    .then(response => {
+async function compileFirmware(jsonString){
+    try {
+        const response = await fetch('/compile', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: jsonString,
+        });
+
         if (response.ok) {
-            return response.blob();
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'STM32WL-standalone.bin';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        } else {
+            const errorText = await response.text();
+            alert('Error: ' + errorText);
         }
-        throw new Error('Erreur lors du téléchargement du fichier.');
-    })
-    .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'STM32WL-standalone.bin';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url); 
-    })
-    .catch(error => {
-        console.error('Erreur:', error);
-    });
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while compiling the code');
+    }
 }
