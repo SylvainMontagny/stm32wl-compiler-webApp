@@ -339,7 +339,7 @@ function getFormJsonString() {
         CONFIRMED: (document.querySelector('input[name="confirmation"]:checked').value.toString() == 'on').toString(),
         APP_PORT: document.getElementById('app_port').value,
         SEND_BY_PUSH_BUTTON: (document.querySelector('input[name="send-mode"]:checked').value == 'push-button').toString(),
-        FRAME_DELAY: document.getElementById('frame-delay').value,
+        FRAME_DELAY: document.getElementById('frame-delay').value * 100,
         PAYLOAD_HELLO: elements.hello.checked.toString(),
         PAYLOAD_TEMPERATURE: elements.temperature.checked.toString(),
         PAYLOAD_HUMIDITY: elements.humidity.checked.toString(),
