@@ -1,272 +1,259 @@
-// Display advanced settings form
-let advancedContainer = document.querySelector('.advance-container .title-container .closed-advance-container');
-let svg_arrow = document.querySelector('.advance-container .title-container .closed-advance-container .svg');
-advancedContainer.addEventListener('click', function() {
-    let advancedForm = document.querySelector('.advanced-settings-form');
-    let restore = document.querySelector('.advance-container .title-container .restore');
+const elements = {
+    advancedContainer: document.querySelector('.advance-container .title-container .closed-advance-container'),
+    svgArrow: document.querySelector('.advance-container .title-container .closed-advance-container .svg'),
+    advancedForm: document.querySelector('.advanced-settings-form'),
+    restore: document.querySelector('.advance-container .title-container .restore'),
+    activationMode: document.getElementById('activation-mode'),
+    otaaContainer: document.querySelector('.otaa-container'),
+    abpContainer: document.querySelector('.abp-container'),
+    hello: document.getElementById('hello'),
+    helloLabel: document.querySelector('label[for="hello"]'),
+    temperature: document.getElementById('temperature'),
+    temperatureLabel: document.querySelector('label[for="temperature"]'),
+    humidity: document.getElementById('humidity'),
+    humidityLabel: document.querySelector('label[for="humidity"]'),
+    cayenne1: document.getElementById('cayenne-lpp-enabled'),
+    cayenne1Label: document.querySelector('label[for="cayenne-lpp-enabled"]'),
+    cayenne2: document.getElementById('cayenne-lpp-disabled'),
+    cayenne2Label: document.querySelector('label[for="cayenne-lpp-disabled"]'),
+    simOn: document.getElementById('mrl003-sim-on'),
+    simOff: document.getElementById('mrl003-sim-off'),
+    rLorawan: document.getElementById('restore-lorawan'),
+    rApp: document.getElementById('restore-app'),
+    rAdvance: document.getElementById('restore-adv'),
+    generateDevEui: document.getElementById('generate-dev-eui'),
+    generateAppKey: document.getElementById('generate-appkey'),
+    generateAppEUI: document.getElementById('generate-appeui'),
+    generateDevAddr: document.getElementById('generate-devaddr'),
+    generateNwkskey: document.getElementById('generate-nwkskey'),
+    generateAppskey: document.getElementById('generate-appskey'),
+    generateAdminAppKey: document.getElementById('generate-admin-gen-app-key'),
+    devEui: document.getElementById('dev-eui'),
+    appKey: document.getElementById('appkey'),
+    appEui: document.getElementById('appeui'),
+    devAddr: document.getElementById('devaddr'),
+    nwksKey: document.getElementById('nwkskey'),
+    appsKey: document.getElementById('appskey'),
+    adminAppKey: document.getElementById('admin-gen-app-key'),
+    mrlAppPort: document.getElementById('mrl003-app-port'),
+    generateFirmware: document.getElementById('generate-firmware'),
+};
 
-    if (advancedForm.style.display === '' || advancedForm.style.display === 'none') {
-        advancedForm.style.display = 'grid'; 
-        restore.style.display = 'block';      
-        svg_arrow.style.transform = 'rotate(90deg)'; 
+// Display advanced settings form
+elements.advancedContainer.addEventListener('click', function() {
+    if (elements.advancedForm.style.display === '' || elements.advancedForm.style.display === 'none') {
+        elements.advancedForm.style.display = 'grid'; 
+        elements.restore.style.display = 'block';      
+        elements.svgArrow.style.transform = 'rotate(90deg)'; 
     } else {
-        advancedForm.style.display = 'none'; 
-        restore.style.display = 'none';  
-        svg_arrow.style.transform = 'rotate(0deg)';
+        elements.advancedForm.style.display = 'none'; 
+        elements.restore.style.display = 'none';  
+        elements.svgArrow.style.transform = 'rotate(0deg)';
     }
 });
-
 
 // Display OTAA ABP
-let activation_mode = document.getElementById('activation-mode');
-activation_mode.addEventListener('change', function() {
-    if(activation_mode.value === 'otaa') {
-        document.querySelector('.otaa-container').style.display = 'block';
-        document.querySelector('.abp-container').style.display = 'none';
+function otaaAbp() {
+    if (elements.activationMode.value === 'otaa') {
+        elements.otaaContainer.style.display = 'block';
+        elements.abpContainer.style.display = 'none';
     } else {
-        document.querySelector('.otaa-container').style.display = 'none';
-        document.querySelector('.abp-container').style.display = 'block';
+        elements.otaaContainer.style.display = 'none';
+        elements.abpContainer.style.display = 'block';
     }
-});
+}
+elements.activationMode.addEventListener('change', otaaAbp);
 
 // Payload Hello error
-let hello = document.getElementById('hello');
-let hello_label = document.querySelector('label[for="hello"]');
-let temperature = document.getElementById('temperature');
-let temperature_label = document.querySelector('label[for="temperature"]');
-let humidity = document.getElementById('humidity');
-let humidity_label = document.querySelector('label[for="humidity"]');
-let cayenne_1 = document.getElementById('cayenne-lpp-enabled');
-let cayenne_1_label = document.querySelector('label[for="cayenne-lpp-enabled"]');
-let cayenne_2 = document.getElementById('cayenne-lpp-disabled');
-let cayenne_2_label = document.querySelector('label[for="cayenne-lpp-disabled"]'); 
-
 function helloError() {
-    if(hello.checked) { 
-        temperature.disabled = true;
-        humidity.disabled = true;
-        cayenne_1.disabled = true;
-        cayenne_2.disabled = true;
-        cayenne_1_label.style.color = '#D1D1D1';
-        cayenne_2_label.style.color = '#D1D1D1';
-        temperature_label.style.color = '#D1D1D1';
-        humidity_label.style.color = '#D1D1D1';
+    if (elements.hello.checked) { 
+        elements.temperature.disabled = true;
+        elements.humidity.disabled = true;
+        elements.cayenne1.disabled = true;
+        elements.cayenne2.disabled = true;
+        elements.cayenne1Label.style.color = '#D1D1D1';
+        elements.cayenne2Label.style.color = '#D1D1D1';
+        elements.temperatureLabel.style.color = '#D1D1D1';
+        elements.humidityLabel.style.color = '#D1D1D1';
     } else {
-        temperature.disabled = false;
-        humidity.disabled = false;
-        cayenne_1.disabled = false;
-        cayenne_2.disabled = false;
-        cayenne_1_label.style.color = '#000';
-        cayenne_2_label.style.color = '#000';
-        temperature_label.style.color = '#000';
-        humidity_label.style.color = '#000';
+        elements.temperature.disabled = false;
+        elements.humidity.disabled = false;
+        elements.cayenne1.disabled = false;
+        elements.cayenne2.disabled = false;
+        elements.cayenne1Label.style.color = '#000';
+        elements.cayenne2Label.style.color = '#000';
+        elements.temperatureLabel.style.color = '#000';
+        elements.humidityLabel.style.color = '#000';
     }
 }
 
-hello.addEventListener('change', helloError);
+elements.hello.addEventListener('change', helloError);
 
 // Payload Temperature error, Humidity error, Cayenne error
-
 function humidityError() {
-    if(humidity.checked) {
-        hello.disabled = true;
-        hello_label.style.color = '#D1D1D1';
-    } else if(!temperature.checked && !cayenne_1.checked) {
-        hello.disabled = false;
-        hello_label.style.color = '#000';
+    if (elements.humidity.checked) {
+        elements.hello.disabled = true;
+        elements.helloLabel.style.color = '#D1D1D1';
+    } else if (!elements.temperature.checked && !elements.cayenne1.checked) {
+        elements.hello.disabled = false;
+        elements.helloLabel.style.color = '#000';
     }
 }
 
-humidity.addEventListener('change', humidityError);
-
+elements.humidity.addEventListener('change', humidityError);
 
 function temperatureError() {
-    if(temperature.checked) {
-        hello.disabled = true;
-        hello_label.style.color = '#D1D1D1';
-    } else if(!humidity.checked && !cayenne_1.checked) {
-        hello.disabled = false;
-        hello_label.style.color = '#000';
+    if (elements.temperature.checked) {
+        elements.hello.disabled = true;
+        elements.helloLabel.style.color = '#D1D1D1';
+    } else if (!elements.humidity.checked && !elements.cayenne1.checked) {
+        elements.hello.disabled = false;
+        elements.helloLabel.style.color = '#000';
     }
 }
 
-temperature.addEventListener('change', temperatureError);
-
+elements.temperature.addEventListener('change', temperatureError);
 
 function cayenne1Error() {
-    if(cayenne_1.checked) {
-        hello.disabled = true;
-        hello_label.style.color = '#D1D1D1';
+    if (elements.cayenne1.checked) {
+        elements.hello.disabled = true;
+        elements.helloLabel.style.color = '#D1D1D1';
     } 
 }
 
-cayenne_1.addEventListener('change', cayenne1Error);
-
+elements.cayenne1.addEventListener('change', cayenne1Error);
 
 function cayenne2Error() {
-    if(cayenne_2.checked && !humidity.checked && !temperature.checked) {
-        hello.disabled = false;
-        hello_label.style.color = '#000';
+    if (elements.cayenne2.checked && !elements.humidity.checked && !elements.temperature.checked) {
+        elements.hello.disabled = false;
+        elements.helloLabel.style.color = '#000';
     }
 }
 
-cayenne_2.addEventListener('change', cayenne2Error);
-
+elements.cayenne2.addEventListener('change', cayenne2Error);
 
 // MRL003 Simulation error
-let sim_on = document.getElementById('mrl003-sim-on');
-let sim_off = document.getElementById('mrl003-sim-off');
-
-function sim_onError() {
-    hello.disabled = true;
-    hello_label.style.color = '#D1D1D1';
-    temperature.disabled = true;
-    humidity.disabled = true;
-    cayenne_1.disabled = true;
-    cayenne_2.disabled = true;
-    cayenne_1_label.style.color = '#D1D1D1';
-    cayenne_2_label.style.color = '#D1D1D1';
-    temperature_label.style.color = '#D1D1D1';
-    humidity_label.style.color = '#D1D1D1';
-    hello.checked = false;
-    temperature.checked = false;
-    humidity.checked = false;
-    cayenne_1.checked = false;
-    cayenne_2.checked = true;
+function simOnError() {
+    elements.hello.disabled = true;
+    elements.helloLabel.style.color = '#D1D1D1';
+    elements.temperature.disabled = true;
+    elements.humidity.disabled = true;
+    elements.cayenne1.disabled = true;
+    elements.cayenne2.disabled = true;
+    elements.cayenne1Label.style.color = '#D1D1D1';
+    elements.cayenne2Label.style.color = '#D1D1D1';
+    elements.temperatureLabel.style.color = '#D1D1D1';
+    elements.humidityLabel.style.color = '#D1D1D1';
+    elements.hello.checked = false;
+    elements.temperature.checked = false;
+    elements.humidity.checked = false;
+    elements.cayenne1.checked = false;
+    elements.cayenne2.checked = true;
 }
 
-sim_on.addEventListener('change', sim_onError);
+elements.simOn.addEventListener('change', simOnError);
 
-
-function sim_offError() {
-    hello.disabled = false;
-    hello_label.style.color = '#000';
-    temperature.disabled = false;
-    humidity.disabled = false;
-    cayenne_1.disabled = false;
-    cayenne_2.disabled = false;
-    cayenne_1_label.style.color = '#000';
-    cayenne_2_label.style.color = '#000';
-    temperature_label.style.color = '#000';
-    humidity_label.style.color = '#000';
+function simOffError() {
+    elements.hello.disabled = false;
+    elements.helloLabel.style.color = '#000';
+    elements.temperature.disabled = false;
+    elements.humidity.disabled = false;
+    elements.cayenne1.disabled = false;
+    elements.cayenne2.disabled = false;
+    elements.cayenne1Label.style.color = '#000';
+    elements.cayenne2Label.style.color = '#000';
+    elements.temperatureLabel.style.color = '#000';
+    elements.humidityLabel.style.color = '#000';
 }
 
-sim_off.addEventListener('change', sim_offError);
-
+elements.simOff.addEventListener('change', simOffError);
 
 // Restore default settings
-
-// restore LoRaWAN settings
-let r_lorawan = document.getElementById('restore-lorawan');
-r_lorawan.addEventListener('click', function() {
-    document.getElementById('activation-mode').value = 'otaa';
+elements.rLorawan.addEventListener('click', function() {
+    elements.activationMode.value = 'otaa';
     document.getElementById('class').value = 'class-a';
     document.getElementById('spreading-factor').value = 'sf7';
     document.getElementById('adaptative-dr-off').checked = true;
     document.getElementById('confirmation-off').checked = true;
     document.getElementById('app_port').value = '15';
-    // change the value in the local storage
+    otaaAbp();
     saveFormData();
 });
 
-// restore application settings
-let r_app = document.getElementById('restore-app');
-r_app.addEventListener('click', function() {
+elements.rApp.addEventListener('click', function() {
     document.getElementById('send-every-frame-delay').checked = true;
     document.getElementById('frame-delay').value = '10';
-    document.getElementById('temperature').checked = false;
-    document.getElementById('humidity').checked = false;
-    document.getElementById('cayenne-lpp-disabled').checked = true;
-    document.getElementById('hello').checked = true;
+    elements.temperature.checked = false;
+    elements.humidity.checked = false;
+    elements.cayenne2.checked = true;
+    elements.hello.checked = true;
     document.getElementById('low-power-disabled').checked = true;
-    // change the value in the local storage
     saveFormData();
 });
 
-// restore advance settings
-let r_advance = document.getElementById('restore-adv');
-r_advance.addEventListener('click', function() {
+elements.rAdvance.addEventListener('click', function() {
     document.getElementById('admin-sensor-disabled').checked = true;
-    document.getElementById('mrl003-app-port').value = '30';
-    document.getElementById('mrl003-sim-off').checked = true;
-    sim_offError();
-    // change the value in the local storage
+    elements.mrlAppPort.value = '30';
+    elements.simOff.checked = true;
+    simOffError();
     saveFormData();
 });
 
-
-
-// generate random credentials
+// Generate random credentials
 const genRandomKey = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-let generate_deveui = document.getElementById('generate-dev-eui');
-let generate_appKey = document.getElementById('generate-appkey');
-let generate_appEUI = document.getElementById('generate-appeui');
-let generate_devAddr = document.getElementById('generate-devaddr');
-let generate_nwkskey = document.getElementById('generate-nwkskey');
-let generate_appskey = document.getElementById('generate-appskey');
-let generate_adminAppKey = document.getElementById('generate-admin-gen-app-key');
 
-// generate random DevEUI
-document.getElementById('dev-eui').value = genRandomKey(16);
-generate_deveui.addEventListener('click', function() {
-    document.getElementById('dev-eui').value = genRandomKey(16);
-    // change the value in the local storage
-    saveFormData();
-});
+window.onload = function() {
+    // Générer des clés aléatoires au chargement initial de la page
+    elements.devEui.value = genRandomKey(16);
+    elements.appKey.value = genRandomKey(32);
+    elements.appEui.value = genRandomKey(16);
+    elements.devAddr.value = genRandomKey(8);
+    elements.nwksKey.value = genRandomKey(32);
+    elements.appsKey.value = genRandomKey(32);
+    elements.adminAppKey.value = genRandomKey(32);
 
-// generate random appKey
-document.getElementById('appkey').value = genRandomKey(32);
-generate_appKey.addEventListener('click', function() {
-    document.getElementById('appkey').value = genRandomKey(32);
-    // change the value in the local storage
-    saveFormData();
-});
+    // Attacher les événements de clic pour générer de nouvelles clés
+    elements.generateDevEui.addEventListener('click', function() {
+        elements.devEui.value = genRandomKey(16);
+        saveFormData();
+    });
 
-// generate random appEUI
-document.getElementById('appeui').value = genRandomKey(16);
-generate_appEUI.addEventListener('click', function() {
-    document.getElementById('appeui').value = genRandomKey(16);
-    // change the value in the local storage
-    saveFormData();
-});
+    elements.generateAppKey.addEventListener('click', function() {
+        elements.appKey.value = genRandomKey(32);
+        saveFormData();
+    });
 
-// generate random devAddr
-document.getElementById('devaddr').value = genRandomKey(8);
-generate_devAddr.addEventListener('click', function() {
-    document.getElementById('devaddr').value = genRandomKey(8);
-    // change the value in the local storage
-    saveFormData();
-});
+    elements.generateAppEUI.addEventListener('click', function() {
+        elements.appEui.value = genRandomKey(16);
+        saveFormData();
+    });
 
-// generate random NwkSKey
-document.getElementById('nwkskey').value = genRandomKey(32);
-generate_nwkskey.addEventListener('click', function() {
-    document.getElementById('nwkskey').value = genRandomKey(32);
-    // change the value in the local storage
-    saveFormData();
-});
+    elements.generateDevAddr.addEventListener('click', function() {
+        elements.devAddr.value = genRandomKey(8);
+        saveFormData();
+    });
 
-// generate random AppSKey
-document.getElementById('appskey').value = genRandomKey(32);
-generate_appskey.addEventListener('click', function() {
-    document.getElementById('appskey').value = genRandomKey(32);
-    // change the value in the local storage
-    saveFormData();
-});
+    elements.generateNwkskey.addEventListener('click', function() {
+        elements.nwksKey.value = genRandomKey(32);
+        saveFormData();
+    });
 
-// generate random adminAppKey
-document.getElementById('admin-gen-app-key').value = genRandomKey(32);
-generate_adminAppKey.addEventListener('click', function() {
-    document.getElementById('admin-gen-app-key').value = genRandomKey(32);
-    // change the value in the local storage
-    saveFormData();
-});
+    elements.generateAppskey.addEventListener('click', function() {
+        elements.appsKey.value = genRandomKey(32);
+        saveFormData();
+    });
+
+    elements.generateAdminAppKey.addEventListener('click', function() {
+        elements.adminAppKey.value = genRandomKey(32);
+        saveFormData();
+    });
+};
 
 
-// Sauvegarder les données dans localStorage
+// Save form data to localStorage
 function saveFormData() {
     const formData = {
-        activationMode: document.getElementById('activation-mode').value,
+        activationMode: elements.activationMode.value,
         class: document.getElementById('class').value,
         spreadingFactor: document.getElementById('spreading-factor').value,
         adaptativeDr: document.querySelector('input[name="adaptative-dr"]:checked').value,
@@ -274,31 +261,31 @@ function saveFormData() {
         appPort: document.getElementById('app_port').value,
         sendMode: document.querySelector('input[name="send-mode"]:checked').value,
         frameDelay: document.getElementById('frame-delay').value,
-        hello: document.getElementById('hello').checked,
-        temperature: document.getElementById('temperature').checked,
-        humidity: document.getElementById('humidity').checked,
+        hello: elements.hello.checked,
+        temperature: elements.temperature.checked,
+        humidity: elements.humidity.checked,
         lowPower: document.querySelector('input[name="low-power"]:checked').value,
         cayenneLpp: document.querySelector('input[name="cayenne-lpp"]:checked').value,
-        devEui: document.getElementById('dev-eui').value,
-        appKey: document.getElementById('appkey').value,
-        appEui: document.getElementById('appeui').value,
-        devAddr: document.getElementById('devaddr').value,
-        nwkSKey: document.getElementById('nwkskey').value,
-        appSKey: document.getElementById('appskey').value,
-        adminAppKey: document.getElementById('admin-gen-app-key').value,
+        devEui: elements.devEui.value,
+        appKey: elements.appKey.value,
+        appEui: elements.appEui.value,
+        devAddr: elements.devAddr.value,
+        nwkSKey: elements.nwksKey.value,
+        appSKey: elements.appsKey.value,
+        adminAppKey: elements.adminAppKey.value,
         mrlSim: document.querySelector('input[name="mrl003-sim"]:checked').value,
-        mrlAppPort: document.getElementById('mrl003-app-port').value,
+        mrlAppPort: elements.mrlAppPort.value,
     };
-    localStorage.setItem('formData', JSON.stringify(formData)); // Sauvegarder les données sous forme de JSON
+    localStorage.setItem('formData', JSON.stringify(formData));
 }
 
-// Restaurer les données depuis localStorage
+// Restore form data from localStorage
 function restoreFormData() {
     const savedData = localStorage.getItem('formData');
     if (savedData) {
         const formData = JSON.parse(savedData);
 
-        document.getElementById('activation-mode').value = formData.activationMode || 'otaa';
+        elements.activationMode.value = formData.activationMode || 'otaa';
         document.getElementById('class').value = formData.class || 'class-a';
         document.getElementById('spreading-factor').value = formData.spreadingFactor || 'sf7';
         document.querySelector(`input[name="adaptative-dr"][value="${formData.adaptativeDr || 'off'}"]`).checked = true;
@@ -306,55 +293,68 @@ function restoreFormData() {
         document.getElementById('app_port').value = formData.appPort || '15';
         document.querySelector(`input[name="send-mode"][value="${formData.sendMode || 'every-frame-delay'}"]`).checked = true;
         document.getElementById('frame-delay').value = formData.frameDelay || '10';
-        document.getElementById('hello').checked = formData.hello || false;
-        document.getElementById('temperature').checked = formData.temperature || false;
-        document.getElementById('humidity').checked = formData.humidity || false;
+        elements.hello.checked = formData.hello || false;
+        elements.temperature.checked = formData.temperature || false;
+        elements.humidity.checked = formData.humidity || false;
         document.querySelector(`input[name="low-power"][value="${formData.lowPower || 'disabled'}"]`).checked = true;
         document.querySelector(`input[name="cayenne-lpp"][value="${formData.cayenneLpp || 'disabled'}"]`).checked = true;
-        document.getElementById('dev-eui').value = formData.devEui;
-        document.getElementById('appkey').value = formData.appKey;
-        document.getElementById('appeui').value = formData.appEui;
-        document.getElementById('devaddr').value = formData.devAddr;
-        document.getElementById('nwkskey').value = formData.nwkSKey;
-        document.getElementById('appskey').value = formData.appSKey;
-        document.getElementById('admin-gen-app-key').value = formData.adminAppKey;
+        elements.devEui.value = formData.devEui;
+        elements.appKey.value = formData.appKey;
+        elements.appEui.value = formData.appEui;
+        elements.devAddr.value = formData.devAddr;
+        elements.nwksKey.value = formData.nwkSKey;
+        elements.appsKey.value = formData.appSKey;
+        elements.adminAppKey.value = formData.adminAppKey;
         document.querySelector(`input[name="mrl003-sim"][value="${formData.mrlSim || 'off'}"]`).checked = true;
-        document.getElementById('mrl003-app-port').value = formData.mrlAppPort || '30';
+        elements.mrlAppPort.value = formData.mrlAppPort || '30';
     }
+    otaaAbp();
 }
 
-// Attacher l'événement 'input' pour sauvegarder automatiquement lorsque les champs changent
 document.querySelectorAll('input, select').forEach(input => {
     input.addEventListener('input', saveFormData);
 });
 
-// Restaurer les données au chargement de la page
+// Restore data on page load
 window.addEventListener('load', restoreFormData);
 
-function getFormJsonString(){
+function formatEUI(str){
+    return `0x${str.match(/.{1,2}/g).join(', 0x')}`
+}
+
+function formatAddr(str){
+    return "0x"+str;
+}
+
+function formatKey(str){
+    return str.match(/.{1,2}/g).join(',');
+}
+
+function getFormJsonString() {
     let formData = {
-        activationMode: document.getElementById('activation-mode').value,
-        class: document.getElementById('class').value,
-        spreadingFactor: document.getElementById('spreading-factor').value,
-        adaptativeDr: document.querySelector('input[name="adaptative-dr"]:checked').value,
-        confirmation: document.querySelector('input[name="confirmation"]:checked').value,
-        appPort: document.getElementById('app_port').value,
-        sendMode: document.querySelector('input[name="send-mode"]:checked').value,
-        frameDelay: document.getElementById('frame-delay').value,
-        hello: document.getElementById('hello').checked,
-        temperature: document.getElementById('temperature').checked,
-        humidity: document.getElementById('humidity').checked,
-        lowPower: document.querySelector('input[name="low-power"]:checked').value,
-        cayenneLpp: document.querySelector('input[name="cayenne-lpp"]:checked').value,
-        devEui: document.getElementById('dev-eui').value,
-        appKey: document.getElementById('appkey').value,
-        appEui: document.getElementById('appeui').value,
-        devAddr: document.getElementById('devaddr').value,
-        nwkSKey: document.getElementById('nwkskey').value,
-        appSKey: document.getElementById('appskey').value,
-        adminAppKey: document.getElementById('admin-gen-app-key').value,
-        mrlSim: document.querySelector('input[name="mrl003-sim"]:checked').value,
-        mrlAppPort: document.getElementById('mrl003-app-port').value,
+        ACTIVATION_MODE: elements.activationMode.value.toUpperCase(),
+        CLASS: document.getElementById('class').value.toUpperCase(),
+        SPREADING_FACTOR: document.getElementById('spreading-factor').value.toUpperCase(),
+        ADAPTIVE_DR: (document.querySelector('input[name="adaptative-dr"]:checked').value == 'on').toString(),
+        CONFIRMED: (document.querySelector('input[name="confirmation"]:checked').value.toString() == 'on').toString(),
+        APP_PORT: document.getElementById('app_port').value,
+        SEND_BY_PUSH_BUTTON: (document.querySelector('input[name="send-mode"]:checked').value == 'push-button').toString(),
+        FRAME_DELAY: document.getElementById('frame-delay').value,
+        PAYLOAD_HELLO: elements.hello.checked.toString(),
+        PAYLOAD_TEMPERATURE: elements.temperature.checked.toString(),
+        PAYLOAD_HUMIDITY: elements.humidity.checked.toString(),
+        LOW_POWER: (document.querySelector('input[name="low-power"]:checked').value == 'enabled').toString(),
+        CAYENNE_LPP: (document.querySelector('input[name="cayenne-lpp"]:checked').value == 'enabled').toString(),
+        devEUI: formatEUI(elements.devEui.value),
+        appKey: formatKey(elements.appKey.value.toUpperCase()),
+        appEUI: formatEUI(elements.appEui.value),
+        devAddr: formatAddr(elements.devAddr.value),
+        nwkSKey: formatKey(elements.nwksKey.value),
+        appSKey: formatKey(elements.appsKey.value),
+        ADMIN_SENSOR_ENABLED: (document.querySelector('input[name="admin-sensor"]:checked').value == 'enabled').toString(),
+        MLR003_SIMU: (document.querySelector('input[name="mrl003-sim"]:checked').value == 'on').toString(),
+        MLR003_APP_PORT: elements.mrlAppPort.value,
+        ADMIN_GEN_APP_KEY: formatKey(elements.adminAppKey.value),
     };
 
     return JSON.stringify(formData, null, 2);
@@ -363,12 +363,12 @@ function getFormJsonString(){
 // Button to compile
 document.getElementById('generate-firmware').addEventListener('click', function() {
     let jsonString = getFormJsonString();
-    compileFirmware(jsonString);
+    console.log(jsonString);
+    //compileFirmware(jsonString);
 } );
 
 // function compile firmware from jsonString of all form data
 function compileFirmware(jsonString){
-    console.log(jsonString);
     fetch('/compile', {
         method: 'POST',
         headers: {
