@@ -12,7 +12,7 @@ let jsontest = {
     "CONFIRMED": "false",
     "APP_PORT": "15",
     "SEND_BY_PUSH_BUTTON": "false",
-    "FRAME_DELAY": "10",
+    "FRAME_DELAY": "10000",
     "PAYLOAD_HELLO": "true",
     "PAYLOAD_TEMPERATURE": "false",
     "PAYLOAD_HUMIDITY": "false",
@@ -33,65 +33,89 @@ let jsontest = {
 //keys to set into General_Setup.h
 const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "MLR003_APP_PORT", "ADMIN_GEN_APP_KEY"]
 
-async function compile() {
-    // put General_Setup.h keys in separate json
+const imageName = 'stm32wl' //image of the compiler
+const volName = 'shared-vol' //name of the volume used to store configs and results
+
+async function compile(jsonConfig) {
+    let id_random = randomId()
+    console.log(`Compiling with id : ${id_random}`)
+    let configPath = `/${volName}/configs/${id_random}` // Path for .h files for compiling
+    let resultPath = `/${volName}/results/${id_random}` // Path for .bin compiled files
+
+    // Split input json for the 2 config files
+    // Put General_Setup.h keys in separate json
     jsonAppSetup = jsontest;
     jsonGenSetup = {};
     for (let key of generalSetupKeys) {
         jsonGenSetup[key] = jsonAppSetup[key];
         delete jsonAppSetup[key];
     }
-    console.log(jsonAppSetup);
-    console.log(jsonGenSetup);
 
-    const id_random = randomId()
-    console.log("fichier id : " + id_random)
-    await createRepoDirs(id_random)
-    processHFile(id_random, jsonAppSetup)
+    // Create folders, move and rename templates
+    await setupFiles(id_random,configPath,resultPath);
+    // Modify .h files with json
+    await modifyHFile(`${configPath}/config_application.h`,jsonAppSetup)
+    await modifyHFile(`${configPath}/General_Setup.h`,jsonGenSetup)
+    // Start Compiling
+    let status = await startCompilerContainer(configPath,resultPath)
+    if(status == 0){
+        console.log(`Compiled successfully : ${id_random}`)
+    } else {
+        console.log(`Error while compiling : ${id_random}`)
+    }
 }
 
 function randomId() {
-    const min = 10 ** 14;
-    const max = 10 ** 15;
-    const id_random = (Math.floor(Math.random() * (max - min)) + min).toString();
+    let min = 10 ** 14;
+    let max = 10 ** 15;
+    let id_random = (Math.floor(Math.random() * (max - min)) + min).toString();
     return id_random.toString()
 }
 
-async function createRepoDirs(id_random) {
-    await createDir('./configs', id_random)
-    createDir('./results', id_random)
-}
-
-async function processHFile(id_random, jsonConfig) {
-    await addHFiles(id_random);
-    const source = await renameHFile(id_random);
-    await modifyHFile(source, jsonConfig); 
-}
-
-async function createDir(parentDir, id) {
-    const newDir = path.join(parentDir, id);
+async function initSharedVolume() {
+    console.log(`Initiating shared volume ${volName}`)
     try {
-        await fs.access(newDir);
-        console.log('Le dossier existe déjà:', newDir);
+        await fs.mkdir(`/${volName}/configs`, { recursive: true });
+        console.log(`Init : configs folder created or already there`);
+        await fs.mkdir(`/${volName}/results`, { recursive: true });
+        console.log(`Init : results folder created or already there`);
+    } catch (err) {
+        console.error(`Error initiating shared volume '${volName}':`, err);
+    }
+}
+
+async function setupFiles(id_random,configPath,resultPath){
+    // Templates
+    const sourceConfigAppTemp = `./templates/config_application_template.h`
+    const sourceConfigGenTemp = `./templates/General_Setup_template.h`
+
+    // Creating folders
+    await createDir(configPath)
+    await createDir(resultPath)
+    // Moving templates
+    await copyFile(sourceConfigAppTemp, configPath)
+    await copyFile(sourceConfigGenTemp, configPath)
+    // Renaming templates
+    await renameFile(`${configPath}/config_application_template.h`,`${configPath}/config_application.h`)
+    await renameFile(`${configPath}/General_Setup_template.h`,`${configPath}/General_Setup.h`)
+}
+
+async function createDir(dir) {
+    try {
+        await fs.access(dir);
+        console.log(`Folder already exist : ${dir}`);
     } catch (err) {
         if (err.code === 'ENOENT') {
-            await fs.mkdir(newDir, { recursive: true });
+            await fs.mkdir(dir, { recursive: true });
         } else {
-            console.error(`Erreur lors de la vérification du dossier: ${err}`);
+            console.error(`Error verrifying file : ${err}`);
         }
     }
 }
 
-async function addHFiles(id_random) {
-    const sourceConfigAppTemp = `./templates/config_application_template.h`
-    const sourceConfigGenTemp = `./templates/General_Setup_template.h`
-    await copyFile(sourceConfigAppTemp, './configs/' + id_random)
-    copyFile(sourceConfigGenTemp, './configs/' + id_random)
-}
-
 async function modifyHFile(source, jsonConfig) {
     try {
-        // Lire le fichier de manière asynchrone
+        // Read async
         let data = await fs.readFile(source, 'utf8');
         let modifiedData = data;
         
@@ -99,98 +123,101 @@ async function modifyHFile(source, jsonConfig) {
             const regex = new RegExp(`<${key}>`);
             modifiedData = modifiedData.replace(regex,value);
         }
-        // Écrire les changements dans le fichier
+        // Write changes to file
         await writeFileAsync(source, modifiedData);
     } catch (err) {
-        console.error(`Erreur lors de la lecture ou l'écriture du fichier : ${err}`);
+        console.error(`Error reading or writing in file : ${err}`);
     }
 }
 
 async function copyFile(source, destination) {
-    const fileName = path.basename(source); // Récupérer le nom du fichier
-    const destPath = path.join(destination, fileName); // Créer le chemin de destination complet
+    let fileName = path.basename(source); // Get file name
+    let destPath = path.join(destination, fileName); // Get full path
 
     try {
         await fs.copyFile(source, destPath);
     } catch (err) {
-        console.error('Erreur lors de la copie du fichier:', err);
+        console.error('Error copying file :', err);
     }
 }
 
 async function writeFileAsync(source, modifiedData) {    
     try {
         await fs.writeFile(source, modifiedData);
-        console.log("modifié")
+        console.log(`${source} modified`)
     } catch (err) {
-        console.error(`Erreur lors de l'écriture du fichier: ${err}`);
+        console.error(`Error writing in file : ${err}`);
     }
 }
 
-async function renameHFile(id_random) {
-    const source = `./configs/${id_random}/config_application_template.h`;
-    const destination = `./configs/${id_random}/config_application.h`;
+async function renameFile(source, destination) {
     try {
         await fs.rename(source, destination);
     } catch (err) {
-        console.error('Erreur lors du renommage du fichier :', err);
+        console.error('Error renaming file :', err);
     }
     return destination; 
 }
 
-const volumepath = '/home' // path where configs and results should be stored
-
-async function startCompilerContainer(id){
+async function startCompilerContainer(configPath, resultPath){
+    const compiledFile = 'STM32WL-standalone.bin'
     try {
-        // Create container
+        // Start compiler with custom CMD
         const container = await docker.createContainer({
-        Image: 'stm32wl', // Compiler image
-        HostConfig: {
-            Binds: [
-            `${volumepath}/configs/${id}:/workspace/config`, // Config folder
-            `${volumepath}/results/${id}:/result`            // Result folder
-            ]
+            Image: imageName, // Compiler image
+            HostConfig: {
+                Binds: [`${volName}:/${volName}`] // Volume that stores configs and results data
+            },
+            // Move configs files to /config, make, and then put .bin into resultpath
+            Cmd: [`/bin/bash`, `-c`, `mv ${configPath}/config_application.h ${configPath}/General_Setup.h config/ && make && mv ${compiledFile} ${resultPath}`]
+        });
+
+        // Start container
+        await container.start();
+        console.log(`Container started: ${container.id}`);
+
+        // Display logs
+        containerLogs(container);
+
+        // Wait for the container to stop
+        const waitResult = await container.wait();
+        console.log('Container stopped with status:', waitResult.StatusCode);
+
+        // Clean up: remove the container
+        await container.remove({ force: true });
+        console.log("Container removed");
+
+        // Return if the container add an error or not
+        return waitResult.StatusCode
+
+        } catch (error) {
+            console.error('Error starting container :', error);
         }
-        });
-
-        // Start container and display logs
-        await container.start({}, function(err, data) {
-            containerLogs(container);
-        });
-        console.log(`Container started : ${container.id}`);
-
-
-    } catch (error) {
-        console.error('Error starting container :', error);
-    }
 }
 
-// Display container logs on console.log
 function containerLogs(container) {
-    // create a single stream for stdin and stdout
+    // Create a single stream for stdin and stdout
     var logStream = new stream.PassThrough();
     logStream.on('data', function (chunk) {
         console.log(chunk.toString('utf8'));
     });
 
     container.logs({
-    follow: true,
-    stdout: true,
-    stderr: true
-    }, function(err, stream){
-    if(err) {
-        return logger.error(err.message);
-    }
-    container.modem.demuxStream(stream, logStream, logStream);
-    stream.on('end', function(){
-        container.remove({ force: true });
-        console.log("Stopped container");
-        stream.destroy();
-    });
-
+        follow: true,
+        stdout: true,
+        stderr: true
+    }, function (err, stream) {
+        if (err) {
+            return console.error(err.message);
+        }
+        container.modem.demuxStream(stream, logStream, logStream);
+        stream.on('end', function () {
+            stream.destroy();
+        });
     });
 }
 
 module.exports = {
-    //startCompilerContainer
-    compile
+    compile,
+    initSharedVolume
 };

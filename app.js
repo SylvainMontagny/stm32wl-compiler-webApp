@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 
 const fs = require('fs');
-const { dockerfunctions, createContainer, startCompilerContainer, compile } = require('./docker/dockerfunctions');
+const { dockerfunctions, initSharedVolume, compile } = require('./docker/dockerfunctions');
 
 const app = express();
 const port = process.env.PORT || 4050;
@@ -11,7 +11,9 @@ const port = process.env.PORT || 4050;
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
+/* ROUTES */
 
+// Route index
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -37,10 +39,11 @@ app.post('/compile', (req, res) => {
 
 });
 
-compile();
-
+/* INIT */
 
 // Start serveur on port 4050
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
+
+initSharedVolume();
