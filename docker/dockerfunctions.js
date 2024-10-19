@@ -33,18 +33,18 @@ let jsontest = {
 //keys to set into General_Setup.h
 const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "MLR003_APP_PORT", "ADMIN_GEN_APP_KEY"]
 
-const imageName = 'stm32wl' //image of the compiler
-const volName = 'shared-vol' //name of the volume used to store configs and results
+const imageName = 'stm32wl' // image of the compiler
+const volName = 'shared-vol' // name of the volume used to store configs and results
+const compiledFile = 'STM32WL-standalone.bin' // compiled file name
 
-async function compile(jsonConfig) {
-    let id_random = randomId()
-    console.log(`Compiling with id : ${id_random}`)
-    let configPath = `/${volName}/configs/${id_random}` // Path for .h files for compiling
-    let resultPath = `/${volName}/results/${id_random}` // Path for .bin compiled files
+async function compile(id, jsonConfig) {
+    console.log(`Compiling with id : ${id}`)
+    let configPath = `/${volName}/configs/${id}` // Path for .h files for compiling
+    let resultPath = `/${volName}/results/${id}` // Path for .bin compiled files
 
     // Split input json for the 2 config files
     // Put General_Setup.h keys in separate json
-    jsonAppSetup = jsontest;
+    jsonAppSetup = jsonConfig;
     jsonGenSetup = {};
     for (let key of generalSetupKeys) {
         jsonGenSetup[key] = jsonAppSetup[key];
@@ -52,17 +52,18 @@ async function compile(jsonConfig) {
     }
 
     // Create folders, move and rename templates
-    await setupFiles(id_random,configPath,resultPath);
+    await setupFiles(id,configPath,resultPath);
     // Modify .h files with json
     await modifyHFile(`${configPath}/config_application.h`,jsonAppSetup)
     await modifyHFile(`${configPath}/General_Setup.h`,jsonGenSetup)
     // Start Compiling
     let status = await startCompilerContainer(configPath,resultPath)
     if(status == 0){
-        console.log(`Compiled successfully : ${id_random}`)
+        console.log(`Compiled successfully : ${id}`)
     } else {
-        console.log(`Error while compiling : ${id_random}`)
+        console.log(`Error while compiling : ${id}`)
     }
+    return status;
 }
 
 function randomId() {
@@ -160,7 +161,6 @@ async function renameFile(source, destination) {
 }
 
 async function startCompilerContainer(configPath, resultPath){
-    const compiledFile = 'STM32WL-standalone.bin'
     try {
         // Start compiler with custom CMD
         const container = await docker.createContainer({
@@ -219,5 +219,8 @@ function containerLogs(container) {
 
 module.exports = {
     compile,
-    initSharedVolume
+    initSharedVolume,
+    randomId,
+    volName,
+    compiledFile
 };
