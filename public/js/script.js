@@ -379,7 +379,7 @@ document.getElementById('generate-firmware').addEventListener('click', function(
     if (validateForm()) {
         let jsonString = getFormJsonString();
         console.log(jsonString);
-        // compileFirmware(jsonString); 
+        compileFirmware(jsonString); 
     } else {
         alert('Please fix the errors in the form before compiling the firmware');
     }
