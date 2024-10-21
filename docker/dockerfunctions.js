@@ -33,7 +33,7 @@ let jsontest = {
 //keys to set into General_Setup.h
 const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "MLR003_APP_PORT", "ADMIN_GEN_APP_KEY"]
 
-const imageName = 'stm32wl' // image of the compiler
+const imageName = 'eliasqzo/stm32wl:latest' // image of the compiler
 const volName = 'shared-vol' // name of the volume used to store configs and results
 const compiledFile = 'STM32WL-standalone.bin' // compiled file name
 
