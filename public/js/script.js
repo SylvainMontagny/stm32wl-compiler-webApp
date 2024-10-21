@@ -309,6 +309,19 @@ document.querySelectorAll('input, select').forEach(input => {
     input.addEventListener('input', saveFormData);
 });
 
+window.addEventListener('load', function() {
+    if (!localStorage.getItem('formData')) {
+        genRandomKey(16, elements.devEui);
+        genRandomKey(32, elements.appKey);
+        genRandomKey(16, elements.appEui);
+        genRandomKey(8, elements.devAddr);
+        genRandomKey(32, elements.nwksKey);
+        genRandomKey(32, elements.appsKey);
+        genRandomKey(32, elements.adminAppKey);
+        saveFormData();
+    }
+});
+
 // Restore data on page load
 window.addEventListener('load', restoreFormData);
 
