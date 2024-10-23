@@ -1,3 +1,4 @@
+// Elements from the form
 const elements = {
     advancedContainer: document.querySelector('.advance-container .title-container .closed-advance-container'),
     svgArrow: document.querySelector('.advance-container .title-container .closed-advance-container .svg'),
@@ -69,30 +70,32 @@ elements.activationMode.addEventListener('change', otaaAbp);
 
 // Payload Hello error
 function helloError() {
-    if (elements.hello.checked) { 
-        elements.temperature.disabled = true;
-        elements.humidity.disabled = true;
-        elements.cayenne1.disabled = true;
-        elements.cayenne2.disabled = true;
-        elements.cayenne1Label.style.color = '#D1D1D1';
-        elements.cayenne2Label.style.color = '#D1D1D1';
-        elements.temperatureLabel.style.color = '#D1D1D1';
-        elements.humidityLabel.style.color = '#D1D1D1';
+    if (elements.hello.checked) {
+
+        [elements.temperature, elements.humidity, elements.cayenne1, elements.cayenne2].forEach(element => {
+            element.disabled = true;
+        });
+
+        [elements.temperatureLabel, elements.humidityLabel, elements.cayenne1Label, elements.cayenne2Label].forEach(label => {
+            label.style.color = '#D1D1D1';
+        });
+
     } else {
-        elements.temperature.disabled = false;
-        elements.humidity.disabled = false;
-        elements.cayenne1.disabled = false;
-        elements.cayenne2.disabled = false;
-        elements.cayenne1Label.style.color = '#000';
-        elements.cayenne2Label.style.color = '#000';
-        elements.temperatureLabel.style.color = '#000';
-        elements.humidityLabel.style.color = '#000';
+
+        [elements.temperature, elements.humidity, elements.cayenne1, elements.cayenne2].forEach(element => {
+            element.disabled = false;
+        });
+
+        [elements.temperatureLabel, elements.humidityLabel, elements.cayenne1Label, elements.cayenne2Label].forEach(label => {
+            label.style.color = '#000';
+        });
+
     }
 }
 
 elements.hello.addEventListener('change', helloError);
 
-// Payload Temperature error, Humidity error, Cayenne error
+// Payload Humidity error
 function humidityError() {
     if (elements.humidity.checked) {
         elements.hello.disabled = true;
@@ -102,9 +105,9 @@ function humidityError() {
         elements.helloLabel.style.color = '#000';
     }
 }
-
 elements.humidity.addEventListener('change', humidityError);
 
+// Payload Temperature error
 function temperatureError() {
     if (elements.temperature.checked) {
         elements.hello.disabled = true;
@@ -114,64 +117,69 @@ function temperatureError() {
         elements.helloLabel.style.color = '#000';
     }
 }
-
 elements.temperature.addEventListener('change', temperatureError);
 
+// Payload Cayenne LPP error
 function cayenne1Error() {
     if (elements.cayenne1.checked) {
         elements.hello.disabled = true;
         elements.helloLabel.style.color = '#D1D1D1';
     } 
 }
-
 elements.cayenne1.addEventListener('change', cayenne1Error);
 
+// Payload Cayenne LPP error
 function cayenne2Error() {
     if (elements.cayenne2.checked && !elements.humidity.checked && !elements.temperature.checked) {
         elements.hello.disabled = false;
         elements.helloLabel.style.color = '#000';
     }
 }
-
 elements.cayenne2.addEventListener('change', cayenne2Error);
 
 // MRL003 Simulation error
 function simOnError() {
-    elements.hello.disabled = true;
-    elements.helloLabel.style.color = '#D1D1D1';
-    elements.temperature.disabled = true;
-    elements.humidity.disabled = true;
-    elements.cayenne1.disabled = true;
-    elements.cayenne2.disabled = true;
-    elements.cayenne1Label.style.color = '#D1D1D1';
-    elements.cayenne2Label.style.color = '#D1D1D1';
-    elements.temperatureLabel.style.color = '#D1D1D1';
-    elements.humidityLabel.style.color = '#D1D1D1';
-    elements.hello.checked = false;
-    elements.temperature.checked = false;
-    elements.humidity.checked = false;
-    elements.cayenne1.checked = false;
-    elements.cayenne2.checked = true;
-}
+    if(elements.simOn.checked) {
 
+        [elements.hello, elements.temperature, elements.humidity, elements.cayenne1, elements.cayenne2].forEach(element => {
+            element.disabled = true;
+        });
+
+        [elements.helloLabel, elements.temperatureLabel, elements.humidityLabel, elements.cayenne1Label, elements.cayenne2Label].forEach(label => {
+            label.style.color = '#D1D1D1';
+        });
+
+        [elements.hello, elements.temperature, elements.humidity, elements.cayenne1].forEach(element => {
+            element.checked = false;
+        });
+
+        elements.cayenne2.checked = true;
+
+        saveFormData();
+    }
+}
 elements.simOn.addEventListener('change', simOnError);
 
+// MRL003 Simulation error
 function simOffError() {
-    elements.hello.disabled = false;
-    elements.helloLabel.style.color = '#000';
-    elements.temperature.disabled = false;
-    elements.humidity.disabled = false;
-    elements.cayenne1.disabled = false;
-    elements.cayenne2.disabled = false;
-    elements.cayenne1Label.style.color = '#000';
-    elements.cayenne2Label.style.color = '#000';
-    elements.temperatureLabel.style.color = '#000';
-    elements.humidityLabel.style.color = '#000';
-}
+    if(elements.simOff.checked) {
 
+        [elements.hello, elements.temperature, elements.humidity, elements.cayenne1, elements.cayenne2].forEach(element => {
+            element.disabled = false;
+        });
+
+        [elements.helloLabel, elements.temperatureLabel, elements.humidityLabel, elements.cayenne1Label, elements.cayenne2Label].forEach(label => {
+            label.style.color = '#000';
+        });
+
+        elements.hello.checked = true;
+        helloError();
+        saveFormData();
+    }
+}
 elements.simOff.addEventListener('change', simOffError);
 
-// Restore default settings
+// Restore default settings for LoRaWAN
 elements.rLorawan.addEventListener('click', function() {
     elements.activationMode.value = 'otaa';
     elements.class.value = 'class_a';
@@ -183,25 +191,31 @@ elements.rLorawan.addEventListener('click', function() {
     saveFormData();
 });
 
+
+// Restore default settings for Application
 elements.rApp.addEventListener('click', function() {
     document.getElementById('send-every-frame-delay').checked = true;
     document.getElementById('frame-delay').value = '10';
-    elements.temperature.checked = false;
-    elements.humidity.checked = false;
-    elements.cayenne2.checked = true;
-    elements.hello.checked = true;
+    if(!elements.simOn.checked) {
+        elements.temperature.checked = false;
+        elements.humidity.checked = false;
+        elements.cayenne2.checked = true;
+        elements.hello.disabled = false;
+        elements.helloLabel.style.color = '#000';
+        elements.hello.checked = true;
+        helloError();
+    }
     saveFormData();
 });
 
+// Restore default settings for Advanced
 elements.rAdvance.addEventListener('click', function() {
     document.getElementById('admin-sensor-disabled').checked = true;
     elements.mrlAppPort.value = '30';
     if(elements.simOn.checked) {
+        elements.simOff.checked = true;
         simOffError();
-        elements.hello.checked = true;
-        helloError();
     }
-    elements.simOff.checked = true;
     saveFormData();
 });
 
@@ -316,11 +330,24 @@ function restoreFormData() {
     otaaAbp();
 }
 
+// Save form data on input change
 document.querySelectorAll('input, select').forEach(input => {
     input.addEventListener('input', saveFormData);
 });
 
+// Restore data on page load
+window.addEventListener('load', restoreFormData);
+
 window.addEventListener('load', function() {
+    // Transmission mode onload
+    helloError();
+    humidityError();
+    temperatureError();
+    cayenne1Error();
+    cayenne2Error();
+    simOnError();
+
+    // gen keys
     if (!localStorage.getItem('formData')) {
         genRandomKey(16, elements.devEui);
         genRandomKey(32, elements.appKey);
@@ -333,9 +360,7 @@ window.addEventListener('load', function() {
     }
 });
 
-// Restore data on page load
-window.addEventListener('load', restoreFormData);
-
+// Format functions
 function formatEUI(str){
     return `0x${str.match(/.{1,2}/g).join(', 0x')}`
 }
@@ -348,6 +373,7 @@ function formatKey(str){
     return str.match(/.{1,2}/g).join(',');
 }
 
+// Get form data as JSON string
 function getFormJsonString() {
     let formData = {
         ACTIVATION_MODE: elements.activationMode.value.toUpperCase(),
@@ -378,6 +404,7 @@ function getFormJsonString() {
     return JSON.stringify(formData, null, 2);
 }
 
+// Validate form data
 function validateForm() {
     let isValid = true;
     const inputs = [
@@ -403,7 +430,7 @@ document.getElementById('generate-firmware').addEventListener('click', function(
     if (validateForm()) {
         let jsonString = getFormJsonString();
         console.log(jsonString);
-        // compileFirmware(jsonString); 
+        compileFirmware(jsonString); 
     } else {
         alert('Please fix the errors in the form before compiling the firmware');
     }

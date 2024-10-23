@@ -201,14 +201,6 @@ select {
     width: 20%;
 }
 
-
-label[for="cayenne-lpp-enabled"],
-label[for="temperature"],
-label[for="humidity"],
-label[for="cayenne-lpp-disabled"] {
-    color: #D1D1D1;
-}
-
 .dev-eui {
     grid-column: span 2; 
 }
