@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const http = require('http');
+const cors = require('cors');
 
 const fs = require('fs');
 const { dockerfunctions, initSharedVolume, compile, randomId, volName, compiledFile } = require('./docker/dockerfunctions');
@@ -10,6 +12,7 @@ const port = process.env.PORT || 4050;
 // Public static link
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
+app.use(cors());
 
 /* ROUTES */
 
@@ -43,9 +46,12 @@ app.post('/compile', async (req, res) => {
 
 /* INIT */
 
+const server = http.createServer(app);
+const io = require('./socket')(server);
+
 // Start serveur on port 4050
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
 
-initSharedVolume();
+// initSharedVolume();
