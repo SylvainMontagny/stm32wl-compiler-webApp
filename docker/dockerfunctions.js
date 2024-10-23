@@ -33,9 +33,11 @@ let jsontest = {
 //keys to set into General_Setup.h
 const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "MLR003_APP_PORT", "ADMIN_GEN_APP_KEY"]
 
-const imageName = 'eliasqzo/stm32wl:latest' // image of the compiler
+const imageName = 'montagny/arm-compiler:1.0' // image of the compiler
 const volName = 'shared-vol' // name of the volume used to store configs and results
 const compiledFile = 'STM32WL-standalone.bin' // compiled file name
+const generalSetupPath = process.env.General_Setup_path;
+const configApplicationPath = process.env.config_application_path;
 
 async function compile(id, jsonConfig) {
     console.log(`Compiling with id : ${id}`)
@@ -51,6 +53,7 @@ async function compile(id, jsonConfig) {
         delete jsonAppSetup[key];
     }
 
+    /*
     // Create folders, move and rename templates
     await setupFiles(id,configPath,resultPath);
     // Modify .h files with json
@@ -63,7 +66,8 @@ async function compile(id, jsonConfig) {
     } else {
         console.log(`Error while compiling : ${id}`)
     }
-    return status;
+    */
+    return 0;
 }
 
 function randomId() {
