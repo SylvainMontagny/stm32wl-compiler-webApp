@@ -1,216 +1,244 @@
 @font-face {
-    font-family: 'SegoeUI';
-    src: local('Segoe UI Light'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/light/latest.woff2) format('woff2'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/light/latest.woff) format('woff'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/light/latest.ttf) format('truetype');
-    font-weight: 100;
+  font-family: "SegoeUI";
+  src: local("Segoe UI Light"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/light/latest.woff2)
+      format("woff2"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/light/latest.woff)
+      format("woff"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/light/latest.ttf)
+      format("truetype");
+  font-weight: 100;
 }
 
 @font-face {
-    font-family: 'SegoeUI';
-    src: local('Segoe UI Semilight'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semilight/latest.woff2) format('woff2'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semilight/latest.woff) format('woff'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semilight/latest.ttf) format('truetype');
-    font-weight: 200;
+  font-family: "SegoeUI";
+  src: local("Segoe UI Semilight"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semilight/latest.woff2)
+      format("woff2"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semilight/latest.woff)
+      format("woff"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semilight/latest.ttf)
+      format("truetype");
+  font-weight: 200;
 }
 
 @font-face {
-    font-family: 'SegoeUI';
-    src: local('Segoe UI'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/normal/latest.woff2) format('woff2'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/normal/latest.woff) format('woff'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/normal/latest.ttf) format('truetype');
-    font-weight: 400;
+  font-family: "SegoeUI";
+  src: local("Segoe UI"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/normal/latest.woff2)
+      format("woff2"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/normal/latest.woff)
+      format("woff"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/normal/latest.ttf)
+      format("truetype");
+  font-weight: 400;
 }
 
 @font-face {
-    font-family: 'SegoeUI';
-    src: local('Segoe UI Bold'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/bold/latest.woff2) format('woff2'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/bold/latest.woff) format('woff'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/bold/latest.ttf) format('truetype');
-    font-weight: 600;
+  font-family: "SegoeUI";
+  src: local("Segoe UI Bold"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/bold/latest.woff2)
+      format("woff2"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/bold/latest.woff)
+      format("woff"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/bold/latest.ttf)
+      format("truetype");
+  font-weight: 600;
 }
 
 @font-face {
-    font-family: 'SegoeUI';
-    src: local('Segoe UI Semibold'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semibold/latest.woff2) format('woff2'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semibold/latest.woff) format('woff'),
-        url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semibold/latest.ttf) format('truetype');
-    font-weight: 700;
+  font-family: "SegoeUI";
+  src: local("Segoe UI Semibold"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semibold/latest.woff2)
+      format("woff2"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semibold/latest.woff)
+      format("woff"),
+    url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semibold/latest.ttf)
+      format("truetype");
+  font-weight: 700;
 }
 
 :root {
-    --primary-color: #0F6CBD;  /* Couleur principale */
-    --gray-color: #EFEEF4;      /* Blanc cassé */
+  --primary-color: #0f6cbd; /* Couleur principale */
+  --gray-color: #efeef4; /* Blanc cassé */
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'SegoeUI';
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "SegoeUI";
 }
 
 body {
-    background-color: var(--gray-color);
+  background-color: var(--gray-color);
+  /* overflow: hidden; */
 }
 
 /* Header Styles */
 header {
-    padding: 1vw;
-    width: 100%;
-    background-color: var(--primary-color);
+  padding: 1vw;
+  width: 70%;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  background-color: var(--primary-color);
 }
 
 .header-container {
-    display: flex;
-    align-items: center;
-    gap: 1vw;
+  display: flex;
+  align-items: center;
+  gap: 1vw;
 }
 
 .header-container h1 {
-    color: white;
-    font-size: 1em;
-    font-weight: bold;
-    margin-right: auto;
+  color: white;
+  font-size: 1em;
+  font-weight: bold;
+  margin-right: auto;
 }
 
 .header-container img {
-    width: 38.41px;
-    height: 28.67px;
+  width: 38.41px;
+  height: 28.67px;
+}
+
+main {
+  display: flex;
+  justify-content: space-between;
 }
 
 /* Form Styles */
 .form-container {
-    display: flex;
-    flex-direction: column;
-    gap: 2vw;
-    padding: 2vw;
-    margin: 2vw 0;
-    background-color: white;
-    border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  gap: 2vw;
+  padding: 2vw;
+  margin: 2vw 0;
+  background-color: white;
+  border-radius: 8px;
 }
 
 .title-container {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 2vw;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2vw;
 }
 
 .title-container h2 {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .restore {
-    text-decoration: none;
-    color : var(--primary-color);
-    cursor: pointer;
+  text-decoration: none;
+  color: var(--primary-color);
+  cursor: pointer;
 }
-
 
 /* LoRaWAN Form Styles */
 .lorawan-form {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2vw;
-    margin: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2vw;
+  margin: 20px;
 }
 
 h3 {
-    margin-bottom: 10px;
-    font-size: 1.2em;
+  margin-bottom: 10px;
+  font-size: 1.2em;
 }
-
 
 /* Input Styles */
 input[type="text"],
 select {
-    padding: 10px;
-    width: 100%;
-    background-color: #F8FAFC;
-    border: 1px solid var(--gray-color);
-    border-radius: 4px;
+  padding: 10px;
+  width: 100%;
+  background-color: #f8fafc;
+  border: 1px solid var(--gray-color);
+  border-radius: 4px;
 }
 
 input[type="number"] {
-    padding: 10px;
-    background-color: #F8FAFC;
-    border: 1px solid var(--gray-color);
-    border-radius: 4px;
+  padding: 10px;
+  background-color: #f8fafc;
+  border: 1px solid var(--gray-color);
+  border-radius: 4px;
 }
 
 select {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .page-container {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70%;
+  /* height: calc(100vh - 65px); */
+  height: 100%;
+  overflow-y: scroll;
 }
 
 .lorawan-container,
 .application-container,
 .otaa-container,
 .advanced-container {
-    width: 50vw;
+  width: 50vw;
 }
 
 .radio-buttons {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 .radio-button input[type="radio"],
 .radio-button input[type="checkbox"],
 .radio-button label {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 /* Application Form Styles */
 .application-form {
-    display: grid;
-    gap: 2vw;
-    margin: 20px;
+  display: grid;
+  gap: 2vw;
+  margin: 20px;
 }
 
-.send-mode,  
-.payload-configuration, 
-.low-power, 
-.cayenne-lpp, 
+.send-mode,
+.payload-configuration,
+.low-power,
+.cayenne-lpp,
 .dev-eui {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .send-mode,
 .frame-delay {
-    grid-column: span 1; 
+  grid-column: span 1;
 }
 
 .send-mode .radio-buttons {
-    display: flex; 
-    gap: 15px; 
+  display: flex;
+  gap: 15px;
 }
 
 label[for="cayenne-lpp-enabled"],
 label[for="temperature"],
 label[for="humidity"],
 label[for="cayenne-lpp-disabled"] {
-    color: #D1D1D1;
+  color: #d1d1d1;
 }
 
 .payload-configuration,
 .dev-eui {
-    grid-column: span 2; 
+  grid-column: span 2;
 }
 
-.low-power, 
+.low-power,
 .cayenne-lpp {
-    grid-column: span 1; 
+  grid-column: span 1;
 }
 
 .dev-eui-container,
@@ -220,8 +248,8 @@ label[for="cayenne-lpp-disabled"] {
 .devaddr-container,
 .nwkskey-container,
 .appskey-container {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 button.generate-dev-eui,
@@ -231,137 +259,159 @@ button.generate-admin-gen-app-key,
 button.generate-devaddr,
 button.generate-nwkskey,
 button.generate-appskey {
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: white;
-    background-color: var(--primary-color);
-    border-radius: 10px;
-    cursor: pointer;
-    border: none;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: white;
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
 }
 
 .fa-solid {
-    margin-top: 1px;
-    font-size: 1.2em;
+  margin-top: 1px;
+  font-size: 1.2em;
 }
 
 /* otaa Form Styles */
 .otaa-form {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2vw;
-    margin: 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2vw;
+  margin: 20px;
 }
 
 /* abp Form Styles */
 .abp-form {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2vw;
-    margin: 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2vw;
+  margin: 20px;
 }
 
 .abp-container {
-    display : none;
+  display: none;
 }
 
 /* Advanced Settings Styles */
 .advanced-settings-form {
-    gap: 2vw;
-    margin: 20px;
-    display: none;
+  gap: 2vw;
+  margin: 20px;
+  display: none;
 }
 
-.advance-container .title-container .closed-advance-container{
-    cursor: pointer;
+.advance-container .title-container .closed-advance-container {
+  cursor: pointer;
 }
 
 .advance-container .title-container .restore {
-    display: none;
+  display: none;
 }
 
 .admin-sensor,
 .mrl003-sim,
 .mlr003-app-port {
-    grid-column: span 1; 
+  grid-column: span 1;
 }
 
 .admin-gen-app-key {
-    grid-column: span 3;
+  grid-column: span 3;
 }
 
 .admin-sensor,
-.mrl003-sim,    
+.mrl003-sim,
 .admin-gen-app-key {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .closed-advance-container {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .svg {
-    height: 40px;
-    display: flex;
-    align-items: flex-end;
-    transform-origin: 20px 22px;
-    transition: transform 0.2s ease;
+  height: 40px;
+  display: flex;
+  align-items: flex-end;
+  transform-origin: 20px 22px;
+  transition: transform 0.2s ease;
 }
 
 /* Generate Firmware Button */
 .generate-firmware {
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: white;
-    background-color: var(--primary-color);
-    border-radius: 10px;
-    cursor: pointer;
-    border: none;
-    width: 25%;
-    font-size: 1.3em;
-    justify-content: center;
-    margin-bottom : 1vw;
-    font-weight: bold;
-    margin-left: auto;
-    margin-right: 3vw;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
+  width: 25%;
+  font-size: 1.3em;
+  justify-content: center;
+  margin-bottom: 1vw;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: 3vw;
+}
+
+.compiler-container {
+  height: 100vh;
+  width: 30%;
+  background: black;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 70%;
+}
+
+.header-compiler {
+  height: 65px;
+  width: 100%;
+  background: black;
+}
+
+.log-container {
+  height: 100%;
+  width: 100%;
+  background: #242424;
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-    .lorawan-container,
-    .application-container,
-    .otaa-container,
-    .advanced-container {
-        width: 70vw; /* Ajuste la largeur pour les écrans moyens */
-    }
+  .lorawan-container,
+  .application-container,
+  .otaa-container,
+  .advanced-container {
+    width: 70vw; /* Ajuste la largeur pour les écrans moyens */
+  }
 
-    .lorawan-form,
-    .application-form {
-        grid-template-columns: repeat(2, 1fr); /* Passe à 2 colonnes */
-    }
+  .lorawan-form,
+  .application-form {
+    grid-template-columns: repeat(2, 1fr); /* Passe à 2 colonnes */
+  }
 }
 
 @media (max-width: 800px) {
-    .lorawan-container,
-    .application-container,
-    .otaa-container,
-    .advanced-container {
-        width: 85vw; /* Ajuste la largeur pour les petits écrans */
-    }
+  .lorawan-container,
+  .application-container,
+  .otaa-container,
+  .advanced-container {
+    width: 85vw; /* Ajuste la largeur pour les petits écrans */
+  }
 
-    .lorawan-form,
-    .application-form {
-        grid-template-columns: 1fr; /* 1 colonne pour les petits écrans */
-    }
+  .lorawan-form,
+  .application-form {
+    grid-template-columns: 1fr; /* 1 colonne pour les petits écrans */
+  }
 
-    .title-container h2 {
-        font-size: 1.5em; /* Augmente la taille du titre sur petits écrans */
-    }
+  .title-container h2 {
+    font-size: 1.5em; /* Augmente la taille du titre sur petits écrans */
+  }
 }
