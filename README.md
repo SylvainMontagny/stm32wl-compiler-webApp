@@ -34,7 +34,7 @@ docker volume create shared-vol
 3. Run the webapp container
 
 ```shell
-docker run -it -v /var/run/docker.sock:/var/run/docker.sock -v shared-vol:/shared-vol -p 80:4050 eliasqzo/compiler-webapp
+docker run -it -v /var/run/docker.sock:/var/run/docker.sock -v shared-vol:/shared-vol -p 80:4050 eliasqzo/compiler-webapp:latest
 ```
 
 You need to pass the docker.sock as a volume to let the webapp launch container with Dockerode library
