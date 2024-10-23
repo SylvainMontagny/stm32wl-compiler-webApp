@@ -88,7 +88,7 @@
                     </div>
     
                     <div class="app_port">
-                        <h3>App Port</h3>
+                        <h3>FPort</h3>
                         <input type="number" id="app_port" name="app_port" min="0" max="255" value="15">
                     </div>
                 </div>
@@ -104,22 +104,17 @@
                 <div class="application-form">
 
                     <div class="send-mode">
-                        <h3>Send Mode</h3>
+                        <h3>Transmission Mode</h3>
                         <div class="radio-buttons">
                             <div class="radio-button">
                                 <input type="radio" id="send-by-push-button" name="send-mode" value="push-button">
-                                <label for="send-by-push-button">Send by push button</label>
+                                <label for="send-by-push-button">Transmission triggered by Push-Button</label>
                             </div>
                             <div class="radio-button">
                                 <input type="radio" id="send-every-frame-delay" name="send-mode" value="every-frame-delay" checked>
-                                <label for="send-every-frame-delay">Send every frame delay</label>
+                                <label for="send-every-frame-delay">Transmission every <input type="number" id="frame-delay" name="frame-delay" min="8" max="1000000" value="10"> secondes</label>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="frame-delay">
-                        <h3>Frame Delay</h3>
-                        <input type="number" id="frame-delay" name="frame-delay" min="8" max="1000000" value="10">
                     </div>
 
                     <div class="payload-configuration">
@@ -127,7 +122,7 @@
                         <div class="radio-buttons">
                             <div class="radio-button">
                                 <input type="checkbox" id="hello" name="payload-configuration" value="hello" checked>
-                                <label for="hello">Hello</label>
+                                <label for="hello">"HELLO"</label>
                             </div>
                             <div class="radio-button">
                                 <input type="checkbox" id="temperature" name="payload-configuration" value="temperature" disabled>
@@ -136,20 +131,6 @@
                             <div class="radio-button">
                                 <input type="checkbox" id="humidity" name="payload-configuration" value="humidity" disabled>
                                 <label for="humidity">Humidity</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="low-power">
-                        <h3>Low Power</h3>
-                        <div class="radio-buttons">
-                            <div class="radio-button">
-                                <input type="radio" id="low-power-enabled" name="low-power" value="enabled">
-                                <label for="low-power-enabled">Enabled</label>
-                            </div>
-                            <div class="radio-button">
-                                <input type="radio" id="low-power-disabled" name="low-power" value="disabled" checked>
-                                <label for="low-power-disabled">Disabled</label>
                             </div>
                         </div>
                     </div>
@@ -171,7 +152,10 @@
                     <div class="dev-eui">
                         <h3>Dev EUI</h3>
                         <div class="dev-eui-container">
-                            <input type="text" id="dev-eui" name="dev-eui">
+                            <div class="input-icon">
+                                <input type="text" id="dev-eui" name="dev-eui" maxlength="16">
+                                <i class="fa-solid fa-copy copy-icon"></i>
+                            </div>
                             <button id="generate-dev-eui" class="generate-dev-eui"><i class="fa-solid fa-shuffle"></i>Generate</button>
                         </div>
                     </div>
@@ -190,9 +174,12 @@
                 <div class="otaa-form">
 
                     <div class="appkey">
-                        <h3>App Key</h3>
+                        <h3>AppKey</h3>
                         <div class="appkey-container">
-                            <input type="text" id="appkey" name="appkey">
+                            <div class="input-icon">
+                                <input type="text" id="appkey" name="appkey" maxlength="32">
+                                <i class="fa-solid fa-copy copy-icon"></i>
+                            </div>
                             <button id="generate-appkey" class="generate-appkey"><i class="fa-solid fa-shuffle"></i>Generate</button>
                         </div>
                     </div>
@@ -200,7 +187,10 @@
                     <div class="appeui-joineui">
                         <h3>AppEUI - JoinEUI</h3>
                         <div class="appeui-joineui-container">
-                            <input type="text" id="appeui" name="appeui">
+                            <div class="input-icon">
+                                <input type="text" id="appeui" name="appeui" maxlength="16">
+                                <i class="fa-solid fa-copy copy-icon"></i>
+                            </div>
                             <button id="generate-appeui" class="generate-appeui"><i class="fa-solid fa-shuffle"></i>Generate</button>
                         </div>
                     </div>
@@ -213,7 +203,6 @@
 
                 <div class="title-container">
                     <h2>ABP Configuration</h2>
-                    <!-- <div id="restore-abp" class="restore">Restore default</div> -->
                 </div>
 
                 <div class="abp-form">
@@ -221,7 +210,10 @@
                     <div class="devaddr">
                         <h3>DevAddr</h3>
                         <div class="devaddr-container">
-                            <input type="text" id="devaddr" name="devaddr">
+                            <div class="input-icon">
+                                <input type="text" id="devaddr" name="devaddr" maxlength="8">
+                                <i class="fa-solid fa-copy copy-icon"></i>
+                            </div>
                             <button id="generate-devaddr" class="generate-devaddr"><i class="fa-solid fa-shuffle"></i>Generate</button>
                         </div>
                     </div>
@@ -229,7 +221,10 @@
                     <div class="nwkskey">
                         <h3>NwkSKey</h3>
                         <div class="nwkskey-container">
-                            <input type="text" id="nwkskey" name="nwkskey">
+                            <div class="input-icon">
+                                <input type="text" id="nwkskey" name="nwkskey" maxlength="32">
+                                <i class="fa-solid fa-copy copy-icon"></i>
+                            </div>
                             <button id="generate-nwkskey" class="generate-nwkskey"><i class="fa-solid fa-shuffle"></i>Generate</button>
                         </div>
                     </div>
@@ -237,7 +232,10 @@
                     <div class="appskey">
                         <h3>AppSKey</h3>
                         <div class="appskey-container">
-                            <input type="text" id="appskey" name="appskey">
+                            <div class="input-icon">
+                                <input type="text" id="appskey" name="appskey" maxlength="32">
+                                <i class="fa-solid fa-copy copy-icon"></i>
+                            </div>
                             <button id="generate-appskey" class="generate-appskey"><i class="fa-solid fa-shuffle"></i>Generate</button>
                         </div>
                     </div>
@@ -261,7 +259,7 @@
                 <div class="advanced-settings-form">
 
                     <div class="admin-sensor">
-                        <h3>Admin Sensor</h3>
+                        <h3>IKS01A3 Sensors</h3>
                         <div class="radio-buttons">
                             <div class="radio-button">
                                 <input type="radio" id="admin-sensor-enabled" name="admin-sensor" value="enabled">
@@ -275,7 +273,7 @@
                     </div>
 
                     <div class="mrl003-sim">
-                        <h3>MRL003 Simulation</h3>
+                        <h3>Thermostatic valve simuation</h3>
                         <div class="radio-buttons">
                             <div class="radio-button">
                                 <input type="radio" id="mrl003-sim-on" name="mrl003-sim" value="on">
@@ -289,14 +287,17 @@
                     </div>
 
                     <div class="mlr003-app-port">
-                        <h3>MRL003 App Port</h3>
+                        <h3>Downlink FPort</h3>
                         <input type="number" id="mrl003-app-port" name="mrl003-app-port" min="1" max="255" value="30">
                     </div>
 
                     <div class="admin-gen-app-key">
-                        <h3>Admin Gen App Key</h3>
+                        <h3>Gen App Key</h3>
                         <div class="admin-gen-app-key-container">
-                            <input type="text" id="admin-gen-app-key" name="admin-gen-app-key">
+                            <div class="input-icon">
+                                <input type="text" id="admin-gen-app-key" name="admin-gen-app-key" maxlength="32">
+                                <i class="fa-solid fa-copy copy-icon"></i>
+                            </div>
                             <button id="generate-admin-gen-app-key" class="generate-admin-gen-app-key"><i class="fa-solid fa-shuffle"></i>Generate</button>
                         </div> 
                     </div>

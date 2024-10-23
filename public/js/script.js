@@ -190,7 +190,6 @@ elements.rApp.addEventListener('click', function() {
     elements.humidity.checked = false;
     elements.cayenne2.checked = true;
     elements.hello.checked = true;
-    document.getElementById('low-power-disabled').checked = true;
     saveFormData();
 });
 
@@ -243,6 +242,20 @@ elements.generateAdminAppKey.addEventListener('click', function() {
 });
 
 
+// Copy to clipboard
+const copyIcons = document.querySelectorAll('.copy-icon');
+
+// Add event listener to all copy icons
+copyIcons.forEach(icon => {
+    icon.addEventListener('click', function() {
+        // Select the input field and copy the text
+        const input = this.previousElementSibling;
+        input.select();
+        input.setSelectionRange(0, 99999); // For smaller devices
+        navigator.clipboard.writeText(input.value);
+    });
+});
+
 
 // Save form data to localStorage
 function saveFormData() {
@@ -258,7 +271,6 @@ function saveFormData() {
         hello: elements.hello.checked,
         temperature: elements.temperature.checked,
         humidity: elements.humidity.checked,
-        lowPower: document.querySelector('input[name="low-power"]:checked').value,
         cayenneLpp: document.querySelector('input[name="cayenne-lpp"]:checked').value,
         devEui: elements.devEui.value,
         appKey: elements.appKey.value,
@@ -290,7 +302,6 @@ function restoreFormData() {
         elements.hello.checked = formData.hello || false;
         elements.temperature.checked = formData.temperature || false;
         elements.humidity.checked = formData.humidity || false;
-        document.querySelector(`input[name="low-power"][value="${formData.lowPower || 'disabled'}"]`).checked = true;
         document.querySelector(`input[name="cayenne-lpp"][value="${formData.cayenneLpp || 'disabled'}"]`).checked = true;
         elements.devEui.value = formData.devEui || genRandomKey(16, elements.devEui);
         elements.appKey.value = formData.appKey || genRandomKey(32, elements.appKey);
@@ -350,7 +361,7 @@ function getFormJsonString() {
         PAYLOAD_HELLO: elements.hello.checked.toString(),
         PAYLOAD_TEMPERATURE: elements.temperature.checked.toString(),
         PAYLOAD_HUMIDITY: elements.humidity.checked.toString(),
-        LOW_POWER: (document.querySelector('input[name="low-power"]:checked').value == 'enabled').toString(),
+        LOW_POWER: "false",
         CAYENNE_LPP_: (document.querySelector('input[name="cayenne-lpp"]:checked').value == 'enabled').toString(),
         devEUI_: formatEUI(elements.devEui.value),
         appKey_: formatKey(elements.appKey.value.toUpperCase()),
@@ -370,7 +381,7 @@ function getFormJsonString() {
 function validateForm() {
     let isValid = true;
     const inputs = [
-        { element: elements.appPort, min: 0, max: 255, name: 'App Port' },
+        { element: elements.appPort, min: 1, max: 255, name: 'App Port' },
         { element: document.getElementById('frame-delay'), min: 8, max: 100, name: 'Frame Delay' },
         { element: elements.mrlAppPort, min: 1, max: 255, name: 'MRL003 App Port' }
     ];
@@ -392,7 +403,7 @@ document.getElementById('generate-firmware').addEventListener('click', function(
     if (validateForm()) {
         let jsonString = getFormJsonString();
         console.log(jsonString);
-        compileFirmware(jsonString); 
+        // compileFirmware(jsonString); 
     } else {
         alert('Please fix the errors in the form before compiling the firmware');
     }

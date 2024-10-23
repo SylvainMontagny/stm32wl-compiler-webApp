@@ -178,23 +178,29 @@ select {
 }
 
 .send-mode,  
-.payload-configuration, 
-.low-power, 
+.payload-configuration,  
 .cayenne-lpp, 
 .dev-eui {
     display: flex;
     flex-direction: column;
 }
 
-.send-mode,
-.frame-delay {
-    grid-column: span 1; 
+.send-mode {
+    grid-column: span 2;
 }
 
 .send-mode .radio-buttons {
-    display: flex; 
-    gap: 15px; 
+    gap: 30px; 
 }
+
+.send-mode .radio-button:first-child {
+    padding-top: 10px;
+}
+
+#frame-delay {
+    width: 20%;
+}
+
 
 label[for="cayenne-lpp-enabled"],
 label[for="temperature"],
@@ -203,13 +209,11 @@ label[for="cayenne-lpp-disabled"] {
     color: #D1D1D1;
 }
 
-.payload-configuration,
 .dev-eui {
     grid-column: span 2; 
 }
-
-.low-power, 
-.cayenne-lpp {
+ 
+.cayenne-lpp, .payload-configuration {
     grid-column: span 1; 
 }
 
@@ -364,4 +368,31 @@ button.generate-appskey {
     .title-container h2 {
         font-size: 1.5em; /* Augmente la taille du titre sur petits écrans */
     }
+}
+
+
+
+.input-icon {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.input-icon input {
+    padding-right: 40px; /* Assurez-vous qu'il y a de la place pour l'icône à droite */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input-icon i {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+}
+
+.input-icon i:hover {
+    color: #000;
 }
