@@ -440,6 +440,7 @@ document.getElementById('generate-firmware').addEventListener('click', function(
 // function compile firmware from jsonString of all form data
 async function compileFirmware(jsonString){
     try {
+        // Send the request
         const response = await fetch('/compile', {
             method: 'POST',
             headers: {
@@ -448,6 +449,7 @@ async function compileFirmware(jsonString){
             body: jsonString,
         });
 
+        // Receive the blob and store it as a file
         if (response.ok) {
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
