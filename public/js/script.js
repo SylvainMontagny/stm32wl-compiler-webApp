@@ -41,6 +41,8 @@ const elements = {
     class : document.getElementById('class'),
     spreadingFactor : document.getElementById('spreading-factor'),
     appPort : document.getElementById('app_port'),
+    frameDelay : document.getElementById('frame-delay'),
+    multipleFirmware : document.getElementById('multiple-firmware-on'),
 };
 
 // Display advanced settings form
@@ -195,7 +197,7 @@ elements.rLorawan.addEventListener('click', function() {
 // Restore default settings for Application
 elements.rApp.addEventListener('click', function() {
     document.getElementById('send-every-frame-delay').checked = true;
-    document.getElementById('frame-delay').value = '10';
+    elements.frameDelay.value = '10';
     if(!elements.simOn.checked) {
         elements.temperature.checked = false;
         elements.humidity.checked = false;
@@ -216,6 +218,11 @@ elements.rAdvance.addEventListener('click', function() {
         elements.simOff.checked = true;
         simOffError();
     }
+    if(elements.multipleFirmware.checked) {
+        elements.multipleFirmware.checked = false;
+        elements.multipleFirmware.dispatchEvent(new Event('change'));
+    }
+    document.getElementById('firmware-nb').value = '2';
     saveFormData();
 });
 
@@ -271,6 +278,89 @@ copyIcons.forEach(icon => {
 });
 
 
+// Error FPort 1 to 255
+function fportError() {
+    let fport = elements.appPort.value;
+    if (fport < 1) {
+        elements.appPort.value = 1;
+    } else if (fport > 255) {
+        elements.appPort.value = 255;
+    }
+}
+elements.appPort.addEventListener('change', fportError);
+
+// Error Frame Delay 8 to 100
+function frameDelayError() {
+    let frameDelay = elements.frameDelay.value;
+    if (frameDelay < 8) {
+        elements.frameDelay.value = 8;
+    } else if (frameDelay > 100) {
+        elements.frameDelay.value = 100;
+    }
+}
+elements.frameDelay.addEventListener('change', frameDelayError);
+
+// Error MRL003 App Port 1 to 255
+function mrlAppPortError() {
+    let mrlAppPort = elements.mrlAppPort.value;
+    if (mrlAppPort < 1) {
+        elements.mrlAppPort.value = 1;
+    } else if (mrlAppPort > 255) {
+        elements.mrlAppPort.value = 255;
+    }
+}
+elements.mrlAppPort.addEventListener('change', mrlAppPortError);
+
+
+// Disable credentials  
+function disableCredentials() {
+    [elements.appEui, elements.devAddr, elements.nwksKey, elements.appsKey, elements.devEui, elements.appKey, elements.adminAppKey].forEach(element => {
+        element.style.color = '#D1D1D1';
+        element.disabled = true;
+    });
+    document.querySelectorAll('.input-icon i').forEach(icon => {
+        icon.style.color = '#D1D1D1';
+        icon.style.cursor = 'not-allowed';
+    });
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.style.display = 'none';
+    });
+}
+
+// Enable credentials
+function enableCredentials() {
+    [elements.appEui, elements.devAddr, elements.nwksKey, elements.appsKey, elements.devEui, elements.appKey, elements.adminAppKey].forEach(element => {
+        element.style.color = '#000';
+        element.disabled = false;
+    });
+    document.querySelectorAll('.input-icon i').forEach(icon => {
+        icon.style.color = '#000';
+        icon.style.cursor = 'pointer';
+    });
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.style.display = 'flex';
+    });
+}
+
+
+// Multiple firmware
+elements.multipleFirmware.addEventListener('change', function() {
+    let firmwareNumber = document.querySelector('.firmware-number');
+    let firmwareNumberInput = document.getElementById('firmware-nb');
+    if(elements.multipleFirmware.checked) {
+        firmwareNumber.style.color = '#000';
+        firmwareNumberInput.style.color = '#000';
+        firmwareNumberInput.disabled = false;
+        disableCredentials();
+    } else {
+        firmwareNumber.style.color = '#D1D1D1';
+        firmwareNumberInput.style.color = '#D1D1D1';
+        firmwareNumberInput.disabled = true;
+        enableCredentials();
+    }
+});
+
+
 // Save form data to localStorage
 function saveFormData() {
     const formData = {
@@ -281,7 +371,7 @@ function saveFormData() {
         confirmation: document.querySelector('input[name="confirmation"]:checked').value,
         appPort: elements.appPort.value,
         sendMode: document.querySelector('input[name="send-mode"]:checked').value,
-        frameDelay: document.getElementById('frame-delay').value,
+        frameDelay: elements.frameDelay.value,
         hello: elements.hello.checked,
         temperature: elements.temperature.checked,
         humidity: elements.humidity.checked,
@@ -312,7 +402,7 @@ function restoreFormData() {
         document.querySelector(`input[name="confirmation"][value="${formData.confirmation || 'off'}"]`).checked = true;
         elements.appPort.value = formData.appPort || '15';
         document.querySelector(`input[name="send-mode"][value="${formData.sendMode || 'every-frame-delay'}"]`).checked = true;
-        document.getElementById('frame-delay').value = formData.frameDelay || '10';
+        elements.frameDelay.value = formData.frameDelay || '10';
         elements.hello.checked = formData.hello || false;
         elements.temperature.checked = formData.temperature || false;
         elements.humidity.checked = formData.humidity || false;
@@ -346,6 +436,9 @@ window.addEventListener('load', function() {
     cayenne1Error();
     cayenne2Error();
     simOnError();
+    fportError();
+    frameDelayError();
+    mrlAppPortError();
 
     // gen keys
     if (!localStorage.getItem('formData')) {
@@ -383,7 +476,7 @@ function getFormJsonString() {
         CONFIRMED: (document.querySelector('input[name="confirmation"]:checked').value.toString() == 'on').toString(),
         APP_PORT: elements.appPort.value,
         SEND_BY_PUSH_BUTTON: (document.querySelector('input[name="send-mode"]:checked').value == 'push-button').toString(),
-        FRAME_DELAY: document.getElementById('frame-delay').value * 1000,
+        FRAME_DELAY: elements.frameDelay.value * 1000,
         PAYLOAD_HELLO: elements.hello.checked.toString(),
         PAYLOAD_TEMPERATURE: elements.temperature.checked.toString(),
         PAYLOAD_HUMIDITY: elements.humidity.checked.toString(),
@@ -404,35 +497,52 @@ function getFormJsonString() {
     return JSON.stringify(formData, null, 2);
 }
 
-// Validate form data
-function validateForm() {
-    let isValid = true;
-    const inputs = [
-        { element: elements.appPort, min: 1, max: 255, name: 'App Port' },
-        { element: document.getElementById('frame-delay'), min: 8, max: 100, name: 'Frame Delay' },
-        { element: elements.mrlAppPort, min: 1, max: 255, name: 'MRL003 App Port' }
-    ];
-
-    inputs.forEach(input => {
-        const value = parseInt(input.element.value);
-        if (isNaN(value) || value < input.min || value > input.max) {
-            isValid = false;
-            alert(`${input.name} must be a number between ${input.min} and ${input.max}`);
-        }
-    });
-
-    return isValid;
+// Get multiple firmware data as JSON strings
+function getMultipleFormJsonString(nbFirmware){
+    let firmwareData = [];
+    for(let i = 0; i < nbFirmware; i++){
+        let formData = {
+            ACTIVATION_MODE: elements.activationMode.value.toUpperCase(),
+            CLASS: elements.class.value.toUpperCase(),
+            SPREADING_FACTOR: elements.spreadingFactor.value.toUpperCase(),
+            ADAPTIVE_DR: (document.querySelector('input[name="adaptative-dr"]:checked').value == 'on').toString(),
+            CONFIRMED: (document.querySelector('input[name="confirmation"]:checked').value.toString() == 'on').toString(),
+            APP_PORT: elements.appPort.value,
+            SEND_BY_PUSH_BUTTON: (document.querySelector('input[name="send-mode"]:checked').value == 'push-button').toString(),
+            FRAME_DELAY: elements.frameDelay.value * 1000,
+            PAYLOAD_HELLO: elements.hello.checked.toString(),
+            PAYLOAD_TEMPERATURE: elements.temperature.checked.toString(),
+            PAYLOAD_HUMIDITY: elements.humidity.checked.toString(),
+            LOW_POWER: "false",
+            CAYENNE_LPP_: (document.querySelector('input[name="cayenne-lpp"]:checked').value == 'enabled').toString(),
+            devEUI_: formatEUI(genRandomKey(16, elements.devEui)),
+            appKey_: formatKey(genRandomKey(32, elements.appKey).toUpperCase()),
+            appEUI_: formatEUI(genRandomKey(16, elements.appEui)),
+            devAddr_: formatAddr(genRandomKey(8, elements.devAddr)),
+            nwkSKey_: formatKey(genRandomKey(32, elements.nwksKey)),
+            appSKey_: formatKey(genRandomKey(32, elements.appsKey)),
+            ADMIN_SENSOR_ENABLED: (document.querySelector('input[name="admin-sensor"]:checked').value == 'enabled').toString(),
+            MLR003_SIMU: (document.querySelector('input[name="mrl003-sim"]:checked').value == 'on').toString(),
+            MLR003_APP_PORT: elements.mrlAppPort.value,
+            ADMIN_GEN_APP_KEY: formatKey(genRandomKey(32, elements.adminAppKey)),
+        };
+        firmwareData.push(formData);
+    }
+    return JSON.stringify(firmwareData, null, 2);
 }
 
 
 // Button to compile
 document.getElementById('generate-firmware').addEventListener('click', function() {
-    if (validateForm()) {
+    if(elements.multipleFirmware.checked){
+        let nbFirmware = document.getElementById('firmware-nb').value;
+        let jsonString = getMultipleFormJsonString(nbFirmware);
+        console.log(jsonString);
+        compileMultipleFirmware(jsonString, nbFirmware);
+    } else {    
         let jsonString = getFormJsonString();
         console.log(jsonString);
         compileFirmware(jsonString); 
-    } else {
-        alert('Please fix the errors in the form before compiling the firmware');
     }
 });
 
@@ -456,6 +566,37 @@ async function compileFirmware(jsonString){
             const a = document.createElement('a');
             a.href = url;
             a.download = 'STM32WL-standalone.bin';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        } else {
+            const errorText = await response.text();
+            alert('Error: ' + errorText);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while compiling the code');
+    }
+}
+
+
+// function compile multiple firmware from jsonString of all form data
+async function compileMultipleFirmware(jsonString, nbFirmware){
+    try {
+        const response = await fetch('/compileMultiple', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: jsonString,
+        });
+
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `STM32WL-standalone-${nbFirmware}.zip`;
             document.body.appendChild(a);
             a.click();
             a.remove();

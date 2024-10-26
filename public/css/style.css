@@ -155,7 +155,8 @@ select {
 .lorawan-container,
 .application-container,
 .otaa-container,
-.advanced-container {
+.advance-container,
+.abp-container {
     width: 50vw;
 }
 
@@ -218,6 +219,25 @@ select {
 .appskey-container {
     display: flex;
     gap: 10px;
+}
+
+.multiple-firmware-container {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.multiple-firmware {
+    grid-column: span 3;
+}
+
+#firmware-nb {
+    width: 20%;
+}
+
+.firmware-number,
+.firmware-number input {
+    color : #D1D1D1;
 }
 
 button.generate-dev-eui,
@@ -334,12 +354,14 @@ button.generate-appskey {
     .lorawan-container,
     .application-container,
     .otaa-container,
-    .advanced-container {
+    .advance-container,
+    .abp-container {
         width: 70vw; /* Ajuste la largeur pour les écrans moyens */
     }
 
     .lorawan-form,
-    .application-form {
+    .application-form,
+    .advance-container {
         grid-template-columns: repeat(2, 1fr); /* Passe à 2 colonnes */
     }
 }
@@ -348,12 +370,14 @@ button.generate-appskey {
     .lorawan-container,
     .application-container,
     .otaa-container,
-    .advanced-container {
+    .advance-container,
+    .abp-container {
         width: 85vw; /* Ajuste la largeur pour les petits écrans */
     }
 
     .lorawan-form,
-    .application-form {
+    .application-form,
+    .advanced-container {
         grid-template-columns: 1fr; /* 1 colonne pour les petits écrans */
     }
 
