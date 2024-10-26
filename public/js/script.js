@@ -497,12 +497,53 @@ function getFormJsonString() {
     return JSON.stringify(formData, null, 2);
 }
 
+// Get multiple firmware data as JSON strings
+function getMultipleFormJsonString(nbFirmware){
+    let firmwareData = [];
+    for(let i = 0; i < nbFirmware; i++){
+        let formData = {
+            ACTIVATION_MODE: elements.activationMode.value.toUpperCase(),
+            CLASS: elements.class.value.toUpperCase(),
+            SPREADING_FACTOR: elements.spreadingFactor.value.toUpperCase(),
+            ADAPTIVE_DR: (document.querySelector('input[name="adaptative-dr"]:checked').value == 'on').toString(),
+            CONFIRMED: (document.querySelector('input[name="confirmation"]:checked').value.toString() == 'on').toString(),
+            APP_PORT: elements.appPort.value,
+            SEND_BY_PUSH_BUTTON: (document.querySelector('input[name="send-mode"]:checked').value == 'push-button').toString(),
+            FRAME_DELAY: elements.frameDelay.value * 1000,
+            PAYLOAD_HELLO: elements.hello.checked.toString(),
+            PAYLOAD_TEMPERATURE: elements.temperature.checked.toString(),
+            PAYLOAD_HUMIDITY: elements.humidity.checked.toString(),
+            LOW_POWER: "false",
+            CAYENNE_LPP_: (document.querySelector('input[name="cayenne-lpp"]:checked').value == 'enabled').toString(),
+            devEUI_: formatEUI(genRandomKey(16, elements.devEui)),
+            appKey_: formatKey(genRandomKey(32, elements.appKey).toUpperCase()),
+            appEUI_: formatEUI(genRandomKey(16, elements.appEui)),
+            devAddr_: formatAddr(genRandomKey(8, elements.devAddr)),
+            nwkSKey_: formatKey(genRandomKey(32, elements.nwksKey)),
+            appSKey_: formatKey(genRandomKey(32, elements.appsKey)),
+            ADMIN_SENSOR_ENABLED: (document.querySelector('input[name="admin-sensor"]:checked').value == 'enabled').toString(),
+            MLR003_SIMU: (document.querySelector('input[name="mrl003-sim"]:checked').value == 'on').toString(),
+            MLR003_APP_PORT: elements.mrlAppPort.value,
+            ADMIN_GEN_APP_KEY: formatKey(genRandomKey(32, elements.adminAppKey)),
+        };
+        firmwareData.push(formData);
+    }
+    return JSON.stringify(firmwareData, null, 2);
+}
+
 
 // Button to compile
 document.getElementById('generate-firmware').addEventListener('click', function() {
-    let jsonString = getFormJsonString();
-    console.log(jsonString);
-    //compileFirmware(jsonString); 
+    if(elements.multipleFirmware.checked){
+        let nbFirmware = document.getElementById('firmware-nb').value;
+        let jsonString = getMultipleFormJsonString(nbFirmware);
+        console.log(jsonString);
+        compileMultipleFirmware(jsonString, nbFirmware);
+    } else {    
+        let jsonString = getFormJsonString();
+        console.log(jsonString);
+        compileFirmware(jsonString); 
+    }
 });
 
 
@@ -523,6 +564,37 @@ async function compileFirmware(jsonString){
             const a = document.createElement('a');
             a.href = url;
             a.download = 'STM32WL-standalone.bin';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        } else {
+            const errorText = await response.text();
+            alert('Error: ' + errorText);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while compiling the code');
+    }
+}
+
+
+// function compile multiple firmware from jsonString of all form data
+async function compileMultipleFirmware(jsonString, nbFirmware){
+    try {
+        const response = await fetch('/compileMultiple', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: jsonString,
+        });
+
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `STM32WL-standalone-${nbFirmware}.zip`;
             document.body.appendChild(a);
             a.click();
             a.remove();
