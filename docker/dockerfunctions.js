@@ -66,13 +66,6 @@ async function compile(id, jsonConfig) {
     return status;
 }
 
-function randomId() {
-    let min = 10 ** 14;
-    let max = 10 ** 15;
-    let id_random = (Math.floor(Math.random() * (max - min)) + min).toString();
-    return id_random.toString()
-}
-
 async function initSharedVolume() {
     console.log(`Initiating shared volume ${volName}`)
     try {
@@ -220,7 +213,6 @@ function containerLogs(container) {
 module.exports = {
     compile,
     initSharedVolume,
-    randomId,
     volName,
     compiledFile
 };
