@@ -3,6 +3,7 @@ const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 const path = require('path');
 var stream = require('stream');
 const fs = require('fs').promises;
+const fse = require('fs-extra');
 
 let jsontest = {
     "ACTIVATION_MODE": "OTAA",
@@ -39,9 +40,9 @@ const compiledFile = 'STM32WL-standalone.bin' // compiled file name
 const generalSetupPath = process.env.General_Setup_path;
 const configApplicationPath = process.env.config_application_path;
 
-async function compile(id, jsonConfig) {
+async function compile(id,jsonConfig) {
     console.log(`Compiling with id : ${id}`)
-    let configPath = `/${volName}/configs/${id}` // Path for .h files for compiling
+    let configPath = `/${volName}/configs/${id}` // Path for compiler files
     let resultPath = `/${volName}/results/${id}` // Path for .bin compiled files
 
     // Split input json for the 2 config files
@@ -53,12 +54,15 @@ async function compile(id, jsonConfig) {
         delete jsonAppSetup[key];
     }
 
-    /*
+
     // Create folders, move and rename templates
     await setupFiles(id,configPath,resultPath);
+    await copyDir("/STM32WL",configPath);
+    /*
     // Modify .h files with json
     await modifyHFile(`${configPath}/config_application.h`,jsonAppSetup)
     await modifyHFile(`${configPath}/General_Setup.h`,jsonGenSetup)
+    */
     // Start Compiling
     let status = await startCompilerContainer(configPath,resultPath)
     if(status == 0){
@@ -66,9 +70,17 @@ async function compile(id, jsonConfig) {
     } else {
         console.log(`Error while compiling : ${id}`)
     }
-    */
     return 0;
 }
+
+async function copyDir(src, dst) {
+    console.log(`Copying STM32WL to ${dst}`)
+    try {
+      await fse.copy(src, dst);
+    } catch (err) {
+      console.error('Error copying files : ', err);
+    }
+  }
 
 function randomId() {
     let min = 10 ** 14;
@@ -172,8 +184,8 @@ async function startCompilerContainer(configPath, resultPath){
             HostConfig: {
                 Binds: [`${volName}:/${volName}`] // Volume that stores configs and results data
             },
-            // Move configs files to /config, make, and then put .bin into resultpath
-            Cmd: [`/bin/bash`, `-c`, `mv ${configPath}/config_application.h ${configPath}/General_Setup.h config/ && make && mv ${compiledFile} ${resultPath}`]
+            // Move to compiler, make, and then put .bin into resultpath
+            Cmd: [`/bin/bash`, `-c`, `cd ..${configPath} && make && mv ${compiledFile} ${resultPath}`]
         });
 
         // Start container
@@ -203,7 +215,7 @@ function containerLogs(container) {
     // Create a single stream for stdin and stdout
     var logStream = new stream.PassThrough();
     logStream.on('data', function (chunk) {
-        console.log(chunk.toString('utf8'));
+        process.stdout.write(chunk.toString('utf8'));
     });
 
     container.logs({
@@ -212,7 +224,7 @@ function containerLogs(container) {
         stderr: true
     }, function (err, stream) {
         if (err) {
-            return console.error(err.message);
+            return process.stderr.write(err.message);
         }
         container.modem.demuxStream(stream, logStream, logStream);
         stream.on('end', function () {
