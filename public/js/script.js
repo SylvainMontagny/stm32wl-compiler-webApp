@@ -1,3 +1,5 @@
+let clientId;
+
 const elements = {
     advancedContainer: document.querySelector('.advance-container .title-container .closed-advance-container'),
     svgArrow: document.querySelector('.advance-container .title-container .closed-advance-container .svg'),
@@ -398,16 +400,28 @@ document.getElementById('generate-firmware').addEventListener('click', function(
     }
 });
 
+function randomId() {
+    let min = 10 ** 14;
+    let max = 10 ** 15;
+    let id_random = (Math.floor(Math.random() * (max - min)) + min);
+    return id_random.toString(36)
+}
+
 
 // function compile firmware from jsonString of all form data
 async function compileFirmware(jsonString){
     try {
+        const requestData = {
+            clientId: clientId,  
+            formData: JSON.parse(jsonString)
+        };
+
         const response = await fetch('/compile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: jsonString,
+            body: JSON.stringify(requestData),
         });
 
         if (response.ok) {
@@ -428,3 +442,25 @@ async function compileFirmware(jsonString){
         alert('An error occurred while compiling the code');
     }
 }
+
+// Initialize Socket.io connection and handle events
+function initializeSocket() {
+    const socket = io.connect('http://localhost:80');
+    
+    clientId = randomId();
+
+    socket.emit('create_id', clientId); 
+
+    socket.on('response', (data) => {
+        console.log(data.socketId);
+    });
+
+    socket.on('compilation_started', (data) => {
+        console.log(data.message);
+    });
+}
+
+// Execute the initializeSocket function once the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initializeSocket();
+});
