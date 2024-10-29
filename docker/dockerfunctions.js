@@ -3,6 +3,10 @@ const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 const path = require('path');
 var stream = require('stream');
 const fs = require('fs').promises;
+const clientList = require('../sockets/clientList');
+const { getSocketInstance, sendLogToClient } = require('../sockets/socketInstance');
+
+
 
 let jsontest = {
     "ACTIVATION_MODE": "OTAA",
@@ -37,10 +41,10 @@ const imageName = 'eliasqzo/stm32wl:latest' // image of the compiler
 const volName = 'shared-vol' // name of the volume used to store configs and results
 const compiledFile = 'STM32WL-standalone.bin' // compiled file name
 
-async function compile(id, jsonConfig) {
-    console.log(`Compiling with id : ${id}`)
-    let configPath = `/${volName}/configs/${id}` // Path for .h files for compiling
-    let resultPath = `/${volName}/results/${id}` // Path for .bin compiled files
+async function compile(clientId, jsonConfig) {
+    console.log(`Compiling with id : ${clientId}`)
+    let configPath = `/${volName}/configs/${clientId}` // Path for .h files for compiling
+    let resultPath = `/${volName}/results/${clientId}` // Path for .bin compiled files
 
     // Split input json for the 2 config files
     // Put General_Setup.h keys in separate json
@@ -52,16 +56,16 @@ async function compile(id, jsonConfig) {
     }
 
     // Create folders, move and rename templates
-    await setupFiles(id,configPath,resultPath);
+    await setupFiles(clientId,configPath,resultPath);
     // Modify .h files with json
     await modifyHFile(`${configPath}/config_application.h`,jsonAppSetup)
     await modifyHFile(`${configPath}/General_Setup.h`,jsonGenSetup)
     // Start Compiling
-    let status = await startCompilerContainer(configPath,resultPath)
+    let status = await startCompilerContainer(configPath,resultPath, clientId)
     if(status == 0){
-        console.log(`Compiled successfully : ${id}`)
+        console.log(`Compiled successfully : ${clientId}`)
     } else {
-        console.log(`Error while compiling : ${id}`)
+        console.log(`Error while compiling : ${clientId}`)
     }
     return status;
 }
@@ -153,7 +157,7 @@ async function renameFile(source, destination) {
     return destination; 
 }
 
-async function startCompilerContainer(configPath, resultPath){
+async function startCompilerContainer(configPath, resultPath, clientId){
     try {
         // Start compiler with custom CMD
         const container = await docker.createContainer({
@@ -170,7 +174,7 @@ async function startCompilerContainer(configPath, resultPath){
         console.log(`Container started: ${container.id}`);
 
         // Display logs
-        containerLogs(container);
+        containerLogs(container, clientId);
 
         // Wait for the container to stop
         const waitResult = await container.wait();
@@ -188,13 +192,13 @@ async function startCompilerContainer(configPath, resultPath){
         }
 }
 
-function containerLogs(container) {
+function containerLogs(container, clientId) {
     // Create a single stream for stdin and stdout
     var logStream = new stream.PassThrough();
     logStream.on('data', function (chunk) {
-        console.log(chunk.toString('utf8'));
+        const logMessage = chunk.toString('utf8');
+        sendLogToClient(clientId, logMessage)
     });
-
     container.logs({
         follow: true,
         stdout: true,

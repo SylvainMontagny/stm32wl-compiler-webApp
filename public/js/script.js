@@ -451,11 +451,7 @@ function initializeSocket() {
 
     socket.emit('create_id', clientId); 
 
-    socket.on('response', (data) => {
-        console.log(data.socketId);
-    });
-
-    socket.on('compilation_started', (data) => {
+    socket.on('compilation_log', (data) => {
         console.log(data.message);
     });
 }

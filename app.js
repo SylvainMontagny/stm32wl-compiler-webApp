@@ -3,7 +3,8 @@ const path = require('path');
 const http = require('http');
 const cors = require('cors');
 const fs = require('fs');
-const clientList = require('./clientList');
+const clientList = require('./sockets/clientList');
+const { initSocket, sendLogToClient } = require('./sockets/socketInstance');
 const { dockerfunctions, initSharedVolume, compile, volName, compiledFile } = require('./docker/dockerfunctions');
 
 
@@ -28,10 +29,7 @@ app.post('/compile', async (req, res) => {
 
     let compiledPath = `/${volName}/results/${clientId}/${compiledFile}`
 
-    const client = clientList.find(client => client.userID === clientId);
-    if (client) {
-        io.to(client.socketId).emit('compilation_started', { message: 'Compilation is starting...' });
-    }
+    sendLogToClient(clientId, 'Compilation is starting...')
 
     let status = await compile(clientId, formData)
     if (status === 0) {
@@ -52,7 +50,7 @@ app.post('/compile', async (req, res) => {
 /* INIT */
 
 const server = http.createServer(app);
-const io = require('./socket')(server);
+initSocket(server);
 
 // Start serveur on port 4050
 server.listen(port, () => {
