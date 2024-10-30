@@ -21,6 +21,7 @@ const elements = {
     rLorawan: document.getElementById('restore-lorawan'),
     rApp: document.getElementById('restore-app'),
     rAdvance: document.getElementById('restore-adv'),
+    frameDelay: document.getElementById('frame-delay'),
     generateDevEui: document.getElementById('generate-dev-eui'),
     generateAppKey: document.getElementById('generate-appkey'),
     generateAppEUI: document.getElementById('generate-appeui'),
@@ -254,7 +255,7 @@ function saveFormData() {
         confirmation: document.querySelector('input[name="confirmation"]:checked').value,
         appPort: elements.appPort.value,
         sendMode: document.querySelector('input[name="send-mode"]:checked').value,
-        frameDelay: document.getElementById('frame-delay').value,
+        frameDelay: elements.frameDelay.value,
         hello: elements.hello.checked,
         temperature: elements.temperature.checked,
         humidity: elements.humidity.checked,
@@ -286,7 +287,7 @@ function restoreFormData() {
         document.querySelector(`input[name="confirmation"][value="${formData.confirmation || 'off'}"]`).checked = true;
         elements.appPort.value = formData.appPort || '15';
         document.querySelector(`input[name="send-mode"][value="${formData.sendMode || 'every-frame-delay'}"]`).checked = true;
-        document.getElementById('frame-delay').value = formData.frameDelay || '10';
+        elements.frameDelay.value = formData.frameDelay || '10';
         elements.hello.checked = formData.hello || false;
         elements.temperature.checked = formData.temperature || false;
         elements.humidity.checked = formData.humidity || false;
@@ -387,19 +388,20 @@ function validateForm() {
 }
 
 //Min and max input number values
-function mixMaxRange(inputElement,min,max) {
+function mixMaxRange(inputElement) {
     inputElement.addEventListener('input', () => {
         let value = parseInt(inputElement.value, 10);
-        if (value < min) {
-            inputElement.value = min; // Reset to 1 if below
-        } else if (value > max) {
-            inputElement.value = max; // Reset to 255 if above
+        if (inputElement.min && value < inputElement.min) {
+            inputElement.value = inputElement.min; // Reset to min if below
+        } else if (inputElement.max && value > inputElement.max) {
+            inputElement.value = inputElement.max; // Reset to max if above
         }
     });
 }
 
-mixMaxRange(elements.appPort,elements.appPort.min,elements.appPort.max);
-mixMaxRange(elements.mrlAppPort,elements.mrlAppPort.min,elements.mrlAppPort.max);
+mixMaxRange(elements.appPort);
+mixMaxRange(elements.mrlAppPort);
+mixMaxRange(elements.frameDelay);
 
 // Button to compile
 document.getElementById('generate-firmware').addEventListener('click', function() {
