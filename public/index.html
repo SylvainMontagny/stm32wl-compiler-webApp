@@ -112,14 +112,14 @@
                             </div>
                             <div class="radio-button">
                                 <input type="radio" id="send-every-frame-delay" name="send-mode" value="every-frame-delay" checked>
-                                <label for="send-every-frame-delay">Transmission every <input type="number" id="frame-delay" name="frame-delay" min="8" max="1000000" value="10"> secondes</label>
+                                <label for="send-every-frame-delay">Transmission every <input type="number" id="frame-delay" name="frame-delay" min="1" value="10"> seconds</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="frame-delay">
                         <h3>Frame Delay</h3>
-                        <input type="number" id="frame-delay" name="frame-delay" min="8" value="10">
+                        <input type="number" id="frame-delay" name="frame-delay" min="1" value="10">
                     </div>
 
                     <div class="payload-configuration">
@@ -307,7 +307,7 @@
                         </div> 
                     </div>
 
-                    <div class="multiple-firmware">
+                    <div class="multiple-firmware" style="display: none;">
                         <h3>Generate multiple Firmwares</h3>
                         <div class="multiple-firmware-container">
                             <div class="radio-button">

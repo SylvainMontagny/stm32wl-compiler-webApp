@@ -402,9 +402,6 @@ window.addEventListener('load', function() {
     cayenne1Error();
     cayenne2Error();
     simOnError();
-    fportError();
-    frameDelayError();
-    mrlAppPortError();
 
     // gen keys
     if (!localStorage.getItem('formData')) {
