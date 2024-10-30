@@ -2,7 +2,8 @@ const express = require('express');
 const path = require('path');
 
 const fs = require('fs');
-const { dockerfunctions, initSharedVolume, compile, randomId, volName, compiledFile } = require('./docker/dockerfunctions');
+const { compile, randomId, volName, compiledFile } = require('./docker/dockerfunctions');
+const { initSharedVolume } = require('./docker/file_fct.js');
 
 const app = express();
 const port = process.env.PORT || 4050;
@@ -48,4 +49,4 @@ app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
 
-initSharedVolume();
+initSharedVolume(volName);

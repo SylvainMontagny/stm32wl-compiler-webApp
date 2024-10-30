@@ -386,6 +386,20 @@ function validateForm() {
     return isValid;
 }
 
+//Min and max input number values
+function mixMaxRange(inputElement,min,max) {
+    inputElement.addEventListener('input', () => {
+        let value = parseInt(inputElement.value, 10);
+        if (value < min) {
+            inputElement.value = min; // Reset to 1 if below
+        } else if (value > max) {
+            inputElement.value = max; // Reset to 255 if above
+        }
+    });
+}
+
+mixMaxRange(elements.appPort,elements.appPort.min,elements.appPort.max);
+mixMaxRange(elements.mrlAppPort,elements.mrlAppPort.min,elements.mrlAppPort.max);
 
 // Button to compile
 document.getElementById('generate-firmware').addEventListener('click', function() {
