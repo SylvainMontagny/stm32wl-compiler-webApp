@@ -1,4 +1,5 @@
 const fs = require('fs-extra');
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
 const compilerPath = '/STM32WL' // Path to the STM32WL compiler files
 const generalSetupPath = process.env.General_Setup_path;
@@ -66,6 +67,59 @@ async function setupFiles(configPath,resultPath,jsonConfigApplication,jsonGenera
     await modifyHFile(`${configPath}${generalSetupPath}/General_Setup.h`,jsonGeneralSetup);
 }
 
+/**
+ * Setup the files for the multi-compilation process
+ */
+async function setupFilesMulti(resultPath,jsonConfig){
+    // Default values
+    const default_id = '';
+    const default_name = '';
+    const default_frequency_plan_id = "EU_863_870_TTN";
+    const default_lorawan_version = "MAC_V1_0_3";
+    const default_lorawan_phy_version = "RP002_V1_0_3";
+
+    
+    const csvName = 'tts-end-devices.csv'
+    let csvPath = `${resultPath}/${csvName}`;
+    await createDir(resultPath)
+
+    let csvData = [];
+    jsonConfig.forEach(element => {
+        let csvElem = {};
+        csvElem.id = default_id;
+        csvElem.name = default_name;
+        csvElem.dev_eui = element.devEUI_.replace(/0x|,\s/g, '');
+        csvElem.join_eui = element.appEUI_.replace(/0x|,\s/g, '');
+        csvElem.frequency_plan_id = default_frequency_plan_id;
+        csvElem.lorawan_version = default_lorawan_version;
+        csvElem.lorawan_phy_version = default_lorawan_phy_version;
+        csvElem.app_key = element.appKey_.replace(/,/g, '');
+
+        csvData.push(csvElem);
+    });
+
+    const csvWriter = createCsvWriter({
+        path: csvPath,
+        header: [
+            { id: 'id', title: 'id' },
+            { id: 'dev_eui', title: 'dev_eui' },
+            { id: 'join_eui', title: 'join_eui' },
+            { id: 'name', title: 'name' },
+            { id: 'frequency_plan_id', title: 'frequency_plan_id' },
+            { id: 'lorawan_version', title: 'lorawan_version' },
+            { id: 'lorawan_phy_version', title: 'lorawan_phy_version' },
+            { id: 'app_key', title: 'app_key' }
+        ]
+    });
+
+    try {
+        await csvWriter.writeRecords(csvData);
+        console.log(`${csvPath} created`);
+    } catch (error) {
+        console.error(`Error creating ${csvPath} :`, error);
+    }
+}
+
 async function copyDir(source, destination) {
     console.log(`Copying STM32WL to ${destination}`)
     try {
@@ -109,5 +163,6 @@ async function writeFileAsync(source, modifiedData) {
 module.exports = {
     initSharedVolume,
     setupFiles,
-    deleteDir
+    deleteDir,
+    setupFilesMulti
 };

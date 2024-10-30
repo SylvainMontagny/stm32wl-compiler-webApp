@@ -1,7 +1,7 @@
 const Docker = require('dockerode');
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 var stream = require('stream');
-const { setupFiles, deleteDir } = require('./file_fct.js');
+const { setupFiles, deleteDir, setupFilesMulti } = require('./file_fct.js');
 
 //keys to set into General_Setup.h
 const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "MLR003_APP_PORT", "ADMIN_GEN_APP_KEY"]
@@ -42,6 +42,14 @@ async function compile(compileId,jsonConfig) {
     await deleteDir(configPath);
 
     return status;
+}
+
+async function compileMultiple(multipleCompileId, jsonConfig){
+    console.log(`Multiple compilation id : ${multipleCompileId}`)
+    let resultPath = `/${volName}/results/${multipleCompileId}` // Path for .zip with .bin and .csv files
+
+    setupFilesMulti(resultPath,jsonConfig)
+    return 0;
 }
 
 /**
@@ -126,6 +134,7 @@ function containerLogs(compileId,container) {
 
 module.exports = {
     compile,
+    compileMultiple,
     randomId,
     volName,
     compiledFile

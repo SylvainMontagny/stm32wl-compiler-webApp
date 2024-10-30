@@ -459,8 +459,8 @@ function getFormJson() {
     return formData;
 }
 
-// Get multiple firmware data as JSON strings
-function getMultipleFormJsonString(nbFirmware){
+// Get multiple firmware data as JSON
+function getMultipleFormJson(nbFirmware){
     let firmwareData = [];
     for(let i = 0; i < nbFirmware; i++){
         let formData = {
@@ -490,7 +490,7 @@ function getMultipleFormJsonString(nbFirmware){
         };
         firmwareData.push(formData);
     }
-    return JSON.stringify(firmwareData, null, 2);
+    return firmwareData;
 }
 
 //Min and max input number values
@@ -513,9 +513,9 @@ mixMaxRange(elements.frameDelay);
 document.getElementById('generate-firmware').addEventListener('click', function() {
     if(elements.multipleFirmware.checked){
         let nbFirmware = document.getElementById('firmware-nb').value;
-        let jsonString = getMultipleFormJsonString(nbFirmware);
-        console.log(jsonString);
-        compileMultipleFirmware(jsonString, nbFirmware);
+        let jsonConfig = getMultipleFormJson(nbFirmware);
+        console.log(jsonConfig);
+        compileMultipleFirmware(jsonConfig, nbFirmware);
     } else {    
         let jsonConfig = getFormJson();
         console.log(jsonConfig);
@@ -531,6 +531,15 @@ function generateBinFileName(jsonConfig){
     let SpreadingFactor = jsonConfig.SPREADING_FACTOR
     let Confirmed = (jsonConfig.CONFIRMED == "true")?"Confirmed":"Unconfirmed"
     return `${DevEUI}-${ActivationMode}-${Class}-${SpreadingFactor}-${Confirmed}.bin`;
+}
+
+// Generate the .zip file name for multiple firmware generation
+function generateMultipleCompileFileName(nbFirmware,jsonConfig){
+    let ActivationMode = jsonConfig.ACTIVATION_MODE
+    let Class = jsonConfig.CLASS
+    let SpreadingFactor = jsonConfig.SPREADING_FACTOR
+    let Confirmed = (jsonConfig.CONFIRMED == "true")?"Confirmed":"Unconfirmed"
+    return `x${nbFirmware}-${ActivationMode}-${Class}-${SpreadingFactor}-${Confirmed}.zip`;
 }
 
 // function compile firmware from jsonString of all form data
@@ -567,21 +576,23 @@ async function compileFirmware(jsonConfig){
 
 
 // function compile multiple firmware from jsonString of all form data
-async function compileMultipleFirmware(jsonString, nbFirmware){
+async function compileMultipleFirmware(jsonConfig, nbFirmware){
     try {
-        const response = await fetch('/compileMultiple', {
+        const response = await fetch('/compile-multiple', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: jsonString,
+            body: JSON.stringify(jsonConfig, null, 2),
         });
 
+        /*
         if (response.ok) {
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
+            console.log(generateMultipleCompileFileName(nbFirmware,jsonConfig[0]))
             a.download = `STM32WL-standalone-${nbFirmware}.zip`;
             document.body.appendChild(a);
             a.click();
@@ -590,6 +601,7 @@ async function compileMultipleFirmware(jsonString, nbFirmware){
             const errorText = await response.text();
             alert('Error: ' + errorText);
         }
+        */
     } catch (error) {
         console.error('Error:', error);
         alert('An error occurred while compiling the code');

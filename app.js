@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 
 const fs = require('fs');
-const { compile, randomId, volName, compiledFile } = require('./docker/dockerfunctions');
+const { compile, compileMultiple, randomId, volName, compiledFile } = require('./docker/dockerfunctions');
 const { initSharedVolume } = require('./docker/file_fct.js');
 
 const app = express();
@@ -21,12 +21,12 @@ app.get('/', (req, res) => {
 
 // Route compile
 app.post('/compile', async (req, res) => {
-    const formData = req.body;
+    let jsonConfig = req.body;
 
     let id = randomId()
     let compiledPath = `/${volName}/results/${id}/${compiledFile}`
 
-    let status = await compile(id, formData)
+    let status = await compile(id, jsonConfig)
     if (status === 0) {
         // Send compiled file data to client
         res.download(compiledPath, (err) => {
@@ -40,6 +40,30 @@ app.post('/compile', async (req, res) => {
         res.status(400).send('Compilation Error');
     }
 
+});
+
+// Route compile multiple
+app.post('/compile-multiple', async (req, res) => {
+    let jsonConfig = req.body;
+
+    let id = randomId()
+    //let compiledPath = `/${volName}/results/${id}/${compiledFile}`
+    let status = await compileMultiple(id, jsonConfig)
+    /*
+    let status = await compile(id, formData)
+    if (status === 0) {
+        // Send compiled file data to client
+        res.download(compiledPath, (err) => {
+            if (err) {
+                console.error(err);
+                res.status(500).send('Error downloading the file');
+            }
+        });
+    } else {
+        // Send an error response
+        res.status(400).send('Compilation Error');
+    }
+    */
 });
 
 /* INIT */
