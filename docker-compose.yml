@@ -13,7 +13,9 @@ services:
 
   compiler:
     image: montagny/arm-compiler:1.0 # Image used for compilation
-
+    deploy:
+      replicas: 0
+      
 volumes:
   shared-vol:
     name: "shared-vol"
