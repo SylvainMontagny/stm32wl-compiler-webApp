@@ -2,7 +2,7 @@ services:
   web:
     image: compiler-webapp # Webapp image
     ports:
-      - "4050:4050" # Webapp port
+      - "80:4050" # Webapp port
     volumes:
       - shared-vol:/shared-vol # Volume to share data across containers
       - /c/Users/elias/Desktop/M1/STM32WL/STM32WL-standalone:/STM32WL # Path to compiler folder

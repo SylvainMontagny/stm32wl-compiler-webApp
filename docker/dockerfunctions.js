@@ -5,32 +5,6 @@ var stream = require('stream');
 const fs = require('fs').promises;
 const fse = require('fs-extra');
 
-let jsontest = {
-    "ACTIVATION_MODE": "OTAA",
-    "CLASS": "CLASS_A",
-    "SPREADING_FACTOR": "7",
-    "ADAPTIVE_DR": "false",
-    "CONFIRMED": "false",
-    "APP_PORT": "15",
-    "SEND_BY_PUSH_BUTTON": "false",
-    "FRAME_DELAY": "10000",
-    "PAYLOAD_HELLO": "true",
-    "PAYLOAD_TEMPERATURE": "false",
-    "PAYLOAD_HUMIDITY": "false",
-    "LOW_POWER": "false",
-    "CAYENNE_LPP_": "false",
-    "devEUI_": "0xdc, 0x70, 0x22, 0x0a, 0x80, 0xa6, 0x4e, 0x9d",
-    "appKey_": "55,1F,E3,F0,4F,80,AC,31,46,F5,B7,F5,D9,21,D3,B3",
-    "appEUI_": "0x67, 0xc3, 0xfe, 0xcd, 0xc4, 0x56, 0x5b, 0xab",
-    "devAddr_": "0x5854ccbd",
-    "nwkSKey_": "81,1c,9a,89,e7,d5,bb,22,7e,94,af,34,22,c1,d9,5e",
-    "appSKey_": "97,1f,b0,fc,cd,2b,59,4e,5c,1b,32,1d,80,2f,9a,08",
-    "ADMIN_SENSOR_ENABLED": "false",
-    "MLR003_SIMU": "false",
-    "MLR003_APP_PORT": "30",
-    "ADMIN_GEN_APP_KEY": "e1,7f,e1,5a,f6,80,1d,16,d0,34,ea,59,ad,2a,4e,f5"
-};
-
 //keys to set into General_Setup.h
 const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "MLR003_APP_PORT", "ADMIN_GEN_APP_KEY"]
 
@@ -47,22 +21,19 @@ async function compile(id,jsonConfig) {
 
     // Split input json for the 2 config files
     // Put General_Setup.h keys in separate json
-    jsonAppSetup = jsonConfig;
-    jsonGenSetup = {};
+    jsonConfigApplication = jsonConfig;
+    jsonGeneralSetup = {};
     for (let key of generalSetupKeys) {
-        jsonGenSetup[key] = jsonAppSetup[key];
-        delete jsonAppSetup[key];
+        jsonGeneralSetup[key] = jsonConfigApplication[key];
+        delete jsonConfigApplication[key];
     }
 
-
-    // Create folders, move and rename templates
+    // Create folders and copy compiler files
     await setupFiles(id,configPath,resultPath);
     await copyDir("/STM32WL",configPath);
-    /*
     // Modify .h files with json
-    await modifyHFile(`${configPath}/config_application.h`,jsonAppSetup)
-    await modifyHFile(`${configPath}/General_Setup.h`,jsonGenSetup)
-    */
+    await modifyHFile(`${configPath}${generalSetupPath}/General_Setup.h`,jsonGeneralSetup);
+    await modifyHFile(`${configPath}${configApplicationPath}/config_application.h`,jsonConfigApplication);
     // Start Compiling
     let status = await startCompilerContainer(configPath,resultPath)
     if(status == 0){
@@ -70,13 +41,41 @@ async function compile(id,jsonConfig) {
     } else {
         console.log(`Error while compiling : ${id}`)
     }
-    return 0;
+    return status;
 }
 
-async function copyDir(src, dst) {
-    console.log(`Copying STM32WL to ${dst}`)
+async function modifyHFile(source,jsonConfig){
     try {
-      await fse.copy(src, dst);
+        // Read async
+        let data = await fs.readFile(source, 'utf8');
+        let modifiedData = data;
+
+        for (let [key, value] of Object.entries(jsonConfig)) {
+            // Special case : { 0x00, ... }
+            if(key == "devEUI_" || key == "appEUI_"){
+                let regex = new RegExp(`(#define ${key}\\s+{ ).+[0-9]`,'m');
+                modifiedData = modifiedData.replace(regex,`$1${value}`);
+            // Special case : ( uint32_t )0x00...
+            } else if(key == "devAddr_"){
+                let regex = new RegExp(`(#define ${key}\\s+.*)0x[0-9]+`,'m')
+                modifiedData = modifiedData.replace(regex,`$1${value}`);
+            // Default case
+            } else {
+                let regex = new RegExp(`(#define ${key}\\s+)[a-zA-Z0-9_,]+`,'m');
+                modifiedData = modifiedData.replace(regex,`$1${value}`);
+            }
+        }
+        // Write changes to file
+        await writeFileAsync(source, modifiedData);
+    } catch (err) {
+        console.error(`Error reading or writing in file : ${err}`);
+    }
+}
+
+async function copyDir(source, destination) {
+    console.log(`Copying STM32WL to ${destination}`)
+    try {
+      await fse.copy(source, destination);
     } catch (err) {
       console.error('Error copying files : ', err);
     }
@@ -127,23 +126,6 @@ async function createDir(dir) {
         } else {
             console.error(`Error verrifying file : ${err}`);
         }
-    }
-}
-
-async function modifyHFile(source, jsonConfig) {
-    try {
-        // Read async
-        let data = await fs.readFile(source, 'utf8');
-        let modifiedData = data;
-        
-        for (let [key, value] of Object.entries(jsonConfig)) {
-            const regex = new RegExp(`<${key}>`);
-            modifiedData = modifiedData.replace(regex,value);
-        }
-        // Write changes to file
-        await writeFileAsync(source, modifiedData);
-    } catch (err) {
-        console.error(`Error reading or writing in file : ${err}`);
     }
 }
 
