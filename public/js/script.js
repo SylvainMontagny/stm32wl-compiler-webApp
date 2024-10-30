@@ -22,6 +22,7 @@ const elements = {
     rLorawan: document.getElementById('restore-lorawan'),
     rApp: document.getElementById('restore-app'),
     rAdvance: document.getElementById('restore-adv'),
+    frameDelay: document.getElementById('frame-delay'),
     generateDevEui: document.getElementById('generate-dev-eui'),
     generateAppKey: document.getElementById('generate-appkey'),
     generateAppEUI: document.getElementById('generate-appeui'),
@@ -277,41 +278,6 @@ copyIcons.forEach(icon => {
     });
 });
 
-
-// Error FPort 1 to 255
-function fportError() {
-    let fport = elements.appPort.value;
-    if (fport < 1) {
-        elements.appPort.value = 1;
-    } else if (fport > 255) {
-        elements.appPort.value = 255;
-    }
-}
-elements.appPort.addEventListener('change', fportError);
-
-// Error Frame Delay 8 to 100
-function frameDelayError() {
-    let frameDelay = elements.frameDelay.value;
-    if (frameDelay < 8) {
-        elements.frameDelay.value = 8;
-    } else if (frameDelay > 100) {
-        elements.frameDelay.value = 100;
-    }
-}
-elements.frameDelay.addEventListener('change', frameDelayError);
-
-// Error MRL003 App Port 1 to 255
-function mrlAppPortError() {
-    let mrlAppPort = elements.mrlAppPort.value;
-    if (mrlAppPort < 1) {
-        elements.mrlAppPort.value = 1;
-    } else if (mrlAppPort > 255) {
-        elements.mrlAppPort.value = 255;
-    }
-}
-elements.mrlAppPort.addEventListener('change', mrlAppPortError);
-
-
 // Disable credentials  
 function disableCredentials() {
     [elements.appEui, elements.devAddr, elements.nwksKey, elements.appsKey, elements.devEui, elements.appKey, elements.adminAppKey].forEach(element => {
@@ -466,8 +432,7 @@ function formatKey(str){
     return str.match(/.{1,2}/g).join(',');
 }
 
-// Get form data as JSON string
-function getFormJsonString() {
+function getFormJson() {
     let formData = {
         ACTIVATION_MODE: elements.activationMode.value.toUpperCase(),
         CLASS: elements.class.value.toUpperCase(),
@@ -494,7 +459,7 @@ function getFormJsonString() {
         ADMIN_GEN_APP_KEY: formatKey(elements.adminAppKey.value),
     };
 
-    return JSON.stringify(formData, null, 2);
+    return formData;
 }
 
 // Get multiple firmware data as JSON strings
@@ -531,6 +496,21 @@ function getMultipleFormJsonString(nbFirmware){
     return JSON.stringify(firmwareData, null, 2);
 }
 
+//Min and max input number values
+function mixMaxRange(inputElement) {
+    inputElement.addEventListener('input', () => {
+        let value = parseInt(inputElement.value, 10);
+        if (inputElement.min && value < inputElement.min) {
+            inputElement.value = inputElement.min; // Reset to min if below
+        } else if (inputElement.max && value > inputElement.max) {
+            inputElement.value = inputElement.max; // Reset to max if above
+        }
+    });
+}
+
+mixMaxRange(elements.appPort);
+mixMaxRange(elements.mrlAppPort);
+mixMaxRange(elements.frameDelay);
 
 // Button to compile
 document.getElementById('generate-firmware').addEventListener('click', function() {
@@ -540,15 +520,24 @@ document.getElementById('generate-firmware').addEventListener('click', function(
         console.log(jsonString);
         compileMultipleFirmware(jsonString, nbFirmware);
     } else {    
-        let jsonString = getFormJsonString();
-        console.log(jsonString);
-        compileFirmware(jsonString); 
+        let jsonConfig = getFormJson();
+        console.log(jsonConfig);
+        compileFirmware(jsonConfig); 
     }
 });
 
+// Generates the file name based on the config
+function generateBinFileName(jsonConfig){
+    let DevEUI = jsonConfig.devEUI_.replace(/0x|,\s/g, '')
+    let ActivationMode = jsonConfig.ACTIVATION_MODE
+    let Class = jsonConfig.CLASS
+    let SpreadingFactor = jsonConfig.SPREADING_FACTOR
+    let Confirmed = (jsonConfig.CONFIRMED == "true")?"Confirmed":"Unconfirmed"
+    return `${DevEUI}-${ActivationMode}-${Class}-${SpreadingFactor}-${Confirmed}.bin`;
+}
 
 // function compile firmware from jsonString of all form data
-async function compileFirmware(jsonString){
+async function compileFirmware(jsonConfig){
     try {
         // Send the request
         const response = await fetch('/compile', {
@@ -556,7 +545,7 @@ async function compileFirmware(jsonString){
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: jsonString,
+            body: JSON.stringify(jsonConfig, null, 2),
         });
 
         // Receive the blob and store it as a file
@@ -565,7 +554,7 @@ async function compileFirmware(jsonString){
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'STM32WL-standalone.bin';
+            a.download = generateBinFileName(jsonConfig);
             document.body.appendChild(a);
             a.click();
             a.remove();
