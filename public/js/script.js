@@ -338,7 +338,7 @@ function formatKey(str){
     return str.match(/.{1,2}/g).join(',');
 }
 
-function getFormJsonString() {
+function getFormJson() {
     let formData = {
         ACTIVATION_MODE: elements.activationMode.value.toUpperCase(),
         CLASS: elements.class.value.toUpperCase(),
@@ -365,8 +365,9 @@ function getFormJsonString() {
         ADMIN_GEN_APP_KEY: formatKey(elements.adminAppKey.value),
     };
 
-    return JSON.stringify(formData, null, 2);
+    return formData;
 }
+
 
 function validateForm() {
     let isValid = true;
@@ -406,24 +407,33 @@ mixMaxRange(elements.frameDelay);
 // Button to compile
 document.getElementById('generate-firmware').addEventListener('click', function() {
     if (validateForm()) {
-        let jsonString = getFormJsonString();
-        console.log(jsonString);
-        compileFirmware(jsonString); 
+        let jsonConfig = getFormJson();
+        console.log(jsonConfig);
+        compileFirmware(jsonConfig); 
     } else {
         alert('Please fix the errors in the form before compiling the firmware');
     }
 });
 
+// Generates the file name based on the config
+function generateBinFileName(jsonConfig){
+    let DevEUI = jsonConfig.devEUI_.replace(/0x|,\s/g, '')
+    let ActivationMode = jsonConfig.ACTIVATION_MODE
+    let Class = jsonConfig.CLASS
+    let SpreadingFactor = jsonConfig.SPREADING_FACTOR
+    let Confirmed = (jsonConfig.CONFIRMED == "true")?"Confirmed":"Unconfirmed"
+    return `${DevEUI}-${ActivationMode}-${Class}-${SpreadingFactor}-${Confirmed}.bin`;
+}
 
 // function compile firmware from jsonString of all form data
-async function compileFirmware(jsonString){
+async function compileFirmware(jsonConfig){
     try {
         const response = await fetch('/compile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: jsonString,
+            body: JSON.stringify(jsonConfig, null, 2),
         });
 
         if (response.ok) {
@@ -431,7 +441,7 @@ async function compileFirmware(jsonString){
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'STM32WL-standalone.bin';
+            a.download = generateBinFileName(jsonConfig);
             document.body.appendChild(a);
             a.click();
             a.remove();
