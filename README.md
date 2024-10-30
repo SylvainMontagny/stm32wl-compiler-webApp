@@ -1,12 +1,6 @@
 # LoRaWAN Compiler Webapp
 
-**LoRaWAN Compiler Webapp** is a containerized web application that allows code compilation by launching containers via a POST Express API. It is designed to manage and isolate compilation environments securely and efficiently, making it easy to execute compilers on demand.
-
-## Features
-
-- Express.js API to launch compiler containers with Dockerode library
-- Secure management of compilation environments
-- Containerize web application via Docker
+**LoRaWAN Compiler Webapp** is a containerized web application that allows code compilation by launching containers via a POST Express API. It is designed to manage and isolate compilation environments securely and efficiently, making it easy to execute compilers on demand. This application is meant to be used alongside STM32WL Standalone compiler files, and an arm-compiler image.
 
 ## Requirement
 
@@ -16,47 +10,84 @@
 
 ### Server Setup
 
-To setup the webapp on a server, you will need a few steps
+To setup the webapp, you will need a few steps
 
-1. Pull pre-built images of the compiler and the webapp from the Docker Hub
-
-```shell
-docker pull eliasqzo/compiler-webapp:latest
-docker pull eliasqzo/stm32wl:latest
-```
-
-2. Create shared-vol docker volume that containers will use to share files
+1. Clone the STM32WL and Webapp Git
 
 ```shell
-docker volume create shared-vol
+git clone https://github.com/SylvainMontagny/STM32WL.git
+git clone https://github.com/elias-qzo/LoRaWAN-Compiler-Webapp.git
 ```
 
-3. Run the webapp container
+2. Start the Webapp container
 
 ```shell
-docker run -it -v /var/run/docker.sock:/var/run/docker.sock -v shared-vol:/shared-vol -p 80:4050 eliasqzo/compiler-webapp:latest
+cd LoRaWAN-Compiler-Webapp
+docker-compose up -d
 ```
 
-You need to pass the docker.sock as a volume to let the webapp launch container with Dockerode library
-You can replace the 80 port to bind on another port of your server, and you can also replace -it by -d to make it detached
+You can remove the -d if you want to see logs in real time
+You might need to change the STM32WL path in the *docker-compose.yml (line 8)*
+
+```yml
+      - /home/debian/STM32WL/STM32WL-standalone:/STM32WL # Path to compiler folder
+```
+
+3. Stop the app
+
+Simply use
+```shell
+docker-compose down
+```
+or *CTRL-C* if you are in real-time mode
 
 ### Build images
 
-You can also build both images yourself if you made some modifications
+You can also build the webapp image yourself if you made some modifications
 
 ```shell
-docker build -t stm32wl STM32WL/
 docker build -t compiler-webapp .
 ```
 
-### Usage, Process overview and Libraries used
+If so, you need to modify the web image into the *docker-compose.yml* file
 
-**Step 1:** Start the main web app container
+### Usage, process overview and libraries used
+
+**Step 1:** Start the main web app container using docker compose
 ```shell
-docker run -it -v /var/run/docker.sock:/var/run/docker.sock -v shared-vol:/shared-vol -p 80:4050 eliasqzo/compiler-webapp:latest
+docker-compose up
+```
+Here is the *docker-compose.yml* used
+```yml
+services:
+  web:
+    image: eliasqzo/compiler-webapp:latest # Webapp image
+    ports:
+      - "80:4050" # Webapp port
+    volumes:
+      - shared-vol:/shared-vol # Volume to share data across containers
+      - /home/debian/STM32WL/STM32WL-standalone:/STM32WL # Path to compiler folder
+      - /var/run/docker.sock:/var/run/docker.sock # Docker socket to start container inside a container
+    environment:
+      - General_Setup_path=/LoRaWAN/App # General_Setup.h path in compiler folder
+      - config_application_path=/LoRaWAN # config_application.h path in compiler folder
+
+  compiler:
+    image: montagny/arm-compiler:1.0 # Image used for compilation
+    profiles:
+      - pull_only # pull only to not start it
+
+volumes:
+  shared-vol:
+    name: "shared-vol"
 ```
 It is an **Express.js server** that let allow us to create an API for the compilation.
-We need to pass the Docker volume **shared-vol** to facilitate data exchange between containers, and also the **Docker daemon socket** to manipulate containers within a container (more infos in Step 4)
+
+We need to pass the Docker volume **shared-vol** to facilitate data exchange between containers. This volume will automatically be created thanks to the three last lines.
+The STM32WL-standalone compiler is passed as a volume so we can copy its content for compilation.
+The **Docker daemon socket** is also passed to manipulate containers within a container (more infos in Step 4)
+
+We also have the *montagny/arm-compiler:1.0* image that we will use for compilation. It is set to pull_only since we don't want to start it for now.
 
 **Step 2:** Send compilation through application interface
 When you click on the *Compile* button on the interface, it will send a **POST request** to the **/compile API route**, sending a JSON payload with all the necessary compilation parameters
@@ -92,7 +123,7 @@ Content-Type: application/json
 ```
 
 **Step 3:** Setup files
-First we generate an ID for the process, and the we initialize the folders for configuration and result into the *shared-vol*
+First we generate an ID for the process, and then we initialize the folders for configuration and result into the *shared-vol* volume.
 ```
 ID : Rt3Le
 
@@ -102,13 +133,16 @@ shared-vol/
 ├── results/
 │   ├── Rt3LE/
 ```
-We modify the *General_Setup.h* and *config_application.h* using *regex* based on the JSON keys and values. After that, we put them in the config folder
+Second, we copy the content of the STM32WL volume content into *configs*, which contains all the necessary .c and .h files for the compilation.
+We modify the *General_Setup.h* and *config_application.h* using *regex* based on the JSON keys and values.
 ```
 shared-vol/
 ├── configs/
 │   ├── Rt3LE/
-│   │   ├── General_Setup.h
-│   │   ├── config_application.h
+│   │   ├── Core/
+│   │   ├── LoRaWAN/
+│   │   ├── Makefile
+│   │   ├── ...
 ├── results/
 │   ├── Rt3LE/
 ```
@@ -125,10 +159,10 @@ This means that new containers are not started within the container running the 
 
 After that, we can launch the container with this function
 ```js
-const imageName = 'eliasqzo/stm32wl:latest' // image of the compiler
+const imageName = 'montagny/arm-compiler:1.0' // image of the compiler
 const volName = 'shared-vol' // name of the volume used to store configs and results
 
-async function startCompilerContainer(configPath, resultPath){
+async function startCompilerContainer(compileId,configPath, resultPath){
     try {
         // Start compiler with custom CMD
         const container = await docker.createContainer({
@@ -136,16 +170,16 @@ async function startCompilerContainer(configPath, resultPath){
             HostConfig: {
                 Binds: [`${volName}:/${volName}`] // Volume that stores configs and results data
             },
-            // Move configs files to /config, make, and then put .bin into resultpath
-            Cmd: [`/bin/bash`, `-c`, `mv ${configPath}/config_application.h ${configPath}/General_Setup.h config/ && make && mv ${compiledFile} ${resultPath}`]
+            // Move to compiler, make, and then put .bin into resultpath
+            Cmd: [`/bin/bash`, `-c`, `cd ..${configPath} && make && mv ${compiledFile} ${resultPath}`]
         });
 
         // Start container
         await container.start();
         console.log(`Container started: ${container.id}`);
 
-        // Display logs
-        containerLogs(container);
+        // Handle logs
+        containerLogs(compileId,container);
 
         // Wait for the container to stop
         const waitResult = await container.wait();
@@ -158,33 +192,32 @@ async function startCompilerContainer(configPath, resultPath){
         // Return if the container add an error or not
         return waitResult.StatusCode
 
-        } catch (error) {
-            console.error('Error starting container :', error);
-        }
+    } catch (error) {
+        console.error('Error starting container :', error);
+    }
 }
 ```
 It will :
-- Start the image *eliasqzo/stm32wl:latest* with the *shared-vol* volume into a container
+- Start the image *montagny/arm-compiler:1.0* with the *shared-vol* volume into a container
 - Execute the custom CMD that moves config files into the compiler, compile and then move the result
 - Delete the container
 - Return the status (0 if everything went well)
 
+At the end of the execution, we will also remove all the compilation files from the *shared-vol* volume
+
 ```
 shared-vol/
 ├── configs/
-│   ├── Rt3LE/
-│   │   ├── General_Setup.h
-│   │   ├── config_application.h
 ├── results/
 │   ├── Rt3LE/
 │   │   ├── STM32WL-standalone.bin
 ```
 
 We can now send the status result and the file as a **blob** through the **/compile API Route**
-A blob is a sendable version of the data inside a file.
+A blob is a sendable version of the data inside a file
 
 **Step 5:** Receive the file
-We can now receive the blob *client-side*, and store it into a file
+We can now receive the blob *client-side*, and store it into a file with a custom name
 This is the client function that send the request and get the file result
 ```js
 async function compileFirmware(jsonString){
@@ -218,4 +251,3 @@ async function compileFirmware(jsonString){
     }
 }
 ```
-
