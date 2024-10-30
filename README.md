@@ -74,8 +74,6 @@ services:
 
   compiler:
     image: montagny/arm-compiler:1.0 # Image used for compilation
-    profiles:
-      - pull_only # pull only to not start it
 
 volumes:
   shared-vol:
@@ -87,7 +85,7 @@ We need to pass the Docker volume **shared-vol** to facilitate data exchange bet
 The STM32WL-standalone compiler is passed as a volume so we can copy its content for compilation.
 The **Docker daemon socket** is also passed to manipulate containers within a container (more infos in Step 4)
 
-We also have the *montagny/arm-compiler:1.0* image that we will use for compilation. It is set to pull_only since we don't want to start it for now.
+We also have the *montagny/arm-compiler:1.0* image that we will use for compilation. We need to pull it so we can use start it with the webcontainer. Here it will be pulled, started, and then stop immediatly since it doesn't have a CMD
 
 **Step 2:** Send compilation through application interface
 When you click on the *Compile* button on the interface, it will send a **POST request** to the **/compile API route**, sending a JSON payload with all the necessary compilation parameters
