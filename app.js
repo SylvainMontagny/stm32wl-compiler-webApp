@@ -47,13 +47,12 @@ app.post('/compile-multiple', async (req, res) => {
     let jsonConfig = req.body;
 
     let id = randomId()
-    //let compiledPath = `/${volName}/results/${id}/${compiledFile}`
+    let zipPath = `/${volName}/results/${id}.zip`
     let status = await compileMultiple(id, jsonConfig)
-    /*
-    let status = await compile(id, formData)
+
     if (status === 0) {
         // Send compiled file data to client
-        res.download(compiledPath, (err) => {
+        res.download(zipPath, (err) => {
             if (err) {
                 console.error(err);
                 res.status(500).send('Error downloading the file');
@@ -63,7 +62,6 @@ app.post('/compile-multiple', async (req, res) => {
         // Send an error response
         res.status(400).send('Compilation Error');
     }
-    */
 });
 
 /* INIT */

@@ -48,7 +48,7 @@ async function compileMultiple(multipleCompileId, jsonConfig){
     console.log(`Multiple compilation id : ${multipleCompileId}`)
     let resultPath = `/${volName}/results/${multipleCompileId}` // Path for .zip with .bin and .csv files
 
-    setupFilesMulti(resultPath,jsonConfig)
+    await setupFilesMulti(resultPath,jsonConfig)
     return 0;
 }
 

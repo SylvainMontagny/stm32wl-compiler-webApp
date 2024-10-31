@@ -586,14 +586,12 @@ async function compileMultipleFirmware(jsonConfig, nbFirmware){
             body: JSON.stringify(jsonConfig, null, 2),
         });
 
-        /*
         if (response.ok) {
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            console.log(generateMultipleCompileFileName(nbFirmware,jsonConfig[0]))
-            a.download = `STM32WL-standalone-${nbFirmware}.zip`;
+            a.download = generateMultipleCompileFileName(nbFirmware,jsonConfig[0]);
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -601,7 +599,6 @@ async function compileMultipleFirmware(jsonConfig, nbFirmware){
             const errorText = await response.text();
             alert('Error: ' + errorText);
         }
-        */
     } catch (error) {
         console.error('Error:', error);
         alert('An error occurred while compiling the code');

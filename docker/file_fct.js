@@ -4,6 +4,8 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const compilerPath = '/STM32WL' // Path to the STM32WL compiler files
 const generalSetupPath = process.env.General_Setup_path;
 const configApplicationPath = process.env.config_application_path;
+const archiver = require('archiver');
+
 
 /**
  * Modify the .h file with the json using regex
@@ -100,6 +102,7 @@ async function setupFilesMulti(resultPath,jsonConfig){
 
     const csvWriter = createCsvWriter({
         path: csvPath,
+        fieldDelimiter: ';',
         header: [
             { id: 'id', title: 'id' },
             { id: 'dev_eui', title: 'dev_eui' },
@@ -118,6 +121,25 @@ async function setupFilesMulti(resultPath,jsonConfig){
     } catch (error) {
         console.error(`Error creating ${csvPath} :`, error);
     }
+
+    await zipDirectory(resultPath,`${resultPath}.zip`)
+}
+
+async function zipDirectory(sourceDir, outPath) {
+    const output = fs.createWriteStream(outPath);
+    const archive = archiver('zip', { zlib: { level: 9 } });
+
+    return new Promise((resolve, reject) => {
+        output.on('close', () => {
+            resolve();
+        });
+
+        archive.on('error', (err) => reject(err));
+
+        archive.pipe(output);
+        archive.directory(sourceDir, false);
+        archive.finalize();
+    });
 }
 
 async function copyDir(source, destination) {
