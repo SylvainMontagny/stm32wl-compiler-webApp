@@ -2,8 +2,8 @@ const express = require('express');
 const path = require('path');
 
 const fs = require('fs');
-const { compile, compileMultiple, randomId, volName, compiledFile } = require('./docker/dockerfunctions');
-const { initSharedVolume } = require('./docker/file_fct.js');
+const { randomId, compile, compileMultiple, volName, compiledFile } = require('./docker/dockerfunctions');
+const { generateBinFileName, generateMultipleCompileFileName, initSharedVolume } = require('./docker/file_fct.js');
 
 const app = express();
 const port = process.env.PORT || 4050;
@@ -24,11 +24,13 @@ app.post('/compile', async (req, res) => {
     let jsonConfig = req.body;
 
     let id = randomId()
-    let compiledPath = `/${volName}/results/${id}/${compiledFile}`
+    let fileName = generateBinFileName(jsonConfig)
+    let compiledPath = `/${volName}/results/${id}/${fileName}`
 
-    let status = await compile(id, jsonConfig)
+    let status = await compile(id, jsonConfig, fileName)
     if (status === 0) {
-        // Send compiled file data to client
+        // Send compiled file data and name to client
+        res.setHeader('X-File-Name', fileName);
         res.download(compiledPath, (err) => {
             if (err) {
                 console.error(err);
@@ -47,11 +49,13 @@ app.post('/compile-multiple', async (req, res) => {
     let jsonConfig = req.body;
 
     let id = randomId()
+    let zipName = generateMultipleCompileFileName(jsonConfig.length, jsonConfig[0]);
     let zipPath = `/${volName}/results/${id}.zip`
     let status = await compileMultiple(id, jsonConfig)
 
     if (status === 0) {
-        // Send compiled file data to client
+        // Send zip file data and name to client
+        res.setHeader('X-File-Name', zipName);
         res.download(zipPath, (err) => {
             if (err) {
                 console.error(err);

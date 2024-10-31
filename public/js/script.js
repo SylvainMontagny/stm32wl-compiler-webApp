@@ -515,32 +515,13 @@ document.getElementById('generate-firmware').addEventListener('click', function(
         let nbFirmware = document.getElementById('firmware-nb').value;
         let jsonConfig = getMultipleFormJson(nbFirmware);
         console.log(jsonConfig);
-        compileMultipleFirmware(jsonConfig, nbFirmware);
+        compileMultipleFirmware(jsonConfig);
     } else {    
         let jsonConfig = getFormJson();
         console.log(jsonConfig);
         compileFirmware(jsonConfig); 
     }
 });
-
-// Generates the file name based on the config
-function generateBinFileName(jsonConfig){
-    let DevEUI = jsonConfig.devEUI_.replace(/0x|,\s/g, '')
-    let ActivationMode = jsonConfig.ACTIVATION_MODE
-    let Class = jsonConfig.CLASS
-    let SpreadingFactor = jsonConfig.SPREADING_FACTOR
-    let Confirmed = (jsonConfig.CONFIRMED == "true")?"Confirmed":"Unconfirmed"
-    return `${DevEUI}-${ActivationMode}-${Class}-${SpreadingFactor}-${Confirmed}.bin`;
-}
-
-// Generate the .zip file name for multiple firmware generation
-function generateMultipleCompileFileName(nbFirmware,jsonConfig){
-    let ActivationMode = jsonConfig.ACTIVATION_MODE
-    let Class = jsonConfig.CLASS
-    let SpreadingFactor = jsonConfig.SPREADING_FACTOR
-    let Confirmed = (jsonConfig.CONFIRMED == "true")?"Confirmed":"Unconfirmed"
-    return `x${nbFirmware}-${ActivationMode}-${Class}-${SpreadingFactor}-${Confirmed}.zip`;
-}
 
 // function compile firmware from jsonString of all form data
 async function compileFirmware(jsonConfig){
@@ -557,10 +538,11 @@ async function compileFirmware(jsonConfig){
         // Receive the blob and store it as a file
         if (response.ok) {
             const blob = await response.blob();
+            const fileName = response.headers.get('X-File-Name');
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = generateBinFileName(jsonConfig);
+            a.download = fileName;
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -576,7 +558,7 @@ async function compileFirmware(jsonConfig){
 
 
 // function compile multiple firmware from jsonString of all form data
-async function compileMultipleFirmware(jsonConfig, nbFirmware){
+async function compileMultipleFirmware(jsonConfig){
     try {
         const response = await fetch('/compile-multiple', {
             method: 'POST',
@@ -588,10 +570,11 @@ async function compileMultipleFirmware(jsonConfig, nbFirmware){
 
         if (response.ok) {
             const blob = await response.blob();
+            const fileName = response.headers.get('X-File-Name');
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = generateMultipleCompileFileName(nbFirmware,jsonConfig[0]);
+            a.download = fileName;
             document.body.appendChild(a);
             a.click();
             a.remove();

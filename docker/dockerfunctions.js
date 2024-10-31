@@ -1,7 +1,7 @@
 const Docker = require('dockerode');
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 var stream = require('stream');
-const { setupFiles, deleteDir, setupFilesMulti } = require('./file_fct.js');
+const { generateBinFileName, setupFiles, deleteDir, setupFilesMulti, zipDirectory } = require('./file_fct.js');
 
 //keys to set into General_Setup.h
 const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "MLR003_APP_PORT", "ADMIN_GEN_APP_KEY"]
@@ -11,9 +11,22 @@ const volName = 'shared-vol' // name of the volume used to store configs and res
 const compiledFile = 'STM32WL-standalone.bin' // compiled file name
 
 /**
+ * Generate a random compileId for the compiling process
+ * With 5 characters/numbers
+ */
+function randomId() {
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let id = '';
+    for (let i = 0; i < 5; i++) {
+        id += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return id;
+}
+
+/**
  * Compile main function used through API
  */
-async function compile(compileId,jsonConfig) {
+async function compile(compileId,jsonConfig, fileName) {
     console.log(`Compiling with id : ${compileId}`)
     let configPath = `/${volName}/configs/${compileId}` // Path for compiler files
     let resultPath = `/${volName}/results/${compileId}` // Path for .bin compiled files
@@ -31,7 +44,7 @@ async function compile(compileId,jsonConfig) {
     await setupFiles(configPath,resultPath,jsonConfigApplication,jsonGeneralSetup);
 
     // Start Compiling
-    let status = await startCompilerContainer(compileId,configPath,resultPath)
+    let status = await startCompilerContainer(compileId,configPath,resultPath,fileName)
     if(status == 0){
         console.log(`Compiled successfully : ${compileId}`)
     } else {
@@ -44,25 +57,56 @@ async function compile(compileId,jsonConfig) {
     return status;
 }
 
-async function compileMultiple(multipleCompileId, jsonConfig){
+async function compileMultiple(multipleCompileId, jsonArrayConfig){
     console.log(`Multiple compilation id : ${multipleCompileId}`)
     let resultPath = `/${volName}/results/${multipleCompileId}` // Path for .zip with .bin and .csv files
+    let configPath = `/${volName}/configs` // Path for all compiler files
 
-    await setupFilesMulti(resultPath,jsonConfig)
-    return 0;
-}
+    // JSON with compiler ID as key and splitted json as value
+    let jsonIdsConfig = []
+    jsonArrayConfig.forEach(element => {
+        let jsonConfig = {}
+        // Split input json for the 2 config files
+        // Put General_Setup.h keys in separate json
+        let jsonConfigApplication = element;
+        let jsonGeneralSetup = {};
+        for (let key of generalSetupKeys) {
+            jsonGeneralSetup[key] = jsonConfigApplication[key];
+            delete jsonConfigApplication[key];
+        }
 
-/**
- * Generate a random compileId for the compiling process
- * With 5 characters/numbers
- */
-function randomId() {
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let id = '';
-    for (let i = 0; i < 5; i++) {
-        id += characters.charAt(Math.floor(Math.random() * characters.length));
+        // Put them in jsonIdsConfig at randomId
+        // Also adds the .bin fileName for compilation
+        jsonConfig.configApplication = jsonConfigApplication;
+        jsonConfig.generalSetup = jsonGeneralSetup;
+        jsonConfig.fileName = generateBinFileName(element)
+        jsonIdsConfig[randomId()] = jsonConfig;
+    })
+    await setupFilesMulti(configPath,resultPath,jsonIdsConfig);
+
+    // Compilation
+    let status = 0;
+    for (let id in jsonIdsConfig) {
+        console.log(`${id} ${resultPath}`)
+        status = await startCompilerContainer(id,`${configPath}/${id}`,resultPath,jsonIdsConfig[id].fileName)
+        if(status == 0){
+            console.log(`Compiled successfully : ${id}`)
+        } else {
+            console.log(`Error while compiling : ${id}`)
+            break;
+        }
     }
-    return id;
+
+    // Clean up : Remove compiler files
+    for(let id in jsonIdsConfig) {
+        await deleteDir(`${configPath}/${id}`);
+    }
+
+    // Zip file
+    if(status == 0){
+        await zipDirectory(resultPath,`${resultPath}.zip`)
+    }
+    return status;
 }
 
 /**
@@ -71,7 +115,7 @@ function randomId() {
  * Return the status of the container execution
  * 0 if everything went well
  */
-async function startCompilerContainer(compileId,configPath, resultPath){
+async function startCompilerContainer(compileId,configPath, resultPath, fileName){
     try {
         // Start compiler with custom CMD
         const container = await docker.createContainer({
@@ -79,8 +123,8 @@ async function startCompilerContainer(compileId,configPath, resultPath){
             HostConfig: {
                 Binds: [`${volName}:/${volName}`] // Volume that stores configs and results data
             },
-            // Move to compiler, make, and then put .bin into resultpath
-            Cmd: [`/bin/bash`, `-c`, `cd ..${configPath} && make && mv ${compiledFile} ${resultPath}`]
+            // Move to compiler, make, and then put .bin into resultpath with new name
+            Cmd: [`/bin/bash`, `-c`, `cd ..${configPath} && make && mv ${compiledFile} ${resultPath}/${fileName}`]
         });
 
         // Start container
@@ -133,9 +177,9 @@ function containerLogs(compileId,container) {
 }
 
 module.exports = {
+    randomId,
     compile,
     compileMultiple,
-    randomId,
     volName,
     compiledFile
 };

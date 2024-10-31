@@ -6,6 +6,28 @@ const generalSetupPath = process.env.General_Setup_path;
 const configApplicationPath = process.env.config_application_path;
 const archiver = require('archiver');
 
+/**
+ * Generates the file name based on the config
+ */
+function generateBinFileName(jsonConfig){
+    let DevEUI = jsonConfig.devEUI_.replace(/0x|,\s/g, '')
+    let ActivationMode = jsonConfig.ACTIVATION_MODE
+    let Class = jsonConfig.CLASS
+    let SpreadingFactor = jsonConfig.SPREADING_FACTOR
+    let Confirmed = (jsonConfig.CONFIRMED == "true")?"Confirmed":"Unconfirmed"
+    return `${DevEUI}-${ActivationMode}-${Class}-${SpreadingFactor}-${Confirmed}.bin`;
+}
+
+/**
+ * Generate the .zip file name for multiple firmware generation
+ */
+function generateMultipleCompileFileName(nbFirmware,jsonConfig){
+    let ActivationMode = jsonConfig.ACTIVATION_MODE
+    let Class = jsonConfig.CLASS
+    let SpreadingFactor = jsonConfig.SPREADING_FACTOR
+    let Confirmed = (jsonConfig.CONFIRMED == "true")?"Confirmed":"Unconfirmed"
+    return `x${nbFirmware}-${ActivationMode}-${Class}-${SpreadingFactor}-${Confirmed}.zip`;
+}
 
 /**
  * Modify the .h file with the json using regex
@@ -72,34 +94,52 @@ async function setupFiles(configPath,resultPath,jsonConfigApplication,jsonGenera
 /**
  * Setup the files for the multi-compilation process
  */
-async function setupFilesMulti(resultPath,jsonConfig){
+async function setupFilesMulti(configPath,resultPath,jsonIdsConfig){
+    // Result folder and CSV creation
+    const csvName = 'tts-end-devices.csv'
+    let csvPath = `${resultPath}/${csvName}`;
+    await createDir(resultPath) // 
+    await setupCsv(csvPath,jsonIdsConfig)
+
+    // Configs folders for compilers
+    for (let id in jsonIdsConfig) {
+        let path = `${configPath}/${id}`
+        await createDir(path);
+
+        // Copy compiler files
+        await copyDir(compilerPath,path);
+
+        // Modify .h files with json
+        await modifyHFile(`${path}${configApplicationPath}/config_application.h`,jsonIdsConfig[id].configApplication);
+        await modifyHFile(`${path}${generalSetupPath}/General_Setup.h`,jsonIdsConfig[id].generalSetup);
+    }
+}
+
+async function setupCsv(csvPath,jsonIdsConfig){
     // Default values
     const default_id = '';
     const default_name = '';
     const default_frequency_plan_id = "EU_863_870_TTN";
     const default_lorawan_version = "MAC_V1_0_3";
     const default_lorawan_phy_version = "RP002_V1_0_3";
-
     
-    const csvName = 'tts-end-devices.csv'
-    let csvPath = `${resultPath}/${csvName}`;
-    await createDir(resultPath)
-
+    // Prepapre CSV Data
     let csvData = [];
-    jsonConfig.forEach(element => {
+    for(let id in jsonIdsConfig){
         let csvElem = {};
         csvElem.id = default_id;
         csvElem.name = default_name;
-        csvElem.dev_eui = element.devEUI_.replace(/0x|,\s/g, '');
-        csvElem.join_eui = element.appEUI_.replace(/0x|,\s/g, '');
+        csvElem.dev_eui = jsonIdsConfig[id].configApplication.devEUI_.replace(/0x|,\s/g, ''); // Remove '0x' and ', '
+        csvElem.join_eui = jsonIdsConfig[id].configApplication.appEUI_.replace(/0x|,\s/g, ''); // Remove '0x' and ', '
         csvElem.frequency_plan_id = default_frequency_plan_id;
         csvElem.lorawan_version = default_lorawan_version;
         csvElem.lorawan_phy_version = default_lorawan_phy_version;
-        csvElem.app_key = element.appKey_.replace(/,/g, '');
+        csvElem.app_key = jsonIdsConfig[id].configApplication.appKey_.replace(/,/g, '') ; // Remove ','
 
         csvData.push(csvElem);
-    });
+    };
 
+    // Create CSV table
     const csvWriter = createCsvWriter({
         path: csvPath,
         fieldDelimiter: ';',
@@ -115,14 +155,13 @@ async function setupFilesMulti(resultPath,jsonConfig){
         ]
     });
 
+    // Write Data to CSV
     try {
         await csvWriter.writeRecords(csvData);
         console.log(`${csvPath} created`);
     } catch (error) {
         console.error(`Error creating ${csvPath} :`, error);
     }
-
-    await zipDirectory(resultPath,`${resultPath}.zip`)
 }
 
 async function zipDirectory(sourceDir, outPath) {
@@ -143,7 +182,7 @@ async function zipDirectory(sourceDir, outPath) {
 }
 
 async function copyDir(source, destination) {
-    console.log(`Copying STM32WL to ${destination}`)
+    console.log(`Copying ${source} to ${destination}`)
     try {
         await fs.copy(source, destination);
     } catch (err) {
@@ -183,8 +222,11 @@ async function writeFileAsync(source, modifiedData) {
 }
 
 module.exports = {
+    generateBinFileName,
+    generateMultipleCompileFileName,
     initSharedVolume,
     setupFiles,
     deleteDir,
-    setupFilesMulti
+    setupFilesMulti,
+    zipDirectory
 };
