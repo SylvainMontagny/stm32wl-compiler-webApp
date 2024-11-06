@@ -23,13 +23,16 @@ app.get('/', (req, res) => {
 
 // Route compile
 app.post('/compile', async (req, res) => {
-    const { clientId, jsonConfig } = req.body;
+    clientId = req.body.clientId;
+    jsonConfig = req.body.formData;
+
+    
+    sendLogToClient(clientId, 'Compilation is starting...')
 
     let id = randomId()
     let fileName = generateBinFileName(jsonConfig)
     let compiledPath = `/${volName}/results/${id}/${fileName}`
-
-    sendLogToClient(clientId, 'Compilation is starting...')
+    
 
     let status = await compile(clientId, id, jsonConfig, fileName)
 
@@ -46,17 +49,19 @@ app.post('/compile', async (req, res) => {
         // Send an error response
         res.status(400).send('Compilation Error');
     }
-
 });
 
 // Route compile multiple
 app.post('/compile-multiple', async (req, res) => {
-    let jsonConfig = req.body;
+    clientId = req.body.clientId;
+    jsonConfig = req.body.formData;
 
-    let id = randomId()
+    sendLogToClient(clientId, 'Compilation is starting...')
+
+    let compileId = randomId()
     let zipName = generateMultipleCompileFileName(jsonConfig.length, jsonConfig[0]);
-    let zipPath = `/${volName}/results/${id}.zip`
-    let status = await compileMultiple(id, jsonConfig)
+    let zipPath = `/${volName}/results/${compileId}.zip`
+    let status = await compileMultiple(clientId, compileId, jsonConfig)
 
     if (status === 0) {
         // Send zip file data and name to client

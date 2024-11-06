@@ -58,7 +58,7 @@ async function compile(clientId,compileId,jsonConfig, fileName) {
     return status;
 }
 
-async function compileMultiple(multipleCompileId, jsonArrayConfig){
+async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig){
     console.log(`Multiple compilation id : ${multipleCompileId}`)
     let resultPath = `/${volName}/results/${multipleCompileId}` // Path for .zip with .bin and .csv files
     let configPath = `/${volName}/configs` // Path for all compiler files
@@ -89,7 +89,7 @@ async function compileMultiple(multipleCompileId, jsonArrayConfig){
     let status = 0;
     for (let id in jsonIdsConfig) {
         console.log(`${id} ${resultPath}`)
-        status = await startCompilerContainer(id,`${configPath}/${id}`,resultPath,jsonIdsConfig[id].fileName)
+        status = await startCompilerContainer(id,`${configPath}/${id}`,resultPath,jsonIdsConfig[id].fileName, clientId);
         if(status == 0){
             console.log(`Compiled successfully : ${id}`)
         } else {
@@ -159,14 +159,17 @@ async function startCompilerContainer(compileId, configPath, resultPath, fileNam
 /**
  * Handle Container Logs
  * Display them on console.log with the compileId first
- */
+*/
 function containerLogs(compileId, container, clientId) {
     // Create a single stream for stdin and stdout
     var logStream = new stream.PassThrough();
     logStream.on('data', function (chunk) {
-        const logMessage = `[${compileId}] ${chunk.toString('utf8')}`
-        sendLogToClient(clientId, logMessage)
-        process.stdout.write(logMessage);
+        let str = chunk.toString('utf8');
+        if(str != ' \n'){
+            const logMessage = `[${compileId}] ${str}`
+            sendLogToClient(clientId, logMessage)
+            process.stdout.write(logMessage);
+        }
     });
     container.logs({
         follow: true,

@@ -549,7 +549,7 @@ async function compileFirmware(jsonConfig){
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(requestData),
+            body: JSON.stringify(requestData, null, 2),
           });
 
 
@@ -576,13 +576,18 @@ async function compileFirmware(jsonConfig){
 // function compile multiple firmware from jsonString of all form data
 async function compileMultipleFirmware(jsonConfig){
     try {
-        const response = await fetch('/compile-multiple', {
-            method: 'POST',
+        const requestData = {
+            clientId: clientId,
+            formData: jsonConfig,
+          };
+      
+          const response = await fetch("/compile-multiple", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
-            body: JSON.stringify(jsonConfig, null, 2),
-        });
+            body: JSON.stringify(requestData, null, 2),
+          });
 
         if (response.ok) {
             const blob = await response.blob();
