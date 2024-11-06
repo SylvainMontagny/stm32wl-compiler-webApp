@@ -521,10 +521,18 @@ document.getElementById('generate-firmware').addEventListener('click', function(
         let jsonConfig = getMultipleFormJson(nbFirmware);
         console.log(jsonConfig);
         compileMultipleFirmware(jsonConfig);
+        
     } else {    
         let jsonConfig = getFormJson();
         console.log(jsonConfig);
         compileFirmware(jsonConfig); 
+    }
+    const compilerContainer = document.querySelector(".compiler-container");
+    const pageContainer = document.querySelector(".page-container");
+
+    if (compilerContainer.style.right === "-35%") {
+        compilerContainer.style.right = "0px";
+        pageContainer.style.width = "65%";
     }
 })
 
@@ -616,8 +624,8 @@ const compilerContainer = document.querySelector(".compiler-container");
 const pageContainer = document.querySelector(".page-container");
 
 if (compilerContainer.style.right === "-35%") {
-compilerContainer.style.right = "0px";
-pageContainer.style.width = "65%";
+    compilerContainer.style.right = "0px";
+    pageContainer.style.width = "65%";
 }
 
 document
