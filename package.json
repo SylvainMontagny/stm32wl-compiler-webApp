@@ -3,11 +3,13 @@
   "main": "app.js",
   "dependencies": {
     "archiver": "^7.0.1",
+    "cors": "^2.8.5",
     "csv-writer": "^1.6.0",
     "dockerode": "^4.0.2",
     "express": "^4.21.1",
     "fs-extra": "^11.2.0",
-    "iot-formations-webapp": "file:"
+    "iot-formations-webapp": "file:",
+    "socket.io": "^4.8.0"
   },
   "scripts": {
     "start": "node app.js"

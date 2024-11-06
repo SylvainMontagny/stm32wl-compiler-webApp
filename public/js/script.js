@@ -47,29 +47,32 @@ const elements = {
 };
 
 // Display advanced settings form
-elements.advancedContainer.addEventListener('click', function() {
-    if (elements.advancedForm.style.display === '' || elements.advancedForm.style.display === 'none') {
-        elements.advancedForm.style.display = 'grid'; 
-        elements.restore.style.display = 'block';      
-        elements.svgArrow.style.transform = 'rotate(90deg)'; 
-    } else {
-        elements.advancedForm.style.display = 'none'; 
-        elements.restore.style.display = 'none';  
-        elements.svgArrow.style.transform = 'rotate(0deg)';
-    }
+elements.advancedContainer.addEventListener("click", function () {
+  if (
+    elements.advancedForm.style.display === "" ||
+    elements.advancedForm.style.display === "none"
+  ) {
+    elements.advancedForm.style.display = "grid";
+    elements.restore.style.display = "block";
+    elements.svgArrow.style.transform = "rotate(90deg)";
+  } else {
+    elements.advancedForm.style.display = "none";
+    elements.restore.style.display = "none";
+    elements.svgArrow.style.transform = "rotate(0deg)";
+  }
 });
 
 // Display OTAA ABP
 function otaaAbp() {
-    if (elements.activationMode.value === 'otaa') {
-        elements.otaaContainer.style.display = 'block';
-        elements.abpContainer.style.display = 'none';
-    } else {
-        elements.otaaContainer.style.display = 'none';
-        elements.abpContainer.style.display = 'block';
-    }
+  if (elements.activationMode.value === "otaa") {
+    elements.otaaContainer.style.display = "block";
+    elements.abpContainer.style.display = "none";
+  } else {
+    elements.otaaContainer.style.display = "none";
+    elements.abpContainer.style.display = "block";
+  }
 }
-elements.activationMode.addEventListener('change', otaaAbp);
+elements.activationMode.addEventListener("change", otaaAbp);
 
 // Payload Hello error
 function helloError() {
@@ -229,38 +232,40 @@ elements.rAdvance.addEventListener('click', function() {
 
 // Generate random credentials
 const genRandomKey = (size, element) => {
-    const key = [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-    element.value = key;
-    saveFormData(); // saveFormData() after generating a new key
-    return key;
+  const key = [...Array(size)]
+    .map(() => Math.floor(Math.random() * 16).toString(16))
+    .join("");
+  element.value = key;
+  saveFormData(); // saveFormData() after generating a new key
+  return key;
 };
 
-elements.generateDevEui.addEventListener('click', function() {
-    genRandomKey(16, elements.devEui);
+elements.generateDevEui.addEventListener("click", function () {
+  genRandomKey(16, elements.devEui);
 });
 
-elements.generateAppKey.addEventListener('click', function() {
-    genRandomKey(32, elements.appKey);
+elements.generateAppKey.addEventListener("click", function () {
+  genRandomKey(32, elements.appKey);
 });
 
-elements.generateAppEUI.addEventListener('click', function() {
-    genRandomKey(16, elements.appEui);
+elements.generateAppEUI.addEventListener("click", function () {
+  genRandomKey(16, elements.appEui);
 });
 
-elements.generateDevAddr.addEventListener('click', function() {
-    genRandomKey(8, elements.devAddr);
+elements.generateDevAddr.addEventListener("click", function () {
+  genRandomKey(8, elements.devAddr);
 });
 
-elements.generateNwkskey.addEventListener('click', function() {
-    genRandomKey(32, elements.nwksKey);
+elements.generateNwkskey.addEventListener("click", function () {
+  genRandomKey(32, elements.nwksKey);
 });
 
-elements.generateAppskey.addEventListener('click', function() {
-    genRandomKey(32, elements.appsKey);
+elements.generateAppskey.addEventListener("click", function () {
+  genRandomKey(32, elements.appsKey);
 });
 
-elements.generateAdminAppKey.addEventListener('click', function() {
-    genRandomKey(32, elements.adminAppKey);
+elements.generateAdminAppKey.addEventListener("click", function () {
+  genRandomKey(32, elements.adminAppKey);
 });
 
 
@@ -357,9 +362,9 @@ function saveFormData() {
 
 // Restore form data from localStorage
 function restoreFormData() {
-    const savedData = localStorage.getItem('formData');
-    if (savedData) {
-        const formData = JSON.parse(savedData);
+  const savedData = localStorage.getItem("formData");
+  if (savedData) {
+    const formData = JSON.parse(savedData);
 
         elements.activationMode.value = formData.activationMode || 'otaa';
         elements.class.value = formData.class || 'class_a';
@@ -421,12 +426,12 @@ function formatEUI(str){
     return `0x${str.match(/.{1,2}/g).join(', 0x')}`
 }
 
-function formatAddr(str){
-    return "0x"+str;
+function formatAddr(str) {
+  return "0x" + str;
 }
 
-function formatKey(str){
-    return str.match(/.{1,2}/g).join(',');
+function formatKey(str) {
+  return str.match(/.{1,2}/g).join(",");
 }
 
 function getFormJson() {
@@ -521,19 +526,32 @@ document.getElementById('generate-firmware').addEventListener('click', function(
         console.log(jsonConfig);
         compileFirmware(jsonConfig); 
     }
-});
+})
+
+function randomId() {
+    let min = 10 ** 14;
+    let max = 10 ** 15;
+    let id_random = Math.floor(Math.random() * (max - min)) + min;
+    return id_random.toString(36);
+}
+
 
 // function compile firmware from jsonString of all form data
 async function compileFirmware(jsonConfig){
     try {
-        // Send the request
-        const response = await fetch('/compile', {
-            method: 'POST',
+        const requestData = {
+            clientId: clientId,
+            formData: jsonConfig,
+          };
+      
+          const response = await fetch("/compile", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
-            body: JSON.stringify(jsonConfig, null, 2),
-        });
+            body: JSON.stringify(requestData),
+          });
+
 
         // Receive the blob and store it as a file
         if (response.ok) {
@@ -553,9 +571,7 @@ async function compileFirmware(jsonConfig){
     } catch (error) {
         console.error('Error:', error);
         alert('An error occurred while compiling the code');
-    }
-}
-
+  }};
 
 // function compile multiple firmware from jsonString of all form data
 async function compileMultipleFirmware(jsonConfig){
@@ -587,3 +603,55 @@ async function compileMultipleFirmware(jsonConfig){
         alert('An error occurred while compiling the code');
     }
 }
+// Initialize Socket.io connection and handle events
+const logContainer = document.getElementById("log-container");
+
+
+const compilerContainer = document.querySelector(".compiler-container");
+const pageContainer = document.querySelector(".page-container");
+
+if (compilerContainer.style.right === "-35%") {
+compilerContainer.style.right = "0px";
+pageContainer.style.width = "65%";
+}
+
+document
+  .getElementById("toggle-compiler")
+  .addEventListener("click", function () {
+    const compilerContainer = document.querySelector(".compiler-container");
+    const pageContainer = document.querySelector(".page-container");
+
+    if (
+      compilerContainer.style.right === "0px" ||
+      !compilerContainer.style.right
+    ) {
+      compilerContainer.style.right = "-35%";
+      pageContainer.style.width = "100%";
+    } else {
+      compilerContainer.style.right = "0px";
+      pageContainer.style.width = "65%";
+    }
+  });
+
+
+function initializeSocket() {
+  const socket = io.connect("http://localhost:80");
+
+  clientId = randomId();
+
+  socket.emit("create_id", clientId);
+
+  socket.on("compilation_log", (data) => {
+    console.log(data.message);
+
+    const p = document.createElement("p");
+    p.textContent = data.message;
+    logContainer.appendChild(p);
+    logContainer.scrollTop = logContainer.scrollHeight;
+  });
+}
+
+// Execute the initializeSocket function once the DOM is fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+  initializeSocket();
+});

@@ -2,6 +2,7 @@ const Docker = require('dockerode');
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 var stream = require('stream');
 const { generateBinFileName, setupFiles, deleteDir, setupFilesMulti, zipDirectory } = require('./file_fct.js');
+const { sendLogToClient } = require('../sockets/socketInstance');
 
 //keys to set into General_Setup.h
 const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "MLR003_APP_PORT", "ADMIN_GEN_APP_KEY"]
@@ -26,7 +27,7 @@ function randomId() {
 /**
  * Compile main function used through API
  */
-async function compile(compileId,jsonConfig, fileName) {
+async function compile(clientId,compileId,jsonConfig, fileName) {
     console.log(`Compiling with id : ${compileId}`)
     let configPath = `/${volName}/configs/${compileId}` // Path for compiler files
     let resultPath = `/${volName}/results/${compileId}` // Path for .bin compiled files
@@ -44,7 +45,7 @@ async function compile(compileId,jsonConfig, fileName) {
     await setupFiles(configPath,resultPath,jsonConfigApplication,jsonGeneralSetup);
 
     // Start Compiling
-    let status = await startCompilerContainer(compileId,configPath,resultPath,fileName)
+    let status = await startCompilerContainer(compileId,configPath,resultPath,fileName,clientId)
     if(status == 0){
         console.log(`Compiled successfully : ${compileId}`)
     } else {
@@ -106,6 +107,11 @@ async function compileMultiple(multipleCompileId, jsonArrayConfig){
     if(status == 0){
         await zipDirectory(resultPath,`${resultPath}.zip`)
     }
+    if(status == 0){
+        console.log(`Compiled successfully : ${clientId}`)
+    } else {
+        console.log(`Error while compiling : ${clientId}`)
+    }
     return status;
 }
 
@@ -115,7 +121,7 @@ async function compileMultiple(multipleCompileId, jsonArrayConfig){
  * Return the status of the container execution
  * 0 if everything went well
  */
-async function startCompilerContainer(compileId,configPath, resultPath, fileName){
+async function startCompilerContainer(compileId, configPath, resultPath, fileName, clientId){
     try {
         // Start compiler with custom CMD
         const container = await docker.createContainer({
@@ -132,7 +138,7 @@ async function startCompilerContainer(compileId,configPath, resultPath, fileName
         console.log(`Container started: ${container.id}`);
 
         // Handle logs
-        containerLogs(compileId,container);
+        containerLogs(compileId,container,clientId);
 
         // Wait for the container to stop
         const waitResult = await container.wait();
@@ -154,13 +160,14 @@ async function startCompilerContainer(compileId,configPath, resultPath, fileName
  * Handle Container Logs
  * Display them on console.log with the compileId first
  */
-function containerLogs(compileId,container) {
+function containerLogs(compileId, container, clientId) {
     // Create a single stream for stdin and stdout
     var logStream = new stream.PassThrough();
     logStream.on('data', function (chunk) {
-        process.stdout.write(`[${compileId}] ${chunk.toString('utf8')}`);
+        const logMessage = `[${compileId}] ${chunk.toString('utf8')}`
+        sendLogToClient(clientId, logMessage)
+        process.stdout.write(logMessage);
     });
-
     container.logs({
         follow: true,
         stdout: true,
@@ -182,4 +189,4 @@ module.exports = {
     compileMultiple,
     volName,
     compiledFile
-};
+}

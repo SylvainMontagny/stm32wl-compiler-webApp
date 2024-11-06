@@ -1,8 +1,9 @@
 const express = require('express');
 const path = require('path');
-
-const fs = require('fs');
-const { randomId, compile, compileMultiple, volName, compiledFile } = require('./docker/dockerfunctions');
+const http = require('http');
+const cors = require('cors');
+const { initSocket, sendLogToClient } = require('./sockets/socketInstance');
+const { randomId, compile, compileMultiple, volName } = require('./docker/dockerfunctions');
 const { generateBinFileName, generateMultipleCompileFileName, initSharedVolume } = require('./docker/file_fct.js');
 
 const app = express();
@@ -11,6 +12,7 @@ const port = process.env.PORT || 4050;
 // Public static link
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
+app.use(cors());
 
 /* ROUTES */
 
@@ -21,13 +23,16 @@ app.get('/', (req, res) => {
 
 // Route compile
 app.post('/compile', async (req, res) => {
-    let jsonConfig = req.body;
+    const { clientId, jsonConfig } = req.body;
 
     let id = randomId()
     let fileName = generateBinFileName(jsonConfig)
     let compiledPath = `/${volName}/results/${id}/${fileName}`
 
-    let status = await compile(id, jsonConfig, fileName)
+    sendLogToClient(clientId, 'Compilation is starting...')
+
+    let status = await compile(clientId, id, jsonConfig, fileName)
+
     if (status === 0) {
         // Send compiled file data and name to client
         res.setHeader('X-File-Name', fileName);
@@ -70,8 +75,11 @@ app.post('/compile-multiple', async (req, res) => {
 
 /* INIT */
 
+const server = http.createServer(app);
+initSocket(server);
+
 // Start serveur on port 4050
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
 
