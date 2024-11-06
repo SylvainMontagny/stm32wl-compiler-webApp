@@ -176,7 +176,6 @@ select {
   align-items: center;
   width: 65%;
   height: 100%;
-  overflow-y: scroll;
   transition: width 0.3s ease;
 }
 
@@ -405,6 +404,7 @@ button.generate-appskey {
   background: #242424;
   overflow: scroll;
   padding: 10px;
+  overflow-x: hidden;
 }
 
 #log-container p {
