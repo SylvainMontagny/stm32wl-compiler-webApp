@@ -1,6 +1,6 @@
 services:
   web:
-    build: . # Build current repository
+    build: . # Docker build current folder
     image: lorawan-compiler-webapp # Webapp image
     ports:
       - "80:4050" # Webapp port

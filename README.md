@@ -26,11 +26,11 @@ cd LoRaWAN-Compiler-Webapp
 docker-compose up -d
 ```
 
-You can remove the -d if you want to see logs in real time
+You can remove the -d if you want to see logs in real time\
 You might need to change the STM32WL path in the *docker-compose.yml (line 8)*
 
 ```yml
-      - /home/debian/STM32WL/STM32WL-standalone:/STM32WL # Path to compiler folder
+- /home/debian/STM32WL/STM32WL-standalone:/STM32WL # Path to compiler folder
 ```
 
 3. Stop the app
@@ -61,7 +61,8 @@ Here is the *docker-compose.yml* used
 ```yml
 services:
   web:
-    image: eliasqzo/compiler-webapp:latest # Webapp image
+    build: . # Docker build current folder
+    image: lorawan-compiler-webapp # Webapp image
     ports:
       - "80:4050" # Webapp port
     volumes:
@@ -76,12 +77,13 @@ services:
     image: montagny/arm-compiler:1.0 # Image used for compilation
     deploy:
       replicas: 0
-
+      
 volumes:
   shared-vol:
     name: "shared-vol"
 ```
-It is an **Express.js server** that let allow us to create an API for the compilation.
+It is an **Express.js server** that let allow us to create an API for the compilation.\
+The image of the webapp is automatically built on *docker-compose up* based on the repo files.\
 
 We need to pass the Docker volume **shared-vol** to facilitate data exchange between containers. This volume will automatically be created thanks to the three last lines.
 The STM32WL-standalone compiler is passed as a volume so we can copy its content for compilation.
@@ -90,7 +92,7 @@ The **Docker daemon socket** is also passed to manipulate containers within a co
 We also have the *montagny/arm-compiler:1.0* image that we will use for compilation. We set it to *deploy replicas 0* since we don't want to start it at *docker-compose up*, we only want to pull it.
 
 **Step 2:** Send compilation through application interface
-When you click on the *Compile* button on the interface, it will send a **POST request** to the **/compile API route**, sending a JSON payload with all the necessary compilation parameters
+When you click on the *Compile* button on the interface, it will send a **POST request** to the **/compile API route**, sending a JSON payload with all the necessary compilation parameters, and also the *Client socket ID* to allow logs communication in real time with the client.
 ```bash
 POST /compile
 Content-Type: application/json
@@ -162,7 +164,7 @@ After that, we can launch the container with this function
 const imageName = 'montagny/arm-compiler:1.0' // image of the compiler
 const volName = 'shared-vol' // name of the volume used to store configs and results
 
-async function startCompilerContainer(compileId,configPath, resultPath){
+async function startCompilerContainer(compileId, configPath, resultPath, fileName, clientId){
     try {
         // Start compiler with custom CMD
         const container = await docker.createContainer({
@@ -170,8 +172,8 @@ async function startCompilerContainer(compileId,configPath, resultPath){
             HostConfig: {
                 Binds: [`${volName}:/${volName}`] // Volume that stores configs and results data
             },
-            // Move to compiler, make, and then put .bin into resultpath
-            Cmd: [`/bin/bash`, `-c`, `cd ..${configPath} && make && mv ${compiledFile} ${resultPath}`]
+            // Move to compiler, make, and then put .bin into resultpath with new name
+            Cmd: [`/bin/bash`, `-c`, `cd ..${configPath} && make && mv ${compiledFile} ${resultPath}/${fileName}`]
         });
 
         // Start container
@@ -179,7 +181,7 @@ async function startCompilerContainer(compileId,configPath, resultPath){
         console.log(`Container started: ${container.id}`);
 
         // Handle logs
-        containerLogs(compileId,container);
+        containerLogs(compileId,container,clientId);
 
         // Wait for the container to stop
         const waitResult = await container.wait();
@@ -251,3 +253,6 @@ async function compileFirmware(jsonString){
     }
 }
 ```
+
+**Multi-compilation**\
+For multi-compilation, the process in almost the same. We use the */compile-multiple** API Route, sending a JSON array containing all the parameters with randomly generated keys. We launch containers one after the other, and then send a *.zip* with all the *bin* files, and a *tts-end-device.csv* file with all the keys of the firmwares.
