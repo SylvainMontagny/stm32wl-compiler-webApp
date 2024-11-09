@@ -27,10 +27,9 @@ docker-compose up -d --build
 ```
 This will build the Docker image of the repo and start it\
 You can remove the -d if you want to see logs in real time\
-You might need to change the STM32WL path in the *docker-compose.yml (line 8)*
-
-```yml
-- /home/debian/STM32WL/STM32WL-standalone:/STM32WL # Path to compiler folder
+By default, the STM32WL-standalone path is set to */home/debian/STM32WL/STM32WL-standalone*. To use another path, create a *.env* file, and add your path into it :
+```makefile
+STM32WL_PATH=/your/path/here
 ```
 
 3. Stop the app
@@ -57,7 +56,7 @@ services:
       - "80:4050" # Webapp port
     volumes:
       - shared-vol:/shared-vol # Volume to share data across containers
-      - /home/debian/STM32WL/STM32WL-standalone:/STM32WL # Path to compiler folder
+      - ${STM32WL_PATH:-/home/debian/STM32WL/STM32WL-standalone}:/STM32WL # Path to compiler folder
       - /var/run/docker.sock:/var/run/docker.sock # Docker socket to start container inside a container
     environment:
       - General_Setup_path=/LoRaWAN/App # General_Setup.h path in compiler folder
@@ -80,15 +79,6 @@ The STM32WL-standalone compiler is passed as a volume so we can copy its content
 The **Docker daemon socket** is also passed to manipulate containers within a container (more infos in Step 4)
 
 We also have the *montagny/arm-compiler:1.0* image that we will use for compilation. We set it to *deploy replicas 0* since we don't want to start it at *docker-compose up*, we only want to pull it.
-
-**Note** : If you want to modify the path to STM32WL and avoid to push it on *git push*, you can use :
-```
-git update-index --assume-unchanged docker-compose.yml
-```
-And to set it back :
-```
-git update-index --no-assume-unchanged docker-compose.yml
-```
 
 **Step 2:** Send compilation through application interface
 When you click on the *Compile* button on the interface, it will send a **POST request** to the **/compile API route**, sending a JSON payload with all the necessary compilation parameters, and also the *Client socket ID* to allow logs communication in real time with the client.
