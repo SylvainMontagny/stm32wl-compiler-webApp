@@ -648,7 +648,7 @@ document
 
 
 function initializeSocket() {
-  const socket = io.connect("http://localhost:80");
+  const socket = io.connect(window.location.href);
 
   clientId = randomId();
 

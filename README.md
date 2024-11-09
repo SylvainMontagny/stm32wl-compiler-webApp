@@ -25,7 +25,7 @@ git clone https://github.com/elias-qzo/LoRaWAN-Compiler-Webapp.git
 cd LoRaWAN-Compiler-Webapp
 docker-compose up -d
 ```
-
+This will build the Docker image of the repo and start it\
 You can remove the -d if you want to see logs in real time\
 You might need to change the STM32WL path in the *docker-compose.yml (line 8)*
 
@@ -43,13 +43,11 @@ or *CTRL-C* if you are in real-time mode
 
 ### Build images
 
-You can also build the webapp image yourself if you made some modifications
+You can rebuild the image if you made some modifications
 
 ```shell
 docker build -t compiler-webapp .
 ```
-
-If so, you need to modify the web image into the *docker-compose.yml* file
 
 ### Usage, process overview and libraries used
 
@@ -90,6 +88,15 @@ The STM32WL-standalone compiler is passed as a volume so we can copy its content
 The **Docker daemon socket** is also passed to manipulate containers within a container (more infos in Step 4)
 
 We also have the *montagny/arm-compiler:1.0* image that we will use for compilation. We set it to *deploy replicas 0* since we don't want to start it at *docker-compose up*, we only want to pull it.
+
+**Note** : If you want to modify the path to STM32WL and avoid to push it on *git push*, you can use :
+```
+git update-index --assume-unchanged docker-compose.yml
+```
+And to set it back :
+```
+git update-index --no-assume-unchanged docker-compose.yml
+```
 
 **Step 2:** Send compilation through application interface
 When you click on the *Compile* button on the interface, it will send a **POST request** to the **/compile API route**, sending a JSON payload with all the necessary compilation parameters, and also the *Client socket ID* to allow logs communication in real time with the client.
