@@ -1,6 +1,7 @@
 services:
   web:
-    image: eliasqzo/compiler-webapp:latest # Webapp image
+    build: . # Build current repository
+    image: lorawan-compiler-webapp # Webapp image
     ports:
       - "80:4050" # Webapp port
     volumes:
