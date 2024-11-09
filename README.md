@@ -23,7 +23,7 @@ git clone https://github.com/elias-qzo/LoRaWAN-Compiler-Webapp.git
 
 ```shell
 cd LoRaWAN-Compiler-Webapp
-docker-compose up -d
+docker-compose up -d --build
 ```
 This will build the Docker image of the repo and start it\
 You can remove the -d if you want to see logs in real time\
@@ -40,14 +40,6 @@ Simply use
 docker-compose down
 ```
 or *CTRL-C* if you are in real-time mode
-
-### Build images
-
-You can rebuild the image if you made some modifications
-
-```shell
-docker build -t compiler-webapp .
-```
 
 ### Usage, process overview and libraries used
 
