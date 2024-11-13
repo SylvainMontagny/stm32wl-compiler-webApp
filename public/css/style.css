@@ -183,7 +183,8 @@ select {
 .application-container,
 .otaa-container,
 .advance-container,
-.abp-container {
+.abp-container,
+.load-bar-container {
     width: 50vw;
 }
 
@@ -426,6 +427,38 @@ button.generate-appskey {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+
+/* Load Bar Styles */
+.load-bar-container {
+  display: none;
+  flex-direction: column;
+  gap: 1vw;
+  background-color: white;
+}
+
+.load-bar-progress-container {
+  display: flex;
+  align-items: center;
+  border: 2px solid var(--gray-color);
+  gap: 1vw;
+  padding: 4px;
+  border-radius: 30px;
+  width: 100%;
+}
+
+.load-bar-progress {
+  width: 0%;
+  height: 20px;
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  position: relative;
+}
+
+.load-bar-container p,
+.load-bar-container h2 {
+  margin-left: 1vw;
 }
 
 /* Responsive Design */
