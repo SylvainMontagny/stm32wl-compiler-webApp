@@ -757,9 +757,10 @@ const logContainer = document.getElementById("log-container");
 const compilerContainer = document.querySelector(".compiler-container");
 const pageContainer = document.querySelector(".page-container");
 
-if (compilerContainer.style.right === "-35%") {
-  compilerContainer.style.right = "0px";
-  pageContainer.style.width = "65%";
+// Fermer le panneau par défaut
+if (compilerContainer.style.right !== "0px") {
+  compilerContainer.style.right = "-35%";
+  pageContainer.style.width = "100%";
 }
 
 document
@@ -785,6 +786,7 @@ document
       chevron.style.transform = "rotate(0deg)";
     }
   });
+
 
 function loadBar(message) {
     const progressBar = document.querySelector(".load-bar-progress");
@@ -821,6 +823,8 @@ function loadBar(message) {
         currentFirmware++;
     }
     currentProgress = progressPercentage;
+
+    progressBar.style.transition = 'width 1s ease';
     progressBar.style.width = `${progressPercentage}%`;
 }
   
