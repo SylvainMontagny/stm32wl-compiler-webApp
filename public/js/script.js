@@ -548,7 +548,7 @@ function randomId() {
 async function compileFirmware(jsonConfig){
     try {
         const requestData = {
-            clientId: clientId,
+            clientId: socket.id,
             formData: jsonConfig,
           };
       
@@ -585,7 +585,7 @@ async function compileFirmware(jsonConfig){
 async function compileMultipleFirmware(jsonConfig){
     try {
         const requestData = {
-            clientId: clientId,
+            clientId: socket.id,
             formData: jsonConfig,
           };
       
@@ -646,13 +646,10 @@ document
     }
   });
 
+let socket;
 
 function initializeSocket() {
-  const socket = io.connect(window.location.href);
-
-  clientId = randomId();
-
-  socket.emit("create_id", clientId);
+  socket = io.connect(window.location.href);
 
   socket.on("compilation_log", (data) => {
     console.log(data.message);
