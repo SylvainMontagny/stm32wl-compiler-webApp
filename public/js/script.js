@@ -786,8 +786,6 @@ function initializeSocket() {
   socket.emit("create_id", clientId);
 
   socket.on("compilation_log", (data) => {
-    console.log(data.message);
-
     const p = document.createElement("p");
     p.textContent = data.message;
     logContainer.appendChild(p);
