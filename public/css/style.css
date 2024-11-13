@@ -452,8 +452,14 @@ button.generate-appskey {
   transition: right 0.3s ease;
 }
 
-.toggle-compiler i {
+.toggle-compiler .fa-chevron-right {
+  color: white;
+  /* transform: rotate(90deg); */
+}
+
+.toggle-compiler .fa-terminal {
   background: white;
+  margin-left: 10px;
   padding: 5px;
   border-radius: 5px;
   color: var(--primary-color);

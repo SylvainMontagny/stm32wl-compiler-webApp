@@ -653,10 +653,14 @@ document
     }
     const compilerContainer = document.querySelector(".compiler-container");
     const pageContainer = document.querySelector(".page-container");
+    const toggleCompiler = document.querySelector(".toggle-compiler");
+    const chevron = document.querySelector(".fa-chevron-right");
 
     if (compilerContainer.style.right === "-35%") {
       compilerContainer.style.right = "0px";
       pageContainer.style.width = "65%";
+      toggleCompiler.style.right = "35%";
+      chevron.style.transform = "rotate(0deg)";
     }
   });
 
@@ -756,6 +760,7 @@ document
     const compilerContainer = document.querySelector(".compiler-container");
     const pageContainer = document.querySelector(".page-container");
     const toggleCompiler = document.querySelector(".toggle-compiler");
+    const chevron = document.querySelector(".fa-chevron-right");
 
     if (
       compilerContainer.style.right === "0px" ||
@@ -764,10 +769,12 @@ document
       compilerContainer.style.right = "-35%";
       pageContainer.style.width = "100%";
       toggleCompiler.style.right = "0%";
+      chevron.style.transform = "rotate(180deg)";
     } else {
       compilerContainer.style.right = "0px";
       pageContainer.style.width = "65%";
       toggleCompiler.style.right = "35%";
+      chevron.style.transform = "rotate(0deg)";
     }
   });
 
