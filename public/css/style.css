@@ -58,6 +58,8 @@
   font-weight: 700;
 }
 
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
+
 :root {
   --primary-color: #0f6cbd; /* Couleur principale */
   --gray-color: #efeef4; /* Blanc cassé */
@@ -428,6 +430,10 @@ button.generate-appskey {
 #log-container p {
   word-wrap: break-word; /* or overflow-wrap: break-word; */
   white-space: normal;
+  font-family: "Fira Code", monospace;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
 }
 
 #log-container > p:last-child {
