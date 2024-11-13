@@ -58,6 +58,8 @@
   font-weight: 700;
 }
 
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
+
 :root {
   --primary-color: #0f6cbd; /* Couleur principale */
   --gray-color: #efeef4; /* Blanc cassé */
@@ -206,36 +208,37 @@ select {
   margin: 20px;
 }
 
-.send-mode,  
-.payload-configuration,  
-.cayenne-lpp, 
+.send-mode,
+.payload-configuration,
+.cayenne-lpp,
 .dev-eui {
   display: flex;
   flex-direction: column;
 }
 
 .send-mode {
-    grid-column: span 2;
+  grid-column: span 2;
 }
 
 .send-mode .radio-buttons {
-    gap: 30px; 
+  gap: 30px;
 }
 
 .send-mode .radio-button:first-child {
-    padding-top: 10px;
+  padding-top: 10px;
 }
 
 #frame-delay {
-    width: 20%;
+  width: 20%;
 }
 
 .dev-eui {
   grid-column: span 2;
 }
- 
-.cayenne-lpp, .payload-configuration {
-    grid-column: span 1; 
+
+.cayenne-lpp,
+.payload-configuration {
+  grid-column: span 1;
 }
 
 .dev-eui-container,
@@ -250,22 +253,22 @@ select {
 }
 
 .multiple-firmware-container {
-    display: flex;
-    align-items: center;
-    gap: 30px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
 }
 
 .multiple-firmware {
-    grid-column: span 3;
+  grid-column: span 3;
 }
 
 #firmware-nb {
-    width: 20%;
+  width: 20%;
 }
 
 .firmware-number,
 .firmware-number input {
-    color : #D1D1D1;
+  color: #d1d1d1;
 }
 
 button.generate-dev-eui,
@@ -408,9 +411,30 @@ button.generate-appskey {
   overflow-x: hidden;
 }
 
+#log-container::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: transparent;
+}
+
+#log-container::-webkit-scrollbar {
+  width: 12px;
+  background-color: transparent;
+}
+
+#log-container::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #555;
+}
+
 #log-container p {
   word-wrap: break-word; /* or overflow-wrap: break-word; */
   white-space: normal;
+  font-family: "Fira Code", monospace;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
 }
 
 #log-container > p:last-child {
@@ -419,14 +443,28 @@ button.generate-appskey {
 
 .toggle-compiler {
   position: fixed;
-  bottom: 10px;
-  right: 10px;
+  bottom: 0;
+  right: 35%;
   padding: 10px 20px;
   background-color: var(--primary-color);
-  color: white;
   border: none;
+  border-radius: 10px 0 0;
+  cursor: pointer;
+  transition: right 0.3s ease;
+}
+
+.toggle-compiler .fa-chevron-right {
+  color: white;
+  /* transform: rotate(90deg); */
+}
+
+.toggle-compiler .fa-terminal {
+  background: white;
+  margin-left: 10px;
+  padding: 5px;
   border-radius: 5px;
   cursor: pointer;
+  color: var(--primary-color);
 }
 
 
@@ -463,64 +501,62 @@ button.generate-appskey {
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-    .lorawan-container,
-    .application-container,
-    .otaa-container,
-    .advance-container,
-    .abp-container {
-        width: 70vw; /* Ajuste la largeur pour les écrans moyens */
-    }
+  .lorawan-container,
+  .application-container,
+  .otaa-container,
+  .advance-container,
+  .abp-container {
+    width: 70vw; /* Ajuste la largeur pour les écrans moyens */
+  }
 
-    .lorawan-form,
-    .application-form,
-    .advance-container {
-        grid-template-columns: repeat(2, 1fr); /* Passe à 2 colonnes */
-    }
+  .lorawan-form,
+  .application-form,
+  .advance-container {
+    grid-template-columns: repeat(2, 1fr); /* Passe à 2 colonnes */
+  }
 }
 
 @media (max-width: 800px) {
-    .lorawan-container,
-    .application-container,
-    .otaa-container,
-    .advance-container,
-    .abp-container {
-        width: 85vw; /* Ajuste la largeur pour les petits écrans */
-    }
+  .lorawan-container,
+  .application-container,
+  .otaa-container,
+  .advance-container,
+  .abp-container {
+    width: 85vw; /* Ajuste la largeur pour les petits écrans */
+  }
 
-    .lorawan-form,
-    .application-form,
-    .advanced-container {
-        grid-template-columns: 1fr; /* 1 colonne pour les petits écrans */
-    }
+  .lorawan-form,
+  .application-form,
+  .advanced-container {
+    grid-template-columns: 1fr; /* 1 colonne pour les petits écrans */
+  }
 
   .title-container h2 {
     font-size: 1.5em; /* Augmente la taille du titre sur petits écrans */
   }
 }
 
-
-
 .input-icon {
-    position: relative;
-    display: inline-block;
-    width: 100%;
+  position: relative;
+  display: inline-block;
+  width: 100%;
 }
 
 .input-icon input {
-    padding-right: 40px; /* Assurez-vous qu'il y a de la place pour l'icône à droite */
-    width: 100%;
-    box-sizing: border-box;
+  padding-right: 40px; /* Assurez-vous qu'il y a de la place pour l'icône à droite */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input-icon i {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #666;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
 }
 
 .input-icon i:hover {
-    color: #000;
+  color: #000;
 }
