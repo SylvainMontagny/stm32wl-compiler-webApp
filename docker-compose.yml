@@ -6,7 +6,7 @@ services:
       - "80:4050" # Webapp port
     volumes:
       - shared-vol:/shared-vol # Volume to share data across containers
-      - ${STM32WL_PATH:-/home/debian/STM32WL/STM32WL-standalone}:/STM32WL # Path to compiler folder
+      - ${STM32WL_PATH:-../STM32WL/STM32WL-standalone}:/STM32WL # Path to compiler folder
       - /var/run/docker.sock:/var/run/docker.sock # Docker socket to start container inside a container
     environment:
       - General_Setup_path=/LoRaWAN/App # General_Setup.h path in compiler folder

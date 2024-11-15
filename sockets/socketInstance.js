@@ -1,5 +1,4 @@
 const socketIo = require('socket.io');
-const clientList = require('./clientList');
 let io;
 
 // Initializes the Socket.IO server with CORS settings and handles client connections.
@@ -11,11 +10,8 @@ const initSocket = (server) => {
         }
     });
 
-    io.on('connection', (socket) => {
+    io.on('connection', () => {
         console.log('New client connected');
-        socket.on('create_id', (userID) => {  
-            clientList.push({ "userID" : userID, "socketId": socket.id });
-        });
     });
 };
 
@@ -29,12 +25,7 @@ const getSocketInstance = () => {
 
 // Sends a compilation log message to the specific client identified by clientId.
 function sendLogToClient(clientId, logMessage) {
-    const client = clientList.find(client => client.userID === clientId);
-    if (client) {
-        io.to(client.socketId).emit('compilation_log', { message: logMessage });
-    } else {
-        console.warn(`Client with ID ${clientId} not found in clientList.`);
-    }
+    io.to(clientId).emit('compilation_log', { message: logMessage });
 }
 
 module.exports = {

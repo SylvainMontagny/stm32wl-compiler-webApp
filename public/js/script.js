@@ -681,7 +681,7 @@ async function compileFirmware(jsonConfig){
     showLoadBar();
     try {
         const requestData = {
-            clientId: clientId,
+            clientId: socket.id,
             formData: jsonConfig,
           };
       
@@ -720,7 +720,7 @@ async function compileMultipleFirmware(jsonConfig){
     numberOfFirmware = jsonConfig.length;
     try {
         const requestData = {
-            clientId: clientId,
+            clientId: socket.id,
             formData: jsonConfig,
           };
       
@@ -787,6 +787,7 @@ document
     }
   });
 
+let socket;
 
 function loadBar(message) {
     const progressBar = document.querySelector(".load-bar-progress");
@@ -860,11 +861,7 @@ function hideLoadBar() {
 
 
 function initializeSocket() {
-  const socket = io.connect(window.location.href);
-
-  clientId = randomId();
-
-  socket.emit("create_id", clientId);
+  socket = io.connect(window.location.href);
 
   socket.on("compilation_log", (data) => {
     console.log(data.message);
