@@ -4,9 +4,12 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install
+# Install without dev dependecies and empty npm cache
+RUN npm install --only=production && npm cache clean --force
 
 COPY . .
 
-EXPOSE 4050
+ENV PORT=4050
+EXPOSE ${PORT}
+
 CMD ["npm", "start"]
