@@ -23,8 +23,8 @@ const elements = {
   cayenne1Label: document.querySelector('label[for="cayenne-lpp-enabled"]'),
   cayenne2: document.getElementById("cayenne-lpp-disabled"),
   cayenne2Label: document.querySelector('label[for="cayenne-lpp-disabled"]'),
-  simOn: document.getElementById("mrl003-sim-on"),
-  simOff: document.getElementById("mrl003-sim-off"),
+  simOn: document.getElementById("mlr003-sim-on"),
+  simOff: document.getElementById("mlr003-sim-off"),
   rLorawan: document.getElementById("restore-lorawan"),
   rApp: document.getElementById("restore-app"),
   rAdvance: document.getElementById("restore-adv"),
@@ -43,13 +43,15 @@ const elements = {
   nwksKey: document.getElementById("nwkskey"),
   appsKey: document.getElementById("appskey"),
   adminAppKey: document.getElementById("admin-gen-app-key"),
-  mrlAppPort: document.getElementById("mrl003-app-port"),
+  mlrAppPort: document.getElementById("mlr003-app-port"),
   generateFirmware: document.getElementById("generate-firmware"),
   class: document.getElementById("class"),
   spreadingFactor: document.getElementById("spreading-factor"),
   appPort: document.getElementById("app_port"),
   frameDelay: document.getElementById("frame-delay"),
   multipleFirmware: document.getElementById("multiple-firmware-on"),
+  firmwareName: document.querySelector(".firmware-name"),
+  firmwareNameInput: document.getElementById("firmware-name"),
 };
 
 // Display advanced settings form
@@ -169,7 +171,7 @@ function cayenne2Error() {
 }
 elements.cayenne2.addEventListener("change", cayenne2Error);
 
-// MRL003 Simulation error
+// MLR003 Simulation error
 function simOnError() {
   if (elements.simOn.checked) {
     [
@@ -208,7 +210,7 @@ function simOnError() {
 }
 elements.simOn.addEventListener("change", simOnError);
 
-// MRL003 Simulation error
+// MLR003 Simulation error
 function simOffError() {
   if (elements.simOff.checked) {
     [
@@ -269,7 +271,7 @@ elements.rApp.addEventListener("click", function () {
 // Restore default settings for Advanced
 elements.rAdvance.addEventListener("click", function () {
   document.getElementById("admin-sensor-disabled").checked = true;
-  elements.mrlAppPort.value = "30";
+  elements.mlrAppPort.value = "30";
   if (elements.simOn.checked) {
     elements.simOff.checked = true;
     simOffError();
@@ -388,11 +390,17 @@ elements.multipleFirmware.addEventListener("change", function () {
     firmwareNumber.style.color = "#000";
     firmwareNumberInput.style.color = "#000";
     firmwareNumberInput.disabled = false;
+    elements.firmwareName.style.color = "#000";
+    elements.firmwareNameInput.style.color = "#000";
+    elements.firmwareNameInput.disabled = false;
     disableCredentials();
   } else {
     firmwareNumber.style.color = "#D1D1D1";
     firmwareNumberInput.style.color = "#D1D1D1";
     firmwareNumberInput.disabled = true;
+    elements.firmwareName.style.color = "#D1D1D1";
+    elements.firmwareNameInput.style.color = "#D1D1D1";
+    elements.firmwareNameInput.disabled = true;
     enableCredentials();
   }
 });
@@ -422,8 +430,8 @@ function saveFormData() {
     nwkSKey: elements.nwksKey.value,
     appSKey: elements.appsKey.value,
     adminAppKey: elements.adminAppKey.value,
-    mrlSim: document.querySelector('input[name="mrl003-sim"]:checked').value,
-    mrlAppPort: elements.mrlAppPort.value,
+    mlrSim: document.querySelector('input[name="mlr003-sim"]:checked').value,
+    mlrAppPort: elements.mlrAppPort.value,
   };
   localStorage.setItem("formData", JSON.stringify(formData));
 }
@@ -471,9 +479,9 @@ function restoreFormData() {
     elements.adminAppKey.value =
       formData.adminAppKey || genRandomKey(32, elements.adminAppKey);
     document.querySelector(
-      `input[name="mrl003-sim"][value="${formData.mrlSim || "off"}"]`
+      `input[name="mlr003-sim"][value="${formData.mlrSim || "off"}"]`
     ).checked = true;
-    elements.mrlAppPort.value = formData.mrlAppPort || "30";
+    elements.mlrAppPort.value = formData.mlrAppPort || "30";
   }
   otaaAbp();
 }
@@ -560,9 +568,9 @@ function getFormJson() {
       "enabled"
     ).toString(),
     MLR003_SIMU: (
-      document.querySelector('input[name="mrl003-sim"]:checked').value == "on"
+      document.querySelector('input[name="mlr003-sim"]:checked').value == "on"
     ).toString(),
-    MLR003_APP_PORT: elements.mrlAppPort.value,
+    MLR003_APP_PORT: elements.mlrAppPort.value,
     ADMIN_GEN_APP_KEY: formatKey(elements.adminAppKey.value),
   };
 
@@ -574,6 +582,7 @@ function getMultipleFormJson(nbFirmware) {
   let firmwareData = [];
   for (let i = 0; i < nbFirmware; i++) {
     let formData = {
+      name: elements.firmwareNameInput.value + "-" + (i + 1),
       ACTIVATION_MODE: elements.activationMode.value.toUpperCase(),
       CLASS: elements.class.value.toUpperCase(),
       SPREADING_FACTOR: elements.spreadingFactor.value.toUpperCase(),
@@ -611,9 +620,9 @@ function getMultipleFormJson(nbFirmware) {
         "enabled"
       ).toString(),
       MLR003_SIMU: (
-        document.querySelector('input[name="mrl003-sim"]:checked').value == "on"
+        document.querySelector('input[name="mlr003-sim"]:checked').value == "on"
       ).toString(),
-      MLR003_APP_PORT: elements.mrlAppPort.value,
+      MLR003_APP_PORT: elements.mlrAppPort.value,
       ADMIN_GEN_APP_KEY: formatKey(genRandomKey(32, elements.adminAppKey)),
     };
     firmwareData.push(formData);
@@ -634,7 +643,7 @@ function mixMaxRange(inputElement) {
 }
 
 mixMaxRange(elements.appPort);
-mixMaxRange(elements.mrlAppPort);
+mixMaxRange(elements.mlrAppPort);
 mixMaxRange(elements.frameDelay);
 
 // Global variables

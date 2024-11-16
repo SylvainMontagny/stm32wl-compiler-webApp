@@ -13,7 +13,7 @@ function generateBinFileName(jsonConfig){
     let DevEUI = jsonConfig.devEUI_.replace(/0x|,\s/g, '')
     let ActivationMode = jsonConfig.ACTIVATION_MODE
     let Class = jsonConfig.CLASS
-    let SpreadingFactor = jsonConfig.SPREADING_FACTOR
+    let SpreadingFactor = 'SF'+jsonConfig.SPREADING_FACTOR
     let Confirmed = (jsonConfig.CONFIRMED == "true")?"Confirmed":"Unconfirmed"
     return `${DevEUI}-${ActivationMode}-${Class}-${SpreadingFactor}-${Confirmed}.bin`;
 }
@@ -24,7 +24,7 @@ function generateBinFileName(jsonConfig){
 function generateMultipleCompileFileName(nbFirmware,jsonConfig){
     let ActivationMode = jsonConfig.ACTIVATION_MODE
     let Class = jsonConfig.CLASS
-    let SpreadingFactor = jsonConfig.SPREADING_FACTOR
+    let SpreadingFactor = 'SF'+jsonConfig.SPREADING_FACTOR
     let Confirmed = (jsonConfig.CONFIRMED == "true")?"Confirmed":"Unconfirmed"
     return `x${nbFirmware}-${ActivationMode}-${Class}-${SpreadingFactor}-${Confirmed}.zip`;
 }
@@ -118,7 +118,6 @@ async function setupFilesMulti(configPath,resultPath,jsonIdsConfig){
 async function setupCsv(csvPath,jsonIdsConfig){
     // Default values
     const default_id = '';
-    const default_name = '';
     const default_frequency_plan_id = "EU_863_870_TTN";
     const default_lorawan_version = "MAC_V1_0_3";
     const default_lorawan_phy_version = "RP002_V1_0_3";
@@ -128,7 +127,7 @@ async function setupCsv(csvPath,jsonIdsConfig){
     for(let id in jsonIdsConfig){
         let csvElem = {};
         csvElem.id = default_id;
-        csvElem.name = default_name;
+        csvElem.name = jsonIdsConfig[id].configApplication.name;
         csvElem.dev_eui = jsonIdsConfig[id].configApplication.devEUI_.replace(/0x|,\s/g, ''); // Remove '0x' and ', '
         csvElem.join_eui = jsonIdsConfig[id].configApplication.appEUI_.replace(/0x|,\s/g, ''); // Remove '0x' and ', '
         csvElem.frequency_plan_id = default_frequency_plan_id;
