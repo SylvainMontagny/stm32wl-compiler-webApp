@@ -334,6 +334,14 @@ button.generate-appskey {
   width: 20%;
 }
 
+#firmware-name {
+  width: 40%;
+}
+
+#firmware-nb {
+  width: 15%;
+}
+
 .svg {
   height: 40px;
   display: flex;
@@ -350,15 +358,8 @@ button.generate-appskey {
 
 .firmware-number,
 .firmware-number input,
-.firmware-name,
 .firmware-name input {
   color: #d1d1d1;
-}
-
-.firmware-name {
-  display: flex;
-  gap: 10px;
-  align-items: center;
 }
 
 /* Generate Firmware Button */

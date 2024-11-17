@@ -50,8 +50,8 @@ const elements = {
   appPort: document.getElementById("app_port"),
   frameDelay: document.getElementById("frame-delay"),
   multipleFirmware: document.getElementById("multiple-firmware-on"),
-  firmwareName: document.querySelector(".firmware-name"),
   firmwareNameInput: document.getElementById("firmware-name"),
+  firmwareNumber: document.getElementById("firmware-nb")
 };
 
 // Display advanced settings form
@@ -280,7 +280,8 @@ elements.rAdvance.addEventListener("click", function () {
     elements.multipleFirmware.checked = false;
     elements.multipleFirmware.dispatchEvent(new Event("change"));
   }
-  document.getElementById("firmware-nb").value = "2";
+  elements.firmwareNumber.value = "2";
+  elements.firmwareNameInput.value = "device";
   saveFormData();
 });
 
@@ -294,8 +295,22 @@ const genRandomKey = (size, element) => {
   return key;
 };
 
+const genRandomEUI = (element) => {
+  const prefix = "ecdb86fffd";
+
+  const randomSuffix = [...Array(4)]
+    .map(() => Math.floor(Math.random() * 16).toString(16))
+    .join("");
+
+  const key = prefix + randomSuffix;
+
+  element.value = key;
+  saveFormData();
+  return key;
+};
+
 elements.generateDevEui.addEventListener("click", function () {
-  genRandomKey(16, elements.devEui);
+  genRandomEUI(elements.devEui);
 });
 
 elements.generateAppKey.addEventListener("click", function () {
@@ -385,20 +400,17 @@ function enableCredentials() {
 // Multiple firmware
 elements.multipleFirmware.addEventListener("change", function () {
   let firmwareNumber = document.querySelector(".firmware-number");
-  let firmwareNumberInput = document.getElementById("firmware-nb");
   if (elements.multipleFirmware.checked) {
     firmwareNumber.style.color = "#000";
-    firmwareNumberInput.style.color = "#000";
-    firmwareNumberInput.disabled = false;
-    elements.firmwareName.style.color = "#000";
+    elements.firmwareNumber.style.color = "#000";
+    elements.firmwareNumber.disabled = false;
     elements.firmwareNameInput.style.color = "#000";
     elements.firmwareNameInput.disabled = false;
     disableCredentials();
   } else {
     firmwareNumber.style.color = "#D1D1D1";
-    firmwareNumberInput.style.color = "#D1D1D1";
-    firmwareNumberInput.disabled = true;
-    elements.firmwareName.style.color = "#D1D1D1";
+    elements.firmwareNumber.style.color = "#D1D1D1";
+    elements.firmwareNumber.disabled = true;
     elements.firmwareNameInput.style.color = "#D1D1D1";
     elements.firmwareNameInput.disabled = true;
     enableCredentials();
@@ -465,7 +477,7 @@ function restoreFormData() {
       `input[name="cayenne-lpp"][value="${formData.cayenneLpp || "disabled"}"]`
     ).checked = true;
     elements.devEui.value =
-      formData.devEui || genRandomKey(16, elements.devEui);
+      formData.devEui || genRandomEUI(elements.devEui);
     elements.appKey.value =
       formData.appKey || genRandomKey(32, elements.appKey);
     elements.appEui.value =
@@ -505,7 +517,7 @@ window.addEventListener("load", function () {
 
   // gen keys
   if (!localStorage.getItem("formData")) {
-    genRandomKey(16, elements.devEui);
+    genRandomEUI(elements.devEui);
     genRandomKey(32, elements.appKey);
     genRandomKey(16, elements.appEui);
     genRandomKey(8, elements.devAddr);
@@ -609,7 +621,7 @@ function getMultipleFormJson(nbFirmware) {
         document.querySelector('input[name="cayenne-lpp"]:checked').value ==
         "enabled"
       ).toString(),
-      devEUI_: formatEUI(genRandomKey(16, elements.devEui)),
+      devEUI_: formatEUI(genRandomEUI(elements.devEui)),
       appKey_: formatKey(genRandomKey(32, elements.appKey).toUpperCase()),
       appEUI_: formatEUI(genRandomKey(16, elements.appEui)),
       devAddr_: formatAddr(genRandomKey(8, elements.devAddr)),
