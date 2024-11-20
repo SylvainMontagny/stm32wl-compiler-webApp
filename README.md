@@ -23,7 +23,7 @@ git clone https://github.com/elias-qzo/LoRaWAN-Compiler-Webapp.git
 
 ```shell
 cd LoRaWAN-Compiler-Webapp
-docker-compose up -d --build
+docker compose up -d --build
 ```
 This will build the Docker image of the repo and start it\
 You can remove the -d if you want to see logs in real time\
@@ -32,13 +32,11 @@ By default, the STM32WL-standalone path is set to */home/debian/STM32WL/STM32WL-
 STM32WL_PATH=/your/path/here
 ```
 
-3. Stop the app
+3. Stop the containers
 
-Simply use
 ```shell
-docker-compose down
+docker compose down
 ```
-or *CTRL-C* if you are in real-time mode
 
 ### Usage, process overview and libraries used
 
