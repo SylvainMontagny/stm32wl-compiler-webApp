@@ -272,27 +272,27 @@
                         </div>
                     </div>
 
-                    <div class="mrl003-sim">
+                    <div class="mlr003-sim">
                         <h3>Thermostatic valve simulation</h3>
                         <div class="radio-buttons">
                             <div class="radio-button">
-                                <input type="radio" id="mrl003-sim-on" name="mrl003-sim" value="on">
-                                <label for="mrl003-sim-on">On</label>
+                                <input type="radio" id="mlr003-sim-on" name="mlr003-sim" value="on">
+                                <label for="mlr003-sim-on">On</label>
                             </div>
                             <div class="radio-button">
-                                <input type="radio" id="mrl003-sim-off" name="mrl003-sim" value="off" checked>
-                                <label for="mrl003-sim-off">Off</label>
+                                <input type="radio" id="mlr003-sim-off" name="mlr003-sim" value="off" checked>
+                                <label for="mlr003-sim-off">Off</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="mlr003-app-port">
                         <h3>Downlink FPort</h3>
-                        <input type="number" id="mrl003-app-port" name="mrl003-app-port" min="1" max="255" value="30">
+                        <input type="number" id="mlr003-app-port" name="mlr003-app-port" min="1" max="255" value="30">
                     </div>
 
                     <div class="admin-gen-app-key">
-                        <h3>Gen App Key</h3>
+                        <h3>GenAppKey <span style="font-weight: normal; font-size: 80%;">(Multicast)</span></h3>
                         <div class="admin-gen-app-key-container">
                             <div class="input-icon">
                                 <input type="text" id="admin-gen-app-key" name="admin-gen-app-key" maxlength="32">
@@ -309,7 +309,7 @@
                                 <input type="checkbox" id="multiple-firmware-on" name="multiple-firmware" value="on">
                                 <label for="multiple-firmware-on">On</label>
                             </div>
-                            <div class="firmware-number">Generate <input type="number" id="firmware-nb" name="firmware-nb" min="1" max="1000000" value="2" disabled> firmwares</div>
+                            <div class="firmware-number">Generate <input type="number" id="firmware-nb" name="firmware-nb" min="1" max="1000000" value="2" disabled> firmwares named <input type="text" id="firmware-name" name="firmware-name" value="device" disabled></div>
                         </div>
                     </div>
                 </div>          

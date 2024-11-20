@@ -206,6 +206,7 @@ select {
   display: grid;
   gap: 2vw;
   margin: 20px;
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .send-mode,
@@ -216,7 +217,8 @@ select {
   flex-direction: column;
 }
 
-.send-mode {
+.send-mode, 
+.dev-eui {
   grid-column: span 2;
 }
 
@@ -232,15 +234,6 @@ select {
   width: 20%;
 }
 
-.dev-eui {
-  grid-column: span 2;
-}
-
-.cayenne-lpp,
-.payload-configuration {
-  grid-column: span 1;
-}
-
 .dev-eui-container,
 .appkey-container,
 .appeui-joineui-container,
@@ -250,25 +243,6 @@ select {
 .appskey-container {
   display: flex;
   gap: 10px;
-}
-
-.multiple-firmware-container {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-}
-
-.multiple-firmware {
-  grid-column: span 3;
-}
-
-#firmware-nb {
-  width: 20%;
-}
-
-.firmware-number,
-.firmware-number input {
-  color: #d1d1d1;
 }
 
 button.generate-dev-eui,
@@ -319,6 +293,7 @@ button.generate-appskey {
   gap: 2vw;
   margin: 20px;
   display: none;
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .advance-container .title-container .closed-advance-container {
@@ -329,19 +304,22 @@ button.generate-appskey {
   display: none;
 }
 
-.admin-sensor,
-.mrl003-sim,
-.mlr003-app-port {
+.mlr003-app-port,
+.mlr003-sim {
   grid-column: span 1;
 }
 
-.admin-gen-app-key {
-  grid-column: span 3;
+.admin-gen-app-key,
+.admin-sensor,
+.multiple-firmware {
+  grid-column: span 2;
 }
 
 .admin-sensor,
-.mrl003-sim,
-.admin-gen-app-key {
+.mlr003-sim,
+.mlr003-app-port,
+.admin-gen-app-key,
+.multiple-firmware {
   display: flex;
   flex-direction: column;
 }
@@ -352,12 +330,36 @@ button.generate-appskey {
   align-items: center;
 }
 
+#mlr003-app-port {
+  width: 20%;
+}
+
+#firmware-name {
+  width: 40%;
+}
+
+#firmware-nb {
+  width: 15%;
+}
+
 .svg {
   height: 40px;
   display: flex;
   align-items: flex-end;
   transform-origin: 20px 22px;
   transition: transform 0.2s ease;
+}
+
+.multiple-firmware-container {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.firmware-number,
+.firmware-number input,
+.firmware-name input {
+  color: #d1d1d1;
 }
 
 /* Generate Firmware Button */
