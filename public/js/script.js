@@ -298,7 +298,7 @@ const genRandomKey = (size, element) => {
 const genRandomEUI = (element) => {
   const prefix = "ecdb86fffd";
 
-  const randomSuffix = [...Array(4)]
+  const randomSuffix = [...Array(6)]
     .map(() => Math.floor(Math.random() * 16).toString(16))
     .join("");
 
