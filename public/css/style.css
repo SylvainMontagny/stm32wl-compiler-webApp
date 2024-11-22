@@ -564,3 +564,36 @@ button.generate-appskey {
 .input-icon i:hover {
   color: #000;
 }
+
+
+/* Caption Styles */
+.fa-circle-question:before, .fa-question-circle:before {
+  color: grey;
+  font-size: 75%;
+  cursor: pointer;
+}
+
+/* Tooltip container styling */
+.tooltip {
+  position: absolute;
+  background-color: #162133;
+  color: #ffffff; 
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  max-width: 300px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.tooltip::after {
+  content: ''; 
+  position: absolute;
+  bottom: -15px; 
+  left: 15px; 
+  border-width: 8px; 
+  border-style: solid;
+  border-color: #162133 transparent transparent transparent;
+}

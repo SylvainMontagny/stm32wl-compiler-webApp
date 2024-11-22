@@ -902,3 +902,44 @@ function initializeSocket() {
 document.addEventListener("DOMContentLoaded", () => {
   initializeSocket();
 });
+
+
+async function getJsonFile(file) {
+  const response = await fetch(file);
+  const data = await response.json();
+  return data;
+}
+
+getJsonFile("js/captions.json").then((data) => {
+  document.querySelectorAll(".fa-regular.fa-circle-question").forEach((icon) => {
+    icon.addEventListener("mouseover", function () {
+      let caption = this.parentElement.textContent;
+      caption = caption.replace(/\s/g, "");
+      let text = data[caption];
+
+      const tooltip = document.createElement("div");
+      tooltip.className = "tooltip";
+      tooltip.innerText = text;
+      document.querySelector(".form-container").appendChild(tooltip);
+
+      const rect = this.getBoundingClientRect();
+      tooltip.style.left = `${rect.left + window.scrollX - 15}px`; 
+      tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 6}px`; 
+
+      this.addEventListener("mouseout", () => {
+        setTimeout(() => {
+          if (!tooltip.matches(":hover")) {
+            tooltip.remove();
+          }
+        }, 300);
+      });
+
+      tooltip.addEventListener("mouseout", () => {
+        tooltip.remove();
+      });
+    });
+  });
+});
+
+
+
