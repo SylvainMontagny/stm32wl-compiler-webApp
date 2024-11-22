@@ -4,7 +4,7 @@
     "AdaptativeDR": "Network management of SF and power transmission.",
     "Confirmation": "Choose if you want an acknowledgement for each uplink transmission.",
     "FPort": "This is the application port. 0 is reserved for MAC Command and is not allowed to transmit the user payload.",
-    "CayenneLPP": "This is a common payload format as described here : https://docs.mydevices.com/docs/lorawan/cayenne-lpp",
+    "CayenneLPP": "This is a common payload format as described here : <a href='https://docs.mydevices.com/docs/lorawan/cayenne-lpp' target='_blank'>CayenneLPP documentation</a>",
     "DevEUI": "A 64 bit extended unique identifier for your end-device.",
     "DevAddr": "A 32 bit non-unique identifier for your end-device.",
     "AppSKey": "Application Session Key used for encryption.",

@@ -597,3 +597,8 @@ button.generate-appskey {
   border-style: solid;
   border-color: #162133 transparent transparent transparent;
 }
+
+.tooltip a {
+  color: var(--primary-color);
+  text-decoration: none;
+}

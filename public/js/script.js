@@ -919,24 +919,23 @@ getJsonFile("js/captions.json").then((data) => {
 
       const tooltip = document.createElement("div");
       tooltip.className = "tooltip";
-      tooltip.innerText = text;
+      tooltip.innerHTML = text;
       document.querySelector(".form-container").appendChild(tooltip);
 
       const rect = this.getBoundingClientRect();
       tooltip.style.left = `${rect.left + window.scrollX - 15}px`; 
       tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 6}px`; 
 
-      this.addEventListener("mouseout", () => {
+      const removeTooltip = () => {
         setTimeout(() => {
-          if (!tooltip.matches(":hover")) {
+          if (!tooltip.matches(":hover") && !icon.matches(":hover")) {
             tooltip.remove();
           }
-        }, 300);
-      });
+        }, 200);
+      };
 
-      tooltip.addEventListener("mouseout", () => {
-        tooltip.remove();
-      });
+      this.addEventListener("mouseout", removeTooltip);
+      tooltip.addEventListener("mouseout", removeTooltip);
     });
   });
 });
