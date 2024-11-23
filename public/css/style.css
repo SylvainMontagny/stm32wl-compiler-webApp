@@ -542,7 +542,6 @@ button.generate-appskey {
 
 .input-icon input {
   padding-right: 40px;
-  /* Assurez-vous qu'il y a de la place pour l'icône à droite */
   width: 100%;
   box-sizing: border-box;
 }
@@ -555,11 +554,6 @@ button.generate-appskey {
   cursor: pointer;
   color: #666;
 }
-
-.input-icon i:hover {
-  color: #000;
-}
-
 
 /* Caption Styles */
 .fa-circle-question:before,

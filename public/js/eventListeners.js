@@ -161,7 +161,7 @@ export function initializeEventListeners() {
             element.disabled = false;
         });
         document.querySelectorAll(".input-icon i").forEach((icon) => {
-            icon.style.color = "#000";
+            icon.style.color = "#666";
             icon.style.cursor = "pointer";
         });
         document.querySelectorAll(".btn").forEach((btn) => {
