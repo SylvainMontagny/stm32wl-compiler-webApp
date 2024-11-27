@@ -3,20 +3,10 @@ import { loadBar } from "./loadBar.js";
 // Initialize Socket.io connection and handle events
 const logContainer = document.getElementById("log-container");
 
-function randomId() {
-    let min = 10 ** 14;
-    let max = 10 ** 15;
-    let id_random = Math.floor(Math.random() * (max - min)) + min;
-    return id_random.toString(36);
-}
-
-let clientId;
+let socket;
 
 export function initializeSocket() {
-    const socket = io.connect(window.location.href);
-    clientId = randomId();
-
-    socket.emit("create_id", clientId);
+    socket = io.connect(window.location.href);
 
     socket.on("compilation_log", (data) => {
         loadBar(data.message);
@@ -28,4 +18,4 @@ export function initializeSocket() {
     });
 }
 
-export { clientId };
+export { socket };

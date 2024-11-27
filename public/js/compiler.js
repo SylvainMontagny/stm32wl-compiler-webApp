@@ -1,7 +1,7 @@
 import { elements } from './elements.js';
 import { showLoadBar } from './loadBar.js';
-import { clientId } from './socket.js';
 import { genRandomEUI, genRandomKey } from './generators.js';
+import { socket } from './socket.js'
 
 function formatEUI(str) {
     return `0x${str.match(/.{1,2}/g).join(", 0x")}`;
@@ -121,7 +121,7 @@ export async function compileFirmware(jsonConfig) {
     showLoadBar();
     try {
         const requestData = {
-            clientId: clientId,
+            clientId: socket.id,
             formData: jsonConfig,
         };
 
@@ -162,7 +162,7 @@ export async function compileMultipleFirmware(jsonConfig) {
     numberOfFirmware = jsonConfig.length;
     try {
         const requestData = {
-            clientId: clientId,
+            clientId: socket.id,
             formData: jsonConfig,
         };
 
