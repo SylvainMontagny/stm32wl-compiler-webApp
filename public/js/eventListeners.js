@@ -329,7 +329,8 @@ export function initializeEventListeners() {
     });
 
     elements.cancel.addEventListener("click", function () {
-        // socket.emit("cancel", { containerId: "compiler-container" });
-        console.log("cancel", elements.containerID);
+        let message = document.getElementById("container-id").textContent;
+        let id = message.match(/\[([^\]]+)\]/)[1];
+        socket.emit("cancel_compilation", { id: id });
     });
 }

@@ -4,6 +4,7 @@ import { loadBar } from "./loadBar.js";
 const logContainer = document.getElementById("log-container");
 
 let socket;
+let messageCount = 0;
 
 export function initializeSocket() {
     socket = io.connect(window.location.href);
@@ -13,8 +14,12 @@ export function initializeSocket() {
 
         const p = document.createElement("p");
         p.textContent = data.message;
-        id = data.message.match(/\[([^\]]+)\]/)[1];
-        p.setAttribute("id", id);
+
+        messageCount++;
+
+        if (messageCount === 2) {
+            p.setAttribute("id", "container-id");
+        }
         logContainer.appendChild(p);
         logContainer.scrollTop = logContainer.scrollHeight;
     });

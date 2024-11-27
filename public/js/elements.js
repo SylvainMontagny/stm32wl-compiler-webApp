@@ -52,5 +52,4 @@ export const elements = {
     firmwareNameInput: document.getElementById("firmware-name"),
     firmwareNumber: document.getElementById("firmware-nb"),
     cancel: document.getElementById("cancel"),
-    containerID: document.getElementById("container-id"),
 };
