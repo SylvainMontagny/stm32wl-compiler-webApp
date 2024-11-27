@@ -490,6 +490,16 @@ button.generate-appskey {
   margin-left: 1vw;
 }
 
+.load-bar-bottom {
+  display: flex;
+  justify-content: space-between;
+}
+
+#cancel {
+  color: red;
+  cursor: pointer;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
 

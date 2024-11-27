@@ -13,6 +13,8 @@ export function initializeSocket() {
 
         const p = document.createElement("p");
         p.textContent = data.message;
+        id = data.message.match(/\[([^\]]+)\]/)[1];
+        p.setAttribute("id", id);
         logContainer.appendChild(p);
         logContainer.scrollTop = logContainer.scrollHeight;
     });

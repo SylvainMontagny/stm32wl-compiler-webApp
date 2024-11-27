@@ -50,5 +50,7 @@ export const elements = {
     frameDelay: document.getElementById("frame-delay"),
     multipleFirmware: document.getElementById("multiple-firmware-on"),
     firmwareNameInput: document.getElementById("firmware-name"),
-    firmwareNumber: document.getElementById("firmware-nb")
+    firmwareNumber: document.getElementById("firmware-nb"),
+    cancel: document.getElementById("cancel"),
+    containerID: document.getElementById("container-id"),
 };

@@ -4,6 +4,7 @@ import { saveFormData, restoreFormData } from './storage.js';
 import { compileFirmware, compileMultipleFirmware, getFormJson, getMultipleFormJson } from './compiler.js';
 import { genRandomEUI, genRandomKey } from './generators.js';
 import { hideLoadBar } from './loadBar.js';
+import { socket } from './socket.js';
 
 export function initializeEventListeners() {
 
@@ -325,5 +326,10 @@ export function initializeEventListeners() {
                 tooltip.addEventListener("mouseout", removeTooltip);
             });
         });
+    });
+
+    elements.cancel.addEventListener("click", function () {
+        // socket.emit("cancel", { containerId: "compiler-container" });
+        console.log("cancel", elements.containerID);
     });
 }
