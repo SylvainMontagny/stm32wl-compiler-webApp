@@ -15,7 +15,7 @@
     "start": "node app.js"
   },
   "version": "1.0.0",
-  "description": "Application web de générations de firmware pour formation IOT",
+  "description": "Firmware generation web application for IOT formations",
   "keywords": [],
   "author": "",
   "license": "ISC"

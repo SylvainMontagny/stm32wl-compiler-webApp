@@ -1,6 +1,6 @@
 # LoRaWAN Compiler Webapp
 
-**LoRaWAN Compiler Webapp** is a containerized web application that allows code compilation by launching containers via a POST Express API. It is designed to manage and isolate compilation environments securely and efficiently, making it easy to execute compilers on demand. This application is meant to be used alongside STM32WL Standalone compiler files, and an arm-compiler image.
+**LoRaWAN Compiler Webapp** is a containerized web application that allows code compilation by launching containers via a POST Express API. It is designed to manage and isolate compilation environments securely and efficiently, making it easy to execute compilers on demand. This application is meant to be used alongside STM32WL-standalone source files, and an arm-compiler image.
 
 ## Requirement
 
@@ -10,7 +10,7 @@
 
 ### Server Setup
 
-To setup the webapp, you will need a few steps
+To setup the webapp, you will need a few steps :
 
 1. Clone the STM32WL and Webapp Git
 
@@ -25,9 +25,12 @@ git clone https://github.com/elias-qzo/LoRaWAN-Compiler-Webapp.git
 cd LoRaWAN-Compiler-Webapp
 docker compose up -d --build
 ```
-This will build the Docker image of the repo and start it\
-You can remove the -d if you want to see logs in real time\
-By default, the STM32WL-standalone path is set to */home/debian/STM32WL/STM32WL-standalone*. To use another path, create a *.env* file, and add your path into it :
+This will build the Docker image of the repo and start it.\
+You can remove the -d if you want to see logs in real time.\
+By default, the STM32WL-standalone path is set to *../STM32WL/STM32WL-standalone*. To use another path, copy the *.env.example* to *.env* file, and add your path into it :
+```
+cp .env.example .env
+``` 
 ```makefile
 STM32WL_PATH=/your/path/here
 ```
@@ -40,11 +43,11 @@ docker compose down
 
 ### Usage, process overview and libraries used
 
-**Step 1:** Start the main web app container using docker compose
+**Step 1:** Start the main web app container using docker compose.
 ```shell
-docker-compose up
+docker compose up
 ```
-Here is the *docker-compose.yml* used
+Here is the *docker-compose.yml* used :
 ```yml
 services:
   web:
@@ -54,11 +57,11 @@ services:
       - "80:4050" # Webapp port
     volumes:
       - shared-vol:/shared-vol # Volume to share data across containers
-      - ${STM32WL_PATH:-/home/debian/STM32WL/STM32WL-standalone}:/STM32WL # Path to compiler folder
+      - ${STM32WL_PATH:-../STM32WL/STM32WL-standalone}:/STM32WL # Path to compiler folder
       - /var/run/docker.sock:/var/run/docker.sock # Docker socket to start container inside a container
     environment:
-      - General_Setup_path=/LoRaWAN/App # General_Setup.h path in compiler folder
-      - config_application_path=/LoRaWAN # config_application.h path in compiler folder
+      - GENERAL_SETUP_PATH=/LoRaWAN/App # General_Setup.h path in compiler folder
+      - CONFIG_APPLICATION_PATH=/LoRaWAN # config_application.h path in compiler folder
 
   compiler:
     image: montagny/arm-compiler:1.0 # Image used for compilation
@@ -74,7 +77,7 @@ The image of the webapp is automatically built on *docker-compose up* based on t
 
 We need to pass the Docker volume **shared-vol** to facilitate data exchange between containers. This volume will automatically be created thanks to the three last lines.
 The STM32WL-standalone compiler is passed as a volume so we can copy its content for compilation.
-The **Docker daemon socket** is also passed to manipulate containers within a container (more infos in Step 4)
+The **Docker daemon socket** is also passed to manipulate containers within a container (more infos in Step 4).
 
 We also have the *montagny/arm-compiler:1.0* image that we will use for compilation. We set it to *deploy replicas 0* since we don't want to start it at *docker-compose up*, we only want to pull it.
 
@@ -146,7 +149,7 @@ const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
 This means that new containers are not started within the container running the web app; instead, they run directly on the host machine, just like the web app container itself. This approach avoids the need to install a full Docker engine inside the container and keeps the architecture simpler and more efficient.
 
-After that, we can launch the container with this function
+After that, we can launch the container with this function :
 ```js
 const imageName = 'montagny/arm-compiler:1.0' // image of the compiler
 const volName = 'shared-vol' // name of the volume used to store configs and results
@@ -178,7 +181,7 @@ async function startCompilerContainer(compileId, configPath, resultPath, fileNam
         await container.remove({ force: true });
         console.log("Container removed");
 
-        // Return if the container add an error or not
+        // Return if the container had an error or not
         return waitResult.StatusCode
 
     } catch (error) {
@@ -192,54 +195,60 @@ It will :
 - Delete the container
 - Return the status (0 if everything went well)
 
-At the end of the execution, we will also remove all the compilation files from the *shared-vol* volume
+At the end of the execution, we will also remove all the compilation files from the *shared-vol* volume.
 
 ```
 shared-vol/
 ├── configs/
 ├── results/
 │   ├── Rt3LE/
-│   │   ├── STM32WL-standalone.bin
+│   │   ├── ecdb86fffde224af-OTAA-CLASS_A-SF7-Unconfirmed.bin
 ```
 
-We can now send the status result and the file as a **blob** through the **/compile API Route**
-A blob is a sendable version of the data inside a file
+We can now send the status result and the file as a **blob** through the **/compile API Route** .
+A blob is a sendable version of the data inside a file.
 
 **Step 5:** Receive the file
-We can now receive the blob *client-side*, and store it into a file with a custom name
-This is the client function that send the request and get the file result
+We can now receive the blob *client-side*, and store it into a file with a custom name.
+This is the client function that send the request and get the file result :
 ```js
-async function compileFirmware(jsonString){
+export async function compileFirmware(jsonConfig) {
+    showLoadBar();
     try {
-        // Send the request
-        const response = await fetch('/compile', {
-            method: 'POST',
+        const requestData = {
+            clientId: socket.id,
+            formData: jsonConfig,
+        };
+
+        const response = await fetch("/compile", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
-            body: jsonString,
+            body: JSON.stringify(requestData, null, 2),
         });
 
         // Receive the blob and store it as a file
         if (response.ok) {
             const blob = await response.blob();
+            const fileName = response.headers.get("X-File-Name");
             const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
+            const a = document.createElement("a");
             a.href = url;
-            a.download = 'STM32WL-standalone.bin';
+            a.download = fileName;
             document.body.appendChild(a);
             a.click();
             a.remove();
         } else {
             const errorText = await response.text();
-            alert('Error: ' + errorText);
+            alert("Error: " + errorText);
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while compiling the code');
+        console.error("Error:", error);
+        alert("An error occurred while compiling the code");
     }
 }
 ```
 
 **Multi-compilation**\
-For multi-compilation, the process in almost the same. We use the */compile-multiple** API Route, sending a JSON array containing all the parameters with randomly generated keys. We launch containers one after the other, and then send a *.zip* with all the *bin* files, and a *tts-end-device.csv* file with all the keys of the firmwares.
+For multi-compilation, the process in almost the same. We use the **/compile-multiple** API Route, sending a JSON array containing all the parameters with randomly generated keys. We launch containers one after the other, and then send a *.zip* with all the *bin* files, and a *tts-end-device.csv* file with all the keys of the firmwares.

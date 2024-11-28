@@ -2,37 +2,37 @@ const fs = require('fs-extra');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
 const compilerPath = '/STM32WL' // Path to the STM32WL compiler files
-const generalSetupPath = process.env.General_Setup_path;
-const configApplicationPath = process.env.config_application_path;
+const generalSetupPath = process.env.GENERAL_SETUP_PATH;
+const configApplicationPath = process.env.CONFIG_APPLICATION_PATH;
 const archiver = require('archiver');
 
 /**
  * Generates the file name based on the config
  */
-function generateBinFileName(jsonConfig){
+function generateBinFileName(jsonConfig) {
     let DevEUI = jsonConfig.devEUI_.replace(/0x|,\s/g, '')
     let ActivationMode = jsonConfig.ACTIVATION_MODE
     let Class = jsonConfig.CLASS
-    let SpreadingFactor = 'SF'+jsonConfig.SPREADING_FACTOR
-    let Confirmed = (jsonConfig.CONFIRMED == "true")?"Confirmed":"Unconfirmed"
+    let SpreadingFactor = 'SF' + jsonConfig.SPREADING_FACTOR
+    let Confirmed = (jsonConfig.CONFIRMED == "true") ? "Confirmed" : "Unconfirmed"
     return `${DevEUI}-${ActivationMode}-${Class}-${SpreadingFactor}-${Confirmed}.bin`;
 }
 
 /**
  * Generate the .zip file name for multiple firmware generation
  */
-function generateMultipleCompileFileName(nbFirmware,jsonConfig){
+function generateMultipleCompileFileName(nbFirmware, jsonConfig) {
     let ActivationMode = jsonConfig.ACTIVATION_MODE
     let Class = jsonConfig.CLASS
-    let SpreadingFactor = 'SF'+jsonConfig.SPREADING_FACTOR
-    let Confirmed = (jsonConfig.CONFIRMED == "true")?"Confirmed":"Unconfirmed"
+    let SpreadingFactor = 'SF' + jsonConfig.SPREADING_FACTOR
+    let Confirmed = (jsonConfig.CONFIRMED == "true") ? "Confirmed" : "Unconfirmed"
     return `x${nbFirmware}-${ActivationMode}-${Class}-${SpreadingFactor}-${Confirmed}.zip`;
 }
 
 /**
  * Modify the .h file with the json using regex
  */
-async function modifyHFile(source,jsonConfig){
+async function modifyHFile(source, jsonConfig) {
     try {
         // Read async
         let data = await fs.readFile(source, 'utf8');
@@ -40,17 +40,17 @@ async function modifyHFile(source,jsonConfig){
 
         for (let [key, value] of Object.entries(jsonConfig)) {
             // Special case : { 0x00, ... }
-            if(key == "devEUI_" || key == "appEUI_"){
-                let regex = new RegExp(`(#define ${key}\\s+{ ).+[0-9]`,'m');
-                modifiedData = modifiedData.replace(regex,`$1${value}`);
-            // Special case : ( uint32_t )0x00...
-            } else if(key == "devAddr_"){
-                let regex = new RegExp(`(#define ${key}\\s+.*)0x[0-9]+`,'m')
-                modifiedData = modifiedData.replace(regex,`$1${value}`);
-            // Default case
+            if (key == "devEUI_" || key == "appEUI_") {
+                let regex = new RegExp(`(#define ${key}\\s+{ ).+[0-9]`, 'm');
+                modifiedData = modifiedData.replace(regex, `$1${value}`);
+                // Special case : ( uint32_t )0x00...
+            } else if (key == "devAddr_") {
+                let regex = new RegExp(`(#define ${key}\\s+.*)0x[0-9]+`, 'm')
+                modifiedData = modifiedData.replace(regex, `$1${value}`);
+                // Default case
             } else {
-                let regex = new RegExp(`(#define ${key}\\s+)[a-zA-Z0-9_,]+`,'m');
-                modifiedData = modifiedData.replace(regex,`$1${value}`);
+                let regex = new RegExp(`(#define ${key}\\s+)[a-zA-Z0-9_,]+`, 'm');
+                modifiedData = modifiedData.replace(regex, `$1${value}`);
             }
         }
         // Write changes to file
@@ -78,28 +78,28 @@ async function initSharedVolume(volName) {
 /**
  * Setup the files for the compilation process
  */
-async function setupFiles(configPath,resultPath,jsonConfigApplication,jsonGeneralSetup){
+async function setupFiles(configPath, resultPath, jsonConfigApplication, jsonGeneralSetup) {
     // Creating folders
     await createDir(configPath)
     await createDir(resultPath)
 
     // Copy compiler files
-    await copyDir(compilerPath,configPath);
-    
+    await copyDir(compilerPath, configPath);
+
     // Modify .h files with json
-    await modifyHFile(`${configPath}${configApplicationPath}/config_application.h`,jsonConfigApplication);
-    await modifyHFile(`${configPath}${generalSetupPath}/General_Setup.h`,jsonGeneralSetup);
+    await modifyHFile(`${configPath}${configApplicationPath}/config_application.h`, jsonConfigApplication);
+    await modifyHFile(`${configPath}${generalSetupPath}/General_Setup.h`, jsonGeneralSetup);
 }
 
 /**
  * Setup the files for the multi-compilation process
  */
-async function setupFilesMulti(configPath,resultPath,jsonIdsConfig){
+async function setupFilesMulti(configPath, resultPath, jsonIdsConfig) {
     // Result folder and CSV creation
     const csvName = 'tts-end-devices.csv'
     let csvPath = `${resultPath}/${csvName}`;
     await createDir(resultPath) // 
-    await setupCsv(csvPath,jsonIdsConfig)
+    await setupCsv(csvPath, jsonIdsConfig)
 
     // Configs folders for compilers
     for (let id in jsonIdsConfig) {
@@ -107,33 +107,32 @@ async function setupFilesMulti(configPath,resultPath,jsonIdsConfig){
         await createDir(path);
 
         // Copy compiler files
-        await copyDir(compilerPath,path);
+        await copyDir(compilerPath, path);
 
         // Modify .h files with json
-        await modifyHFile(`${path}${configApplicationPath}/config_application.h`,jsonIdsConfig[id].configApplication);
-        await modifyHFile(`${path}${generalSetupPath}/General_Setup.h`,jsonIdsConfig[id].generalSetup);
+        await modifyHFile(`${path}${configApplicationPath}/config_application.h`, jsonIdsConfig[id].configApplication);
+        await modifyHFile(`${path}${generalSetupPath}/General_Setup.h`, jsonIdsConfig[id].generalSetup);
     }
 }
 
-async function setupCsv(csvPath,jsonIdsConfig){
+async function setupCsv(csvPath, jsonIdsConfig) {
     // Default values
-    const default_id = '';
     const default_frequency_plan_id = "EU_863_870_TTN";
     const default_lorawan_version = "MAC_V1_0_3";
     const default_lorawan_phy_version = "RP002_V1_0_3";
-    
+
     // Prepapre CSV Data
     let csvData = [];
-    for(let id in jsonIdsConfig){
+    for (let id in jsonIdsConfig) {
         let csvElem = {};
-        csvElem.id = default_id;
+        csvElem.id = jsonIdsConfig[id].configApplication.name;
         csvElem.name = jsonIdsConfig[id].configApplication.name;
         csvElem.dev_eui = jsonIdsConfig[id].configApplication.devEUI_.replace(/0x|,\s/g, ''); // Remove '0x' and ', '
         csvElem.join_eui = jsonIdsConfig[id].configApplication.appEUI_.replace(/0x|,\s/g, ''); // Remove '0x' and ', '
         csvElem.frequency_plan_id = default_frequency_plan_id;
         csvElem.lorawan_version = default_lorawan_version;
         csvElem.lorawan_phy_version = default_lorawan_phy_version;
-        csvElem.app_key = jsonIdsConfig[id].configApplication.appKey_.replace(/,/g, '') ; // Remove ','
+        csvElem.app_key = jsonIdsConfig[id].configApplication.appKey_.replace(/,/g, ''); // Remove ','
 
         csvData.push(csvElem);
     };
@@ -204,14 +203,14 @@ async function createDir(dir) {
 
 async function deleteDir(path) {
     try {
-      await fs.remove(path);
-      console.log(`${path} directory removed`);
+        await fs.remove(path);
+        console.log(`${path} directory removed`);
     } catch (err) {
-      console.error(`Error suppressing ${path} directory :`, err);
+        console.error(`Error suppressing ${path} directory :`, err);
     }
-  }
+}
 
-async function writeFileAsync(source, modifiedData) {    
+async function writeFileAsync(source, modifiedData) {
     try {
         await fs.writeFile(source, modifiedData);
         console.log(`${source} modified`)
