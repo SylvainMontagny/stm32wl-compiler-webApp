@@ -2,8 +2,8 @@ const fs = require('fs-extra');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
 const compilerPath = '/STM32WL' // Path to the STM32WL compiler files
-const generalSetupPath = process.env.General_Setup_path;
-const configApplicationPath = process.env.config_application_path;
+const generalSetupPath = process.env.GENERAL_SETUP_PATH;
+const configApplicationPath = process.env.CONFIG_APPLICATION_PATH;
 const archiver = require('archiver');
 
 /**

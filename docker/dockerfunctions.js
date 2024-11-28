@@ -148,7 +148,7 @@ async function startCompilerContainer(compileId, configPath, resultPath, fileNam
         await container.remove({ force: true });
         console.log("Container removed");
 
-        // Return if the container add an error or not
+        // Return if the container had an error or not
         return waitResult.StatusCode
 
     } catch (error) {
