@@ -70,12 +70,16 @@ app.post('/compile-multiple', async (req, res) => {
     if (status === 0) {
         // Send zip file data and name to client
         res.setHeader('X-File-Name', zipName);
+        res.setHeader('compiler-status', status);
         res.download(zipPath, (err) => {
             if (err) {
                 console.error(err);
                 res.status(500).send('Error downloading the file');
             }
         });
+    }else if(status === 137){
+        res.setHeader('compiler-status', status);
+        res.status(200).send();
     } else {
         // Send an error response
         res.status(400).send('Compilation Error');

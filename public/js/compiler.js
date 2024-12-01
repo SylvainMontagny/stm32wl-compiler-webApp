@@ -187,16 +187,27 @@ export async function compileMultipleFirmware(jsonConfig) {
         });
 
         if (response.ok) {
-            console.log(response.headers.get("compiler-status"));
-            const blob = await response.blob();
-            const fileName = response.headers.get("X-File-Name");
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
+            const status = parseInt(response.headers.get("compiler-status"), 10);
+            switch (status) {
+                case 0:
+                    console.log("Compilation successful");
+                    const blob = await response.blob();
+                    const fileName = response.headers.get("X-File-Name");
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    break;
+                case 137:
+                    console.log("Container stopped");
+                    break;
+                default:
+                    console.error("Unknown status:", status);
+                    break;
+            }
         } else {
             const errorText = await response.text();
             alert("Error: " + errorText);

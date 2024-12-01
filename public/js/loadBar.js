@@ -77,9 +77,13 @@ export function showLoadBar() {
 export function hideLoadBar() {
     const compileButton = document.getElementById('generate-firmware');
     const loadBarContainer = document.querySelector('.load-bar-container');
+    loadBarContainer.style.display = 'none';
+    compileButton.style.display = 'flex';
 
+    /*
     setTimeout(() => {
         loadBarContainer.style.display = 'none';
         compileButton.style.display = 'flex';
     }, 2000);
+    */
 }

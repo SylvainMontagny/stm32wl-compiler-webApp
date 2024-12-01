@@ -98,7 +98,7 @@ async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig){
         if(status == 0){
             console.log(`Compiled successfully : ${id}`)
         } else if(status == 137){
-            console.log(`Compiling stopped successfully : ${compileId}`)
+            console.log(`Compiling stopped successfully : ${multipleCompileId}`)
             break;
         } else {
             console.log(`Error while compiling : ${id}`)
@@ -109,16 +109,12 @@ async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig){
     // Clean up : Remove compiler files
     for(let id in jsonIdsConfig) {
         await deleteDir(`${configPath}/${id}`);
+        delete containerIdMap[id];
     }
 
     // Zip file
     if(status == 0){
         await zipDirectory(resultPath,`${resultPath}.zip`)
-    }
-    if(status == 0){
-        console.log(`Compiled successfully : ${clientId}`)
-    } else {
-        console.log(`Error while compiling : ${clientId}`)
     }
     return status;
 }
