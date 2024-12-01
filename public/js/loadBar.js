@@ -4,6 +4,8 @@ import { numberOfFirmware } from './compiler.js';
 let currentProgress = 0;
 let currentProgressMultiple = 0;
 let currentFirmware = 1;
+let currentStep = 0;
+let previousStep = null;
 
 export function loadBar(message) {
     const progressBar = document.querySelector(".load-bar-progress");
@@ -11,31 +13,37 @@ export function loadBar(message) {
 
     const regex = /\[CC\]\s+(\w+)/;
     let progressPercentage = currentProgress
+    let maxStep = numberOfFirmware * 5;
 
     if (regex.test(message)) {
         const match = message.match(regex);
         if (match) {
             const step = match[1];
+            if ((previousStep !== step) && (step === 'Core' || step === 'Drivers' || step === 'LoRaWAN' || step === 'Middlewares')) {
+                previousStep = step;
+                currentStep++;
+            }
             if (step === 'Startup') {
                 progressPercentage = 0 / numberOfFirmware + currentProgressMultiple;
-                p.textContent = '0/5 Creating files' + ' (' + currentFirmware + '/' + numberOfFirmware + ')';
+                p.textContent = currentStep + '/' + maxStep + ' Firmware n°' + currentFirmware + ' : Creating files';
             } else if (step === 'Core') {
                 progressPercentage = 20 / numberOfFirmware + currentProgressMultiple;
-                p.textContent = '1/5 Compiling Core files' + ' (' + currentFirmware + '/' + numberOfFirmware + ')';
+                p.textContent = currentStep + '/' + maxStep + ' Firmware n°' + currentFirmware + ' : Compiling Core files';
             } else if (step === 'Drivers') {
                 progressPercentage = 40 / numberOfFirmware + currentProgressMultiple;
-                p.textContent = '2/5 Compiling Drivers' + ' (' + currentFirmware + '/' + numberOfFirmware + ')';
+                p.textContent = currentStep + '/' + maxStep + ' Firmware n°' + currentFirmware + ' : Compiling Drivers';
             } else if (step === 'LoRaWAN') {
                 progressPercentage = 60 / numberOfFirmware + currentProgressMultiple;
-                p.textContent = '3/5 Compiling LoRaWAN files' + ' (' + currentFirmware + '/' + numberOfFirmware + ')';
+                p.textContent = currentStep + '/' + maxStep + ' Firmware n°' + currentFirmware + ' : Compiling LoRaWAN files';
             } else if (step === 'Middlewares') {
                 progressPercentage = 80 / numberOfFirmware + currentProgressMultiple;
-                p.textContent = '4/5 Compiling Middlewares' + ' (' + currentFirmware + '/' + numberOfFirmware + ')';
+                p.textContent = currentStep + '/' + maxStep + ' Firmware n°' + currentFirmware + ' : Compiling Middlewares';
             }
         }
     } else if (message.includes('Finished building')) {
         progressPercentage = 100 / numberOfFirmware + currentProgressMultiple;
-        p.textContent = '5/5 Finished' + ' (' + currentFirmware + '/' + numberOfFirmware + ')';
+        currentStep++;
+        p.textContent = currentStep + '/' + maxStep + ' Firmware n°' + currentFirmware + ' : Finished';
         currentProgressMultiple += 100 / numberOfFirmware;
         currentFirmware++;
     }
@@ -49,10 +57,12 @@ export function resetProgressBar() {
     const progressBar = document.querySelector(".load-bar-progress");
     const p = document.querySelector(".load-bar-container p");
     progressBar.style.width = "0%";
-    p.textContent = '0/5 Creating files';
+    p.textContent = '';
     currentProgress = 0;
     currentProgressMultiple = 0;
     currentFirmware = 1;
+    currentStep = 0;
+    previousStep = null;
 }
 
 export function showLoadBar() {
