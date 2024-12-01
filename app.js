@@ -3,7 +3,7 @@ const path = require('path');
 const http = require('http');
 const cors = require('cors');
 const { initSocket, sendLogToClient } = require('./sockets/socketInstance');
-const { randomId, compile, compileMultiple, volName } = require('./docker/dockerfunctions');
+const { randomId, compile, compileMultiple, volName, stopContainer, containerIdMap } = require('./docker/dockerfunctions');
 const { generateBinFileName, generateMultipleCompileFileName, initSharedVolume } = require('./docker/file_fct.js');
 
 const app = express();
@@ -38,6 +38,7 @@ app.post('/compile', async (req, res) => {
 
     if (status === 0) {
         // Send compiled file data and name to client
+        res.setHeader('compiler-status', status);
         res.setHeader('X-File-Name', fileName);
         res.download(compiledPath, (err) => {
             if (err) {
@@ -45,6 +46,9 @@ app.post('/compile', async (req, res) => {
                 res.status(500).send('Error downloading the file');
             }
         });
+    }else if(status === 137){
+        res.setHeader('compiler-status', status);
+        res.status(200).send();
     } else {
         // Send an error response
         res.status(400).send('Compilation Error');
@@ -81,7 +85,7 @@ app.post('/compile-multiple', async (req, res) => {
 /* INIT */
 
 const server = http.createServer(app);
-initSocket(server);
+initSocket(server, containerIdMap);
 
 // Start serveur on port 4050
 server.listen(port, () => {

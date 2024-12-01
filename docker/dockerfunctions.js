@@ -1,8 +1,8 @@
 const Docker = require('dockerode');
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 var stream = require('stream');
-const { generateBinFileName, setupFiles, deleteDir, setupFilesMulti, zipDirectory } = require('./file_fct.js');
 const { sendLogToClient } = require('../sockets/socketInstance');
+const { generateBinFileName, setupFiles, deleteDir, setupFilesMulti, zipDirectory } = require('./file_fct.js');
 
 //keys to set into General_Setup.h
 const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "MLR003_APP_PORT", "ADMIN_GEN_APP_KEY"]
@@ -10,6 +10,8 @@ const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "MLR003_APP_POR
 const imageName = 'montagny/arm-compiler:1.0' // image of the compiler
 const volName = 'shared-vol' // name of the volume used to store configs and results
 const compiledFile = 'STM32WL-standalone.bin' // compiled file name
+
+const containerIdMap = {};
 
 /**
  * Generate a random compileId for the compiling process
@@ -48,9 +50,12 @@ async function compile(clientId,compileId,jsonConfig, fileName) {
     let status = await startCompilerContainer(compileId,configPath,resultPath,fileName,clientId)
     if(status == 0){
         console.log(`Compiled successfully : ${compileId}`)
+    } else if(status == 137){
+        console.log(`Compiling stopped successfully : ${compileId}`)
     } else {
         console.log(`Error while compiling : ${compileId}`)
     }
+    delete containerIdMap[compileId];
     
     // Clean up : Remove compiler files
     await deleteDir(configPath);
@@ -92,6 +97,9 @@ async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig){
         status = await startCompilerContainer(id,`${configPath}/${id}`,resultPath,jsonIdsConfig[id].fileName, clientId);
         if(status == 0){
             console.log(`Compiled successfully : ${id}`)
+        } else if(status == 137){
+            console.log(`Compiling stopped successfully : ${compileId}`)
+            break;
         } else {
             console.log(`Error while compiling : ${id}`)
             break;
@@ -132,6 +140,8 @@ async function startCompilerContainer(compileId, configPath, resultPath, fileNam
             // Move to compiler, make, and then put .bin into resultpath with new name
             Cmd: [`/bin/bash`, `-c`, `cd ..${configPath} && make && mv ${compiledFile} ${resultPath}/${fileName}`]
         });
+
+        containerIdMap[compileId] = container.id;
 
         // Start container
         await container.start();
@@ -191,5 +201,6 @@ module.exports = {
     compile,
     compileMultiple,
     volName,
-    compiledFile
+    compiledFile,
+    containerIdMap
 }
