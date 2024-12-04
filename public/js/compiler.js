@@ -119,6 +119,7 @@ export function getMultipleFormJson(nbFirmware) {
 // function compile firmware from jsonString of all form data
 export async function compileFirmware(jsonConfig) {
     showLoadBar();
+    elements.console.innerHTML = "";
     try {
         const requestData = {
             clientId: socket.id,
@@ -171,6 +172,7 @@ let numberOfFirmware = 1;
 // function compile multiple firmware from jsonString of all form data
 export async function compileMultipleFirmware(jsonConfig) {
     showLoadBar();
+    elements.console.innerHTML = "";
     numberOfFirmware = jsonConfig.length;
     try {
         const requestData = {

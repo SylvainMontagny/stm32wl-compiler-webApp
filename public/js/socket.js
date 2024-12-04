@@ -1,6 +1,7 @@
 import { loadBar } from "./loadBar.js";
+import { elements } from "./elements.js";
 
-const logContainer = document.getElementById("log-container");
+const logContainer = elements.console;
 
 let socket;
 let lastParagraph = null;
