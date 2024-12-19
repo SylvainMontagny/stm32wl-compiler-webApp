@@ -7,6 +7,7 @@ let io;
 // Initializes the Socket.IO server with CORS settings and handles client connections.
 const initSocket = (server, containerIdMap) => {
     io = new Server(server, {
+        path: '/compiler/socket.io',
         cors: {
             origin: "*",
             methods: ["GET", "POST"]
