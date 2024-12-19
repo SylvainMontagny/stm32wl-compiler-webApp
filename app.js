@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const http = require('http');
@@ -8,9 +9,11 @@ const { generateBinFileName, generateMultipleCompileFileName, initSharedVolume }
 
 const app = express();
 const port = process.env.PORT || 4050;
+const prefix = process.env.ROUTE_PREFIX || '';
+console.log(prefix)
 
 // Public static link
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(prefix, express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(cors());
 app.set('trust proxy', true);
@@ -18,12 +21,12 @@ app.set('trust proxy', true);
 /* ROUTES */
 
 // Route index
-app.get('/', (req, res) => {
+app.get(`${prefix}/`, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Route compile
-app.post('/compile', async (req, res) => {
+app.post(`${prefix}/compile`, async (req, res) => {
     clientId = req.body.clientId;
     jsonConfig = req.body.formData;
 
@@ -57,7 +60,7 @@ app.post('/compile', async (req, res) => {
 });
 
 // Route compile multiple
-app.post('/compile-multiple', async (req, res) => {
+app.post(`${prefix}/compile-multiple`, async (req, res) => {
     clientId = req.body.clientId;
     jsonConfig = req.body.formData;
 
