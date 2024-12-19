@@ -126,7 +126,7 @@ export async function compileFirmware(jsonConfig) {
             formData: jsonConfig,
         };
 
-        const response = await fetch("/compile", {
+        const response = await fetch(window.location.href+"/compile", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -180,7 +180,7 @@ export async function compileMultipleFirmware(jsonConfig) {
             formData: jsonConfig,
         };
 
-        const response = await fetch("/compile-multiple", {
+        const response = await fetch(window.location.href+"/compile-multiple", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
