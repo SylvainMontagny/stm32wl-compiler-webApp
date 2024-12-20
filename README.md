@@ -54,7 +54,7 @@ services:
     build: . # Docker build current folder
     image: lorawan-compiler-webapp # Webapp image
     ports:
-      - "80:4050" # Webapp port
+      - "4050:4050" # Webapp port
     volumes:
       - shared-vol:/shared-vol # Volume to share data across containers
       - ${STM32WL_PATH:-../STM32WL/STM32WL-standalone}:/STM32WL # Path to compiler folder
