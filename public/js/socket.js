@@ -7,7 +7,7 @@ let socket;
 let lastParagraph = null;
 
 export function initializeSocket() {
-    socket = io(window.location.location, { path: '/socket.io' });
+    socket = io(window.location.location, { path:  window.location.pathname+`socket.io` });
 
     socket.on("compilation_log", (data) => {
         loadBar(data.message);
