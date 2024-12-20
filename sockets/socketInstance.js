@@ -26,7 +26,6 @@ const initSocket = (server, containerIdMap) => {
  * Stop the container based on the compiled id
  * 
 */
-
 async function stopContainer(clientId, compileId, containerIdMap) {
     const containerId = containerIdMap[compileId];
     if (!containerId) {
