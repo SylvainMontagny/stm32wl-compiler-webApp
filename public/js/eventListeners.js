@@ -333,4 +333,11 @@ export function initializeEventListeners() {
         let id = message.match(/\[([^\]]+)\]/)[1];
         socket.emit("cancel_compilation", { id: id });
     });
+
+    elements.frameDelay.addEventListener("change", function () {
+        let value = parseInt(elements.frameDelay.value, 10);
+        if (value < 8) {
+            elements.frameDelay.value = 8;
+        }
+    });
 }
