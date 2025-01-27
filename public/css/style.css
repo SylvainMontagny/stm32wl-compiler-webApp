@@ -602,3 +602,51 @@ button.generate-appskey {
   color: var(--primary-color);
   text-decoration: none;
 }
+
+/* Popup Styles */
+
+/* Style for the background blur */
+.blur-background {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Style for the modal */
+.modal {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border: 1px solid #ccc;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.modal h3 {
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.modal p {
+  margin-bottom: 20px;
+}
+
+.modal button {
+  padding: 10px;
+  color: white;
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
+  margin-right: 10px;
+}
+
+.modal button#cancel-usb-send {
+  background-color: red;
+}

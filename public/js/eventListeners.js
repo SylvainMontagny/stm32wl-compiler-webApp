@@ -262,6 +262,7 @@ export function initializeEventListeners() {
     document.getElementById('confirm-usb-send').addEventListener('click', async function() {
         await sendToUSBDevice(store.compiledFileName, store.compiledFile);
         document.getElementById('usb-modal').style.display = 'none';
+        pageContainer.classList.remove("blur-background");
         document.getElementById('auto-usb-send').checked = false;
         usbPathHandle = null;
     });
@@ -269,6 +270,7 @@ export function initializeEventListeners() {
     // Button to cancel USB send
     document.getElementById('cancel-usb-send').addEventListener('click', function() {
         document.getElementById('usb-modal').style.display = 'none';
+        pageContainer.classList.remove("blur-background");
         document.getElementById('auto-usb-send').checked = false;
         usbPathHandle = null;
     });
@@ -286,6 +288,7 @@ export function initializeEventListeners() {
                 .then(() => {
                     if (store.compiledFile && store.compiledFileName) {
                         document.getElementById('usb-modal').style.display = 'block';
+                        pageContainer.classList.add("blur-background");
                     }
                 });
         }
