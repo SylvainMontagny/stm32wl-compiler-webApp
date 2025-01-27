@@ -1,7 +1,9 @@
 import { elements } from './elements.js';
 import { showLoadBar } from './loadBar.js';
 import { genRandomEUI, genRandomKey } from './generators.js';
-import { socket } from './socket.js'
+import { socket } from './socket.js';
+import { usbPathHandle } from './eventListeners.js';
+import { store } from './store.js';
 
 function formatEUI(str) {
     return `0x${str.match(/.{1,2}/g).join(", 0x")}`;
@@ -21,18 +23,14 @@ export function getFormJson() {
         CLASS: elements.class.value.toUpperCase(),
         SPREADING_FACTOR: elements.spreadingFactor.value.toUpperCase(),
         ADAPTIVE_DR: (
-            document.querySelector('input[name="adaptative-dr"]:checked').value ==
-            "on"
+            document.querySelector('input[name="adaptative-dr"]:checked').value == "on"
         ).toString(),
         CONFIRMED: (
-            document
-                .querySelector('input[name="confirmation"]:checked')
-                .value.toString() == "on"
+            document.querySelector('input[name="confirmation"]:checked').value.toString() == "on"
         ).toString(),
         APP_PORT: elements.appPort.value,
         SEND_BY_PUSH_BUTTON: (
-            document.querySelector('input[name="send-mode"]:checked').value ==
-            "push-button"
+            document.querySelector('input[name="send-mode"]:checked').value == "push-button"
         ).toString(),
         FRAME_DELAY: elements.frameDelay.value * 1000,
         PAYLOAD_HELLO: elements.hello.checked.toString(),
@@ -40,8 +38,7 @@ export function getFormJson() {
         PAYLOAD_HUMIDITY: elements.humidity.checked.toString(),
         LOW_POWER: "false",
         CAYENNE_LPP_: (
-            document.querySelector('input[name="cayenne-lpp"]:checked').value ==
-            "enabled"
+            document.querySelector('input[name="cayenne-lpp"]:checked').value == "enabled"
         ).toString(),
         devEUI_: formatEUI(elements.devEui.value),
         appKey_: formatKey(elements.appKey.value.toUpperCase()),
@@ -50,8 +47,7 @@ export function getFormJson() {
         nwkSKey_: formatKey(elements.nwksKey.value),
         appSKey_: formatKey(elements.appsKey.value),
         ADMIN_SENSOR_ENABLED: (
-            document.querySelector('input[name="admin-sensor"]:checked').value ==
-            "enabled"
+            document.querySelector('input[name="admin-sensor"]:checked').value == "enabled"
         ).toString(),
         MLR003_SIMU: (
             document.querySelector('input[name="mlr003-sim"]:checked').value == "on"
@@ -73,18 +69,14 @@ export function getMultipleFormJson(nbFirmware) {
             CLASS: elements.class.value.toUpperCase(),
             SPREADING_FACTOR: elements.spreadingFactor.value.toUpperCase(),
             ADAPTIVE_DR: (
-                document.querySelector('input[name="adaptative-dr"]:checked').value ==
-                "on"
+                document.querySelector('input[name="adaptative-dr"]:checked').value == "on"
             ).toString(),
             CONFIRMED: (
-                document
-                    .querySelector('input[name="confirmation"]:checked')
-                    .value.toString() == "on"
+                document.querySelector('input[name="confirmation"]:checked').value.toString() == "on"
             ).toString(),
             APP_PORT: elements.appPort.value,
             SEND_BY_PUSH_BUTTON: (
-                document.querySelector('input[name="send-mode"]:checked').value ==
-                "push-button"
+                document.querySelector('input[name="send-mode"]:checked').value == "push-button"
             ).toString(),
             FRAME_DELAY: elements.frameDelay.value * 1000,
             PAYLOAD_HELLO: elements.hello.checked.toString(),
@@ -92,8 +84,7 @@ export function getMultipleFormJson(nbFirmware) {
             PAYLOAD_HUMIDITY: elements.humidity.checked.toString(),
             LOW_POWER: "false",
             CAYENNE_LPP_: (
-                document.querySelector('input[name="cayenne-lpp"]:checked').value ==
-                "enabled"
+                document.querySelector('input[name="cayenne-lpp"]:checked').value == "enabled"
             ).toString(),
             devEUI_: formatEUI(genRandomEUI(elements.devEui)),
             appKey_: formatKey(genRandomKey(32, elements.appKey).toUpperCase()),
@@ -102,8 +93,7 @@ export function getMultipleFormJson(nbFirmware) {
             nwkSKey_: formatKey(genRandomKey(32, elements.nwksKey)),
             appSKey_: formatKey(genRandomKey(32, elements.appsKey)),
             ADMIN_SENSOR_ENABLED: (
-                document.querySelector('input[name="admin-sensor"]:checked').value ==
-                "enabled"
+                document.querySelector('input[name="admin-sensor"]:checked').value == "enabled"
             ).toString(),
             MLR003_SIMU: (
                 document.querySelector('input[name="mlr003-sim"]:checked').value == "on"
@@ -116,7 +106,7 @@ export function getMultipleFormJson(nbFirmware) {
     return firmwareData;
 }
 
-// function compile firmware from jsonString of all form data
+// Compile firmware from jsonString of all form data
 export async function compileFirmware(jsonConfig) {
     showLoadBar();
     elements.console.innerHTML = "";
@@ -134,7 +124,6 @@ export async function compileFirmware(jsonConfig) {
             body: JSON.stringify(requestData, null, 2),
         });
 
-        // Receive the blob and store it as a file
         if (response.ok) {
             const status = parseInt(response.headers.get("compiler-status"), 10);
             switch (status) {
@@ -149,6 +138,8 @@ export async function compileFirmware(jsonConfig) {
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
+                    store.compiledFile = blob;
+                    store.compiledFileName = fileName;
                     break;
                 case 137:
                     console.log("Container stopped");
@@ -164,6 +155,24 @@ export async function compileFirmware(jsonConfig) {
     } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while compiling the code");
+    }
+}
+
+// Send compiled firmware to USB device
+export async function sendToUSBDevice(fileName, blob) {
+    if (!usbPathHandle) {
+        console.error('No USB path selected');
+        return;
+    }
+
+    try {
+        const fileHandle = await usbPathHandle.getFileHandle(fileName, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        console.log('File transferred successfully to device');
+    } catch (error) {
+        console.error('Error transferring file to device:', error);
     }
 }
 
@@ -221,4 +230,4 @@ export async function compileMultipleFirmware(jsonConfig) {
     numberOfFirmware = 1;
 }
 
-export { numberOfFirmware };
+export { numberOfFirmware }; 

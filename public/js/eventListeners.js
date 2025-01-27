@@ -1,10 +1,15 @@
 import { elements } from './elements.js';
 import { otaaAbp, helloError, humidityError, temperatureError, cayenne1Error, cayenne2Error, simOnError, simOffError } from './formHandlers.js';
 import { saveFormData, restoreFormData } from './storage.js';
-import { compileFirmware, compileMultipleFirmware, getFormJson, getMultipleFormJson } from './compiler.js';
+import { compileFirmware, compileMultipleFirmware, getFormJson, getMultipleFormJson, sendToUSBDevice } from './compiler.js';
 import { genRandomEUI, genRandomKey } from './generators.js';
 import { hideLoadBar } from './loadBar.js';
 import { socket } from './socket.js';
+import { store } from './store.js';
+
+// eventListeners.js
+export let usbPathHandle;
+
 
 export function initializeEventListeners() {
 
@@ -239,16 +244,50 @@ export function initializeEventListeners() {
     mixMaxRange(elements.mlrAppPort);
     mixMaxRange(elements.frameDelay);
 
+    // Check if USB path is selected before enabling auto send
+    document.getElementById('auto-usb-send').addEventListener('change', async function() {
+        try {
+            usbPathHandle = await window.showDirectoryPicker();
+            console.log('USB path selected:', usbPathHandle);
+        } catch (error) {
+            console.error('Error selecting USB path:', error);
+        }
+        if (this.checked && !usbPathHandle) {
+            alert("Please select a USB path before enabling auto send.");
+            this.checked = false;
+        }
+    });
+
+    // Button to send to USB
+    document.getElementById('confirm-usb-send').addEventListener('click', async function() {
+        await sendToUSBDevice(store.compiledFileName, store.compiledFile);
+        document.getElementById('usb-modal').style.display = 'none';
+        document.getElementById('auto-usb-send').checked = false;
+        usbPathHandle = null;
+    });
+
+    // Button to cancel USB send
+    document.getElementById('cancel-usb-send').addEventListener('click', function() {
+        document.getElementById('usb-modal').style.display = 'none';
+        document.getElementById('auto-usb-send').checked = false;
+        usbPathHandle = null;
+    });
+
     // Button to compile
-    document.getElementById('generate-firmware').addEventListener('click', function () {
+    document.getElementById('generate-firmware').addEventListener('click', async function () {
         if (elements.multipleFirmware.checked) {
             let nbFirmware = document.getElementById('firmware-nb').value;
             let jsonConfig = getMultipleFormJson(nbFirmware);
             compileMultipleFirmware(jsonConfig).then(hideLoadBar);
-
         } else {
             let jsonConfig = getFormJson();
-            compileFirmware(jsonConfig).then(hideLoadBar);
+            compileFirmware(jsonConfig)
+                .then(hideLoadBar)
+                .then(() => {
+                    if (store.compiledFile && store.compiledFileName) {
+                        document.getElementById('usb-modal').style.display = 'block';
+                    }
+                });
         }
         const compilerContainer = document.querySelector(".compiler-container");
         const pageContainer = document.querySelector(".page-container");
