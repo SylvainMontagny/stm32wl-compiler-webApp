@@ -6,6 +6,8 @@ import { genRandomEUI, genRandomKey } from './generators.js';
 import { hideLoadBar } from './loadBar.js';
 import { socket } from './socket.js';
 import { store } from './store.js';
+import { showSnackBar } from './snackBar.js';
+
 
 
 export function initializeEventListeners() {
@@ -269,7 +271,7 @@ export function initializeEventListeners() {
                 console.log('USB path selected:', store.usbPathHandle);
             } catch (error) {
                 console.error('Error selecting USB path:', error);
-                alert("You need to select a USB path to enable auto send.");
+                showSnackBar("You need to select a USB path to enable auto send.");
                 this.checked = false; 
                 return;
             }
@@ -278,23 +280,6 @@ export function initializeEventListeners() {
         }
     });
     
-
-    // Button to send to USB
-    document.getElementById('usb-send').addEventListener('click', async function() {
-        await sendToUSBDevice(store.compiledFileName, store.compiledFile, store.usbPathHandle);
-        elements.usbModal.style.display = 'none';
-        elements.background.classList.remove("blur-background");
-        elements.usbAutoSend.checked = false;
-    });
-
-    // Button to cancel USB send
-    document.getElementById('usb-cancel').addEventListener('click', function() {
-        elements.usbModal.style.display = 'none';
-        elements.background.classList.remove("blur-background");
-        elements.usbAutoSend.checked = false;
-    });
-
-    // Button to compile
     document.getElementById('generate-firmware').addEventListener('click', async function () {
         if (elements.multipleFirmware.checked) {
             let nbFirmware = document.getElementById('firmware-nb').value;
@@ -303,19 +288,13 @@ export function initializeEventListeners() {
         } else {
             let jsonConfig = getFormJson();
             compileFirmware(jsonConfig)
-                .then(hideLoadBar)
-                .then(() => {
-                    if (store.compiledFile && store.compiledFileName) {
-                        elements.usbModal.style.display = 'block';
-                        elements.background.classList.add("blur-background");
-                    }
-                });
+                .then(hideLoadBar);
         }
         const compilerContainer = document.querySelector(".compiler-container");
         const pageContainer = document.querySelector(".page-container");
         const toggleCompiler = document.querySelector(".toggle-compiler");
         const chevron = document.querySelector(".fa-chevron-right");
-
+    
         if (compilerContainer.style.right === "-35%") {
             compilerContainer.style.right = "0px";
             pageContainer.style.width = "65%";

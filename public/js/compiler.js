@@ -3,6 +3,7 @@ import { showLoadBar } from './loadBar.js';
 import { genRandomEUI, genRandomKey } from './generators.js';
 import { socket } from './socket.js';
 import { store } from './store.js';
+import { showSnackBar } from './snackBar.js';
 
 function formatEUI(str) {
     return `0x${str.match(/.{1,2}/g).join(", 0x")}`;
@@ -139,6 +140,11 @@ export async function compileFirmware(jsonConfig) {
                     a.remove();
                     store.compiledFile = blob;
                     store.compiledFileName = fileName;
+                    showSnackBar("Firmware generated. Send the file to the device?", (confirm) => {
+                        if (confirm) {
+                            sendToUSBDevice(store.compiledFileName, store.compiledFile, store.usbPathHandle);
+                        }
+                    }, false);
                     break;
                 case 137:
                     console.log("Container stopped");
@@ -149,11 +155,11 @@ export async function compileFirmware(jsonConfig) {
             }
         } else {
             const errorText = await response.text();
-            alert("Error: " + errorText);
+            showSnackBar("Error: " + errorText);
         }
     } catch (error) {
         console.error("Error:", error);
-        alert("An error occurred while compiling the code");
+        showSnackBar("An error occurred while compiling the code");
     }
 }
 
@@ -220,11 +226,11 @@ export async function compileMultipleFirmware(jsonConfig) {
             }
         } else {
             const errorText = await response.text();
-            alert("Error: " + errorText);
+            showSnackBar("Error: " + errorText);
         }
     } catch (error) {
         console.error("Error:", error);
-        alert("An error occurred while compiling the code");
+        showSnackBar("An error occurred while compiling the code");
     }
     numberOfFirmware = 1;
 }
