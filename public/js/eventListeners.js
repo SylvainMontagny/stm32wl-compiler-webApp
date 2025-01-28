@@ -7,9 +7,6 @@ import { hideLoadBar } from './loadBar.js';
 import { socket } from './socket.js';
 import { store } from './store.js';
 
-// eventListeners.js
-export let usbPathHandle;
-
 
 export function initializeEventListeners() {
 
@@ -175,6 +172,24 @@ export function initializeEventListeners() {
         });
     }
 
+    // Disable auto send
+    function disableAutoSend() {
+        elements.usbAutoSend.checked = false;
+        elements.usbAutoSend.disabled = true;
+        elements.usbAutoSendLabel.style.color = "#D1D1D1";
+        elements.usbAutoSend.style.cursor = "not-allowed";
+        elements.usbAutoSendLabel.style.cursor = "not-allowed";
+    }
+
+    // Enable auto send
+    function enableAutoSend() {
+        elements.usbAutoSend.disabled = false;
+        elements.usbAutoSendLabel.style.color = "#000";
+        elements.usbAutoSend.style.cursor = "pointer";
+        elements.usbAutoSendLabel.style.cursor = "pointer";
+    }
+
+
     // Multiple firmware
     elements.multipleFirmware.addEventListener("change", function () {
         let firmwareNumber = document.querySelector(".firmware-number");
@@ -184,6 +199,7 @@ export function initializeEventListeners() {
             elements.firmwareNumber.disabled = false;
             elements.firmwareNameInput.style.color = "#000";
             elements.firmwareNameInput.disabled = false;
+            disableAutoSend();
             disableCredentials();
         } else {
             firmwareNumber.style.color = "#D1D1D1";
@@ -191,6 +207,7 @@ export function initializeEventListeners() {
             elements.firmwareNumber.disabled = true;
             elements.firmwareNameInput.style.color = "#D1D1D1";
             elements.firmwareNameInput.disabled = true;
+            enableAutoSend();
             enableCredentials();
         }
     });
@@ -245,34 +262,36 @@ export function initializeEventListeners() {
     mixMaxRange(elements.frameDelay);
 
     // Check if USB path is selected before enabling auto send
-    document.getElementById('auto-usb-send').addEventListener('change', async function() {
-        try {
-            usbPathHandle = await window.showDirectoryPicker();
-            console.log('USB path selected:', usbPathHandle);
-        } catch (error) {
-            console.error('Error selecting USB path:', error);
-        }
-        if (this.checked && !usbPathHandle) {
-            alert("Please select a USB path before enabling auto send.");
-            this.checked = false;
+    elements.usbAutoSend.addEventListener('change', async function() {
+        if (this.checked) {
+            try {
+                store.usbPathHandle = await window.showDirectoryPicker();
+                console.log('USB path selected:', store.usbPathHandle);
+            } catch (error) {
+                console.error('Error selecting USB path:', error);
+                alert("You need to select a USB path to enable auto send.");
+                this.checked = false; 
+                return;
+            }
+        } else {
+            console.log("Auto send disabled.");
         }
     });
+    
 
     // Button to send to USB
-    document.getElementById('confirm-usb-send').addEventListener('click', async function() {
-        await sendToUSBDevice(store.compiledFileName, store.compiledFile);
-        document.getElementById('usb-modal').style.display = 'none';
-        pageContainer.classList.remove("blur-background");
-        document.getElementById('auto-usb-send').checked = false;
-        usbPathHandle = null;
+    document.getElementById('usb-send').addEventListener('click', async function() {
+        await sendToUSBDevice(store.compiledFileName, store.compiledFile, store.usbPathHandle);
+        elements.usbModal.style.display = 'none';
+        elements.background.classList.remove("blur-background");
+        elements.usbAutoSend.checked = false;
     });
 
     // Button to cancel USB send
-    document.getElementById('cancel-usb-send').addEventListener('click', function() {
-        document.getElementById('usb-modal').style.display = 'none';
-        pageContainer.classList.remove("blur-background");
-        document.getElementById('auto-usb-send').checked = false;
-        usbPathHandle = null;
+    document.getElementById('usb-cancel').addEventListener('click', function() {
+        elements.usbModal.style.display = 'none';
+        elements.background.classList.remove("blur-background");
+        elements.usbAutoSend.checked = false;
     });
 
     // Button to compile
@@ -287,8 +306,8 @@ export function initializeEventListeners() {
                 .then(hideLoadBar)
                 .then(() => {
                     if (store.compiledFile && store.compiledFileName) {
-                        document.getElementById('usb-modal').style.display = 'block';
-                        pageContainer.classList.add("blur-background");
+                        elements.usbModal.style.display = 'block';
+                        elements.background.classList.add("blur-background");
                     }
                 });
         }

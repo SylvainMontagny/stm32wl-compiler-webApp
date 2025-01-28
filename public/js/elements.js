@@ -53,4 +53,9 @@ export const elements = {
     firmwareNumber: document.getElementById("firmware-nb"),
     cancel: document.getElementById("cancel"),
     console: document.getElementById("log-container"),
+    background: document.querySelector(".background"),
+    usbModal: document.getElementById("usb-modal"),
+    usbAutoSend: document.getElementById('auto-usb-send'),
+    usbAutoSendLabel: document.getElementById('auto-usb-send-label'),
+    optionContainer: document.querySelector(".option-container"),
 };

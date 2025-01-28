@@ -1,4 +1,5 @@
 import { numberOfFirmware } from './compiler.js';
+import { elements } from './elements.js';
 
 // Global variables
 let currentProgress = 0;
@@ -72,6 +73,7 @@ export function showLoadBar() {
 
     compileButton.style.display = 'none';
     loadBarContainer.style.display = 'flex';
+    elements.optionContainer.style.display = 'none';
 }
 
 export function hideLoadBar() {
@@ -79,6 +81,7 @@ export function hideLoadBar() {
     const loadBarContainer = document.querySelector('.load-bar-container');
     loadBarContainer.style.display = 'none';
     compileButton.style.display = 'flex';
+    elements.optionContainer.style.display = 'flex';
 
     /*
     setTimeout(() => {

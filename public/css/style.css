@@ -363,7 +363,6 @@ button.generate-appskey {
   width: 25%;
   font-size: 1.3em;
   justify-content: center;
-  margin-bottom: 1vw;
   font-weight: bold;
   margin-left: auto;
   margin-right: 3vw;
@@ -612,10 +611,21 @@ button.generate-appskey {
   user-select: none;
 }
 
+#auto-usb-send,
+#auto-usb-send-label {
+  cursor: pointer;
+}
+
+.option-container {
+  margin-top: -1vw;
+  margin-left: auto;
+  margin-right: 4vw;
+}
+
 /* Style for the modal */
 .modal {
   display: none;
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -644,9 +654,14 @@ button.generate-appskey {
   border-radius: 10px;
   cursor: pointer;
   border: none;
-  margin-right: 10px;
 }
 
-.modal button#cancel-usb-send {
+.modal .usb-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 10px;
+}
+
+.modal button#usb-cancel {
   background-color: red;
 }

@@ -2,7 +2,6 @@ import { elements } from './elements.js';
 import { showLoadBar } from './loadBar.js';
 import { genRandomEUI, genRandomKey } from './generators.js';
 import { socket } from './socket.js';
-import { usbPathHandle } from './eventListeners.js';
 import { store } from './store.js';
 
 function formatEUI(str) {
@@ -159,7 +158,7 @@ export async function compileFirmware(jsonConfig) {
 }
 
 // Send compiled firmware to USB device
-export async function sendToUSBDevice(fileName, blob) {
+export async function sendToUSBDevice(fileName, blob, usbPathHandle) {
     if (!usbPathHandle) {
         console.error('No USB path selected');
         return;

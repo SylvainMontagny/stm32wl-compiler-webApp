@@ -22,6 +22,7 @@
             <h1> LoRaWAN Firmware Generation </h1>
         </div>
     </header>
+    <div class="background">
     <div class="page-container">
 
         <div class="form-container">
@@ -352,7 +353,7 @@
             <button id="generate-firmware" class="generate-firmware"><i class="fa-solid fa-gear"></i>Compile</button>
             <div class="option-container">
                 <input type="checkbox" id="auto-usb-send" name="auto-usb-send">
-                <label for="auto-usb-send">Send automatically</label>
+                <label for="auto-usb-send" id="auto-usb-send-label">Send automatically</label>
             </div>
             <div class="compiler-container">
                 <div class="header-compiler">
@@ -366,12 +367,15 @@
             </button>
         </div>
     </div>
+    </div>
 
     <div id="usb-modal" class="modal">
         <h3>Firmware generated</h3>
         <p>Send the file to the device ?</p>
-        <button id="confirm-usb-send">Send</button>
-        <button id="cancel-usb-send">Cancel</button>
+        <div class="usb-modal-buttons">
+            <button id="usb-send">Send</button>
+            <button id="usb-cancel">Cancel</button>
+        </div>
     </div>
 
 
