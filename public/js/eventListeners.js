@@ -1,10 +1,14 @@
 import { elements } from './elements.js';
 import { otaaAbp, helloError, humidityError, temperatureError, cayenne1Error, cayenne2Error, simOnError, simOffError } from './formHandlers.js';
 import { saveFormData, restoreFormData } from './storage.js';
-import { compileFirmware, compileMultipleFirmware, getFormJson, getMultipleFormJson } from './compiler.js';
+import { compileFirmware, compileMultipleFirmware, getFormJson, getMultipleFormJson, sendToUSBDevice } from './compiler.js';
 import { genRandomEUI, genRandomKey } from './generators.js';
 import { hideLoadBar } from './loadBar.js';
 import { socket } from './socket.js';
+import { store } from './store.js';
+import { showSnackBar } from './snackBar.js';
+
+
 
 export function initializeEventListeners() {
 
@@ -170,6 +174,24 @@ export function initializeEventListeners() {
         });
     }
 
+    // Disable auto send
+    function disableAutoSend() {
+        elements.usbAutoSend.checked = false;
+        elements.usbAutoSend.disabled = true;
+        elements.usbAutoSendLabel.style.color = "#D1D1D1";
+        elements.usbAutoSend.style.cursor = "not-allowed";
+        elements.usbAutoSendLabel.style.cursor = "not-allowed";
+    }
+
+    // Enable auto send
+    function enableAutoSend() {
+        elements.usbAutoSend.disabled = false;
+        elements.usbAutoSendLabel.style.color = "#000";
+        elements.usbAutoSend.style.cursor = "pointer";
+        elements.usbAutoSendLabel.style.cursor = "pointer";
+    }
+
+
     // Multiple firmware
     elements.multipleFirmware.addEventListener("change", function () {
         let firmwareNumber = document.querySelector(".firmware-number");
@@ -179,6 +201,7 @@ export function initializeEventListeners() {
             elements.firmwareNumber.disabled = false;
             elements.firmwareNameInput.style.color = "#000";
             elements.firmwareNameInput.disabled = false;
+            disableAutoSend();
             disableCredentials();
         } else {
             firmwareNumber.style.color = "#D1D1D1";
@@ -186,6 +209,7 @@ export function initializeEventListeners() {
             elements.firmwareNumber.disabled = true;
             elements.firmwareNameInput.style.color = "#D1D1D1";
             elements.firmwareNameInput.disabled = true;
+            enableAutoSend();
             enableCredentials();
         }
     });
@@ -239,22 +263,38 @@ export function initializeEventListeners() {
     mixMaxRange(elements.mlrAppPort);
     mixMaxRange(elements.frameDelay);
 
-    // Button to compile
-    document.getElementById('generate-firmware').addEventListener('click', function () {
+    // Check if USB path is selected before enabling auto send
+    elements.usbAutoSend.addEventListener('change', async function() {
+        if (this.checked) {
+            try {
+                store.usbPathHandle = await window.showDirectoryPicker();
+                console.log('USB path selected:', store.usbPathHandle);
+            } catch (error) {
+                console.error('Error selecting USB path:', error);
+                showSnackBar("You need to select a USB path to enable auto send.");
+                this.checked = false; 
+                return;
+            }
+        } else {
+            console.log("Auto send disabled.");
+        }
+    });
+    
+    document.getElementById('generate-firmware').addEventListener('click', async function () {
         if (elements.multipleFirmware.checked) {
             let nbFirmware = document.getElementById('firmware-nb').value;
             let jsonConfig = getMultipleFormJson(nbFirmware);
             compileMultipleFirmware(jsonConfig).then(hideLoadBar);
-
         } else {
             let jsonConfig = getFormJson();
-            compileFirmware(jsonConfig).then(hideLoadBar);
+            compileFirmware(jsonConfig)
+                .then(hideLoadBar);
         }
         const compilerContainer = document.querySelector(".compiler-container");
         const pageContainer = document.querySelector(".page-container");
         const toggleCompiler = document.querySelector(".toggle-compiler");
         const chevron = document.querySelector(".fa-chevron-right");
-
+    
         if (compilerContainer.style.right === "-35%") {
             compilerContainer.style.right = "0px";
             pageContainer.style.width = "65%";

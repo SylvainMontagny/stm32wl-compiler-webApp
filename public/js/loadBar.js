@@ -1,4 +1,5 @@
 import { numberOfFirmware } from './compiler.js';
+import { elements } from './elements.js';
 
 // Global variables
 let currentProgress = 0;

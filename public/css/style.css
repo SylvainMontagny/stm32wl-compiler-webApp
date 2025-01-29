@@ -363,7 +363,6 @@ button.generate-appskey {
   width: 25%;
   font-size: 1.3em;
   justify-content: center;
-  margin-bottom: 1vw;
   font-weight: bold;
   margin-left: auto;
   margin-right: 3vw;
@@ -601,4 +600,75 @@ button.generate-appskey {
 .tooltip a {
   color: var(--primary-color);
   text-decoration: none;
+}
+
+/* Popup Styles */
+
+#auto-usb-send,
+#auto-usb-send-label {
+  cursor: pointer;
+}
+
+.option-container {
+  margin: 20px;
+}
+
+
+/* Snackbar Styles */
+#snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  background-color: white;
+  color: black;
+  text-align: center;
+  box-shadow: #D1D1D1 0px 0px 5px;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 1;
+  left: 30px;
+  bottom: 30px;
+  font-size: 17px;
+}
+
+#snackbar.auto-close {
+  visibility: visible;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+#snackbar.show {
+  visibility: visible;
+  -webkit-animation: fadein 0.5s;
+  animation: fadein 0.5s;
+}
+
+#snackbar button {
+  margin-left: 10px;
+  padding: 8px 16px;
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+@-webkit-keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
 }
