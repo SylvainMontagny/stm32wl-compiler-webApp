@@ -3,7 +3,7 @@ import { showLoadBar } from './loadBar.js';
 import { genRandomEUI, genRandomKey } from './generators.js';
 import { socket } from './socket.js';
 import { store } from './store.js';
-import { showSnackBar } from './snackBar.js';
+import { showSnackBar, hideSnackBar } from './snackBar.js';
 
 function formatEUI(str) {
     return `0x${str.match(/.{1,2}/g).join(", 0x")}`;
@@ -140,7 +140,7 @@ export async function compileFirmware(jsonConfig) {
                     a.remove();
                     store.compiledFile = blob;
                     store.compiledFileName = fileName;
-                    showSnackBar("Firmware generated. Send the file to the device?", (confirm) => {
+                    showSnackBar("Program device ?", (confirm) => {
                         if (confirm) {
                             sendToUSBDevice(store.compiledFileName, store.compiledFile, store.usbPathHandle);
                         }
@@ -171,11 +171,13 @@ export async function sendToUSBDevice(fileName, blob, usbPathHandle) {
     }
 
     try {
+        showSnackBar("Programming device...", null, false);
         const fileHandle = await usbPathHandle.getFileHandle(fileName, { create: true });
         const writable = await fileHandle.createWritable();
         await writable.write(blob);
         await writable.close();
-        console.log('File transferred successfully to device');
+        hideSnackBar();
+        showSnackBar("Programming completed", null);
     } catch (error) {
         console.error('Error transferring file to device:', error);
     }

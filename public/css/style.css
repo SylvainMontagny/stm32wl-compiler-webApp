@@ -604,22 +604,13 @@ button.generate-appskey {
 
 /* Popup Styles */
 
-/* Style for the background blur */
-.blur-background {
-  filter: blur(5px);
-  pointer-events: none;
-  user-select: none;
-}
-
 #auto-usb-send,
 #auto-usb-send-label {
   cursor: pointer;
 }
 
 .option-container {
-  margin-top: -1vw;
-  margin-left: auto;
-  margin-right: 4vw;
+  margin: 20px;
 }
 
 
@@ -630,12 +621,12 @@ button.generate-appskey {
   background-color: white;
   color: black;
   text-align: center;
-  box-shadow: #000 0px 0px 10px;
+  box-shadow: #D1D1D1 0px 0px 5px;
   border-radius: 2px;
   padding: 16px;
   position: fixed;
   z-index: 1;
-  left: 50px;
+  left: 30px;
   bottom: 30px;
   font-size: 17px;
 }

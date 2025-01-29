@@ -26,8 +26,13 @@ export function showSnackBar(message, callback, autoClose = true) {
     }
 
     if (autoClose) {
-        snackbar.classList.add("auto-close");
+        snackbar.className = snackbar.className.replace("", "auto-close");
     } else {
-        snackbar.classList.add("show");
+        snackbar.className = snackbar.className.replace("", "show");
     }
+}
+
+export function hideSnackBar() {
+    const snackbar = document.getElementById("snackbar");
+    snackbar.className = snackbar.className.replace("show", "");
 }

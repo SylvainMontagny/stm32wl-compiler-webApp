@@ -1,8 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const https = require('https');
-const fs = require('fs');
+const http = require('http');
 const cors = require('cors');
 const { initSocket, sendLogToClient } = require('./sockets/socketInstance');
 const { randomId, compile, compileMultiple, volName, stopContainer, containerIdMap } = require('./docker/dockerfunctions');
@@ -10,12 +9,6 @@ const { generateBinFileName, generateMultipleCompileFileName, initSharedVolume }
 
 const app = express();
 const port = process.env.PORT || 4050;
-
-// Load SSL certificates
-const options = {
-    key: fs.readFileSync('localhost-key.pem'),
-    cert: fs.readFileSync('localhost.pem')
-};
 
 // Public static link
 app.use(express.static(path.join(__dirname, 'public')));
@@ -95,12 +88,12 @@ app.post('/compile-multiple', async (req, res) => {
 
 /* INIT */
 
-const server = https.createServer(options, app);
+const server = http.createServer(app);
 initSocket(server, containerIdMap);
 
 // Start server on port 4050
 server.listen(port, () => {
-    console.log(`HTTPS server running at https://localhost:${port}`);
+    console.log(`HTTP server running at http://localhost:${port}`);
 });
 
 initSharedVolume(volName);
