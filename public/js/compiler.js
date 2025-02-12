@@ -33,7 +33,7 @@ export function getFormJson() {
             document.querySelector('input[name="send-mode"]:checked').value == "push-button"
         ).toString(),
         FRAME_DELAY: elements.frameDelay.value * 1000,
-        PAYLOAD_HELLO: elements.hello.checked.toString(),
+        PAYLOAD_1234: elements.hello.checked.toString(),
         PAYLOAD_TEMPERATURE: elements.temperature.checked.toString(),
         PAYLOAD_HUMIDITY: elements.humidity.checked.toString(),
         LOW_POWER: "false",
@@ -79,7 +79,7 @@ export function getMultipleFormJson(nbFirmware) {
                 document.querySelector('input[name="send-mode"]:checked').value == "push-button"
             ).toString(),
             FRAME_DELAY: elements.frameDelay.value * 1000,
-            PAYLOAD_HELLO: elements.hello.checked.toString(),
+            PAYLOAD_1234: elements.hello.checked.toString(),
             PAYLOAD_TEMPERATURE: elements.temperature.checked.toString(),
             PAYLOAD_HUMIDITY: elements.humidity.checked.toString(),
             LOW_POWER: "false",

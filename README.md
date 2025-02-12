@@ -96,7 +96,7 @@ Content-Type: application/json
   "APP_PORT": "15",
   "SEND_BY_PUSH_BUTTON": "false",
   "FRAME_DELAY": 10000,
-  "PAYLOAD_HELLO": "true",
+  "PAYLOAD_1234": "true",
   "PAYLOAD_TEMPERATURE": "false",
   "PAYLOAD_HUMIDITY": "false",
   "LOW_POWER": "false",
