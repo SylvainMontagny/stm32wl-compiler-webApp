@@ -140,11 +140,16 @@ export async function compileFirmware(jsonConfig) {
                     a.remove();
                     store.compiledFile = blob;
                     store.compiledFileName = fileName;
-                    showSnackBar("Program device ?", (confirm) => {
-                        if (confirm) {
-                            sendToUSBDevice(store.compiledFileName, store.compiledFile, store.usbPathHandle);
-                        }
-                    }, false);
+
+                    if(elements.usbAutoSend.checked){
+                        showSnackBar("Program device ?", (confirm) => {
+                            if (confirm) {
+                                sendToUSBDevice(store.compiledFileName, store.compiledFile, store.usbPathHandle);
+                            }
+                        }, false);
+                        elements.usbAutoSend.checked = false;
+                    }
+
                     break;
                 case 137:
                     console.log("Container stopped");
