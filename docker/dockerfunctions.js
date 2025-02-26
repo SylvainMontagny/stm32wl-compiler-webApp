@@ -26,42 +26,6 @@ function randomId() {
     return id;
 }
 
-const expectedSchema = {
-    type: "object",
-    properties: {
-        ACTIVATION_MODE: { type: "string" },
-        CLASS: { type: "string" },
-        SPREADING_FACTOR: { type: "string", pattern: "^[0-9]+$" },
-        ADAPTIVE_DR: { type: "string", enum: ["true", "false"] },
-        CONFIRMED: { type: "string", enum: ["true", "false"] },
-        APP_PORT: { type: "string", pattern: "^[0-9]+$" },
-        SEND_BY_PUSH_BUTTON: { type: "string", enum: ["true", "false"] },
-        FRAME_DELAY: { type: "integer", minimum: 0 },
-        PAYLOAD_1234: { type: "string", enum: ["true", "false"] },
-        PAYLOAD_TEMPERATURE: { type: "string", enum: ["true", "false"] },
-        PAYLOAD_HUMIDITY: { type: "string", enum: ["true", "false"] },
-        LOW_POWER: { type: "string", enum: ["true", "false"] },
-        CAYENNE_LPP_: { type: "string", enum: ["true", "false"] },
-        devEUI_: { type: "string", pattern: "^0x([0-9a-fA-F]{2}, ){7}[0-9a-fA-F]{2}$" },  // 16 caractères hex
-        appKey_: { type: "string", pattern: "^([0-9a-fA-F]{2}, ){31}[0-9a-fA-F]{2}$" },  // 32 caractères hex
-        appEUI_: { type: "string", pattern: "^0x([0-9a-fA-F]{2}, ){7}[0-9a-fA-F]{2}$" },  // 16 caractères hex
-        devAddr_: { type: "string", pattern: "^0x[0-9a-fA-F]{8}$" },  // 8 caractères hex
-        nwkSKey_: { type: "string", pattern: "^([0-9a-fA-F]{2}, ){31}[0-9a-fA-F]{2}$" },  // 32 caractères hex
-        appSKey_: { type: "string", pattern: "^([0-9a-fA-F]{2}, ){31}[0-9a-fA-F]{2}$" },  // 32 caractères hex
-        ADMIN_SENSOR_ENABLED: { type: "string", enum: ["true", "false"] },
-        MLR003_SIMU: { type: "string", enum: ["true", "false"] },
-        MLR003_APP_PORT: { type: "string", pattern: "^[0-9]+$" },
-        ADMIN_GEN_APP_KEY: { type: "string", pattern: "^([0-9a-fA-F]{2}, ){31}[0-9a-fA-F]{2}$" }
-    },
-    required: [
-        "ACTIVATION_MODE", "CLASS", "SPREADING_FACTOR", "ADAPTIVE_DR", "CONFIRMED",
-        "APP_PORT", "SEND_BY_PUSH_BUTTON", "FRAME_DELAY", "PAYLOAD_1234",
-        "PAYLOAD_TEMPERATURE", "PAYLOAD_HUMIDITY", "LOW_POWER", "CAYENNE_LPP_",
-        "devEUI_", "appKey_", "appEUI_", "devAddr_", "nwkSKey_", "appSKey_",
-        "ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "MLR003_APP_PORT", "ADMIN_GEN_APP_KEY"
-    ]
-};
-
 /**
  * Compile main function used through API
  */
@@ -74,7 +38,12 @@ async function compile(clientId, compileId, jsonConfig, fileName) {
     // Put General_Setup.h keys in separate json
 
     console.log("jsonConfig", jsonConfig)
-    validateJson(jsonConfig, expectedSchema)
+
+    if (!validateLoRaWANKeys(clientId, jsonConfig) || !validateGeneralConfig(clientId,jsonConfig)) {
+        console.error("Invalid configuration, stopping compilation.");
+        sendLogToClient(clientId,"Invalid configuration, stopping compilation.")
+        return 404;
+    }
 
     jsonConfigApplication = jsonConfig;
     jsonGeneralSetup = {};
@@ -232,56 +201,73 @@ function containerLogs(compileId, container, clientId) {
     });
 }
 
-/**
-    Checks that all expected keys are present and checks that there are no extra keys.
- */
-function validateJson(receivedJson, expectedSchema) {
-    const receivedKeys = Object.keys(receivedJson);
-    const expectedKeys = Object.keys(expectedSchema.properties);
-
-    const missingKeys = expectedKeys.filter(key => !receivedKeys.includes(key));
-    const extraKeys = receivedKeys.filter(key => !expectedKeys.includes(key));
-
-    if (missingKeys.length > 0) {
-        console.warn(`⚠️ Missing keys in the received JSON: ${missingKeys.join(", ")}`);
+function validateLoRaWANKeys(clientId, config) {
+    const expectedLengths = {
+        devEUI_: 8,
+        appKey_: 16,
+        appEUI_: 8,
+        devAddr_: 1,
+        nwkSKey_: 16,
+        appSKey_: 16,
+        ADMIN_GEN_APP_KEY: 16
+    };
+    
+    for (const key in expectedLengths) {
+        if (!config[key]) {
+            let msg = `${key} is missing in the configuration.`
+            sendLogToClient(clientId, msg)
+            return false;
+        }
+        let bytes = config[key].split(',').map(byte => byte.trim());
+        if (bytes.length !== expectedLengths[key]) {
+            let msg = `${key} must contain ${expectedLengths[key]} bytes, but contains ${bytes.length}`
+            sendLogToClient(clientId, msg)
+            return false;
+        }
     }
-
-    if (extraKeys.length > 0) {
-        console.warn(`⚠️ Unexpected keys in the received JSON: ${extraKeys.join(", ")}`);
-    }
-
-    let isValid = missingKeys.length === 0 && extraKeys.length === 0;
-
-    // Vérification des formats
-    // for (const key of expectedKeys) {
-    //     if (receivedJson[key] !== undefined) {
-    //         const value = receivedJson[key];
-    //         const schema = expectedSchema.properties[key];
-
-    //         if (schema.type === "string" && typeof value !== "string") {
-    //             console.warn(`⚠️ Key "${key}" should be a string but got ${typeof value}`);
-    //             isValid = false;
-    //         }
-
-    //         if (schema.pattern && !new RegExp(schema.pattern).test(value)) {
-    //             console.warn(`⚠️ Key "${key}" does not match expected format: ${value}`);
-    //             isValid = false;
-    //         }
-
-    //         if (schema.enum && !schema.enum.includes(value)) {
-    //             console.warn(`⚠️ Key "${key}" should be one of [${schema.enum.join(", ")}] but got "${value}"`);
-    //             isValid = false;
-    //         }
-
-    //         if (schema.minimum !== undefined && value < schema.minimum) {
-    //             console.warn(`⚠️ Key "${key}" should be >= ${schema.minimum} but got ${value}`);
-    //             isValid = false;
-    //         }
-    //     }
-    // }
-
-    return isValid;
+    return true;
 }
+
+function validateGeneralConfig(clientId, config) {
+    const keyTypes = {
+        boolean: [
+            "ADAPTIVE_DR", "CONFIRMED", "SEND_BY_PUSH_BUTTON", "PAYLOAD_1234", 
+            "PAYLOAD_TEMPERATURE", "PAYLOAD_HUMIDITY", "LOW_POWER", "CAYENNE_LPP_", 
+            "ADMIN_SENSOR_ENABLED", "MLR003_SIMU"
+        ],
+        string: ["ACTIVATION_MODE", "CLASS", "SPREADING_FACTOR"],
+        number: ["APP_PORT", "FRAME_DELAY", "MLR003_APP_PORT"]
+    };
+    
+    for (const key of keyTypes.boolean) {
+        if (!(key in config) || (config[key] !== 'true' && config[key] !== 'false')) {
+            let msg = `${key} must be 'true' or 'false'.`
+            console.error(msg);
+            sendLogToClient(clientId, msg);
+            return false;
+        }
+    }
+    
+    for (const key of keyTypes.string) {
+        if (!(key in config) || typeof config[key] !== 'string') {
+            let msg = `${key} must be a string.`
+            console.error(msg);
+            sendLogToClient(clientId, msg);
+            return false;
+        }
+    }
+    
+    for (const key of keyTypes.number) {
+        if (!(key in config) || isNaN(parseInt(config[key], 10))) {
+            let msg = `${key} must be a valid number.`;
+            console.error(msg);
+            sendLogToClient(clientId, msg);
+            return false;
+        }
+    }
+    return true;
+}
+    
 
 
 module.exports = {
