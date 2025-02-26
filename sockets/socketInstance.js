@@ -38,7 +38,7 @@ async function stopContainer(clientId, compileId, containerIdMap) {
         sendLogToClient(clientId,`Container with compileId ${compileId} stopped and removed.`);
         delete containerIdMap[compileId];
     } catch (error) {
-         sendLogToClient(clientId,`Error stopping container with compileId ${compileId} `, error);
+        sendLogToClient(clientId,`Error stopping container with compileId ${compileId} `, error);
     }
 }
 

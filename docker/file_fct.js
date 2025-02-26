@@ -42,16 +42,22 @@ async function modifyHFile(source, jsonConfig) {
             // Special case : { 0x00, ... }
             if (key == "devEUI_" || key == "appEUI_") {
                 let regex = new RegExp(`(#define ${key}\\s+{ ).+[0-9]`, 'm');
-                modifiedData = modifiedData.replace(regex, `$1${value}`);
+                newData = modifiedData.replace(regex, `$1${value}`);
                 // Special case : ( uint32_t )0x00...
             } else if (key == "devAddr_") {
                 let regex = new RegExp(`(#define ${key}\\s+.*)0x[0-9]+`, 'm')
-                modifiedData = modifiedData.replace(regex, `$1${value}`);
+                newData = modifiedData.replace(regex, `$1${value}`);
                 // Default case
             } else {
                 let regex = new RegExp(`(#define ${key}\\s+)[a-zA-Z0-9_,]+`, 'm');
-                modifiedData = modifiedData.replace(regex, `$1${value}`);
+                newData = modifiedData.replace(regex, `$1${value}`);
             }
+
+            if (newData === modifiedData) {
+                console.warn(`Warning: Key "${key}" not found in the file.`);
+            }
+
+            modifiedData = newData;
         }
         // Write changes to file
         await writeFileAsync(source, modifiedData);

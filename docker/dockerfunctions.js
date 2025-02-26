@@ -26,16 +26,56 @@ function randomId() {
     return id;
 }
 
+const expectedSchema = {
+    type: "object",
+    properties: {
+        ACTIVATION_MODE: { type: "string" },
+        CLASS: { type: "string" },
+        SPREADING_FACTOR: { type: "string", pattern: "^[0-9]+$" },
+        ADAPTIVE_DR: { type: "string", enum: ["true", "false"] },
+        CONFIRMED: { type: "string", enum: ["true", "false"] },
+        APP_PORT: { type: "string", pattern: "^[0-9]+$" },
+        SEND_BY_PUSH_BUTTON: { type: "string", enum: ["true", "false"] },
+        FRAME_DELAY: { type: "integer", minimum: 0 },
+        PAYLOAD_1234: { type: "string", enum: ["true", "false"] },
+        PAYLOAD_TEMPERATURE: { type: "string", enum: ["true", "false"] },
+        PAYLOAD_HUMIDITY: { type: "string", enum: ["true", "false"] },
+        LOW_POWER: { type: "string", enum: ["true", "false"] },
+        CAYENNE_LPP_: { type: "string", enum: ["true", "false"] },
+        devEUI_: { type: "string", pattern: "^0x([0-9a-fA-F]{2}, ){7}[0-9a-fA-F]{2}$" },  // 16 caractères hex
+        appKey_: { type: "string", pattern: "^([0-9a-fA-F]{2}, ){31}[0-9a-fA-F]{2}$" },  // 32 caractères hex
+        appEUI_: { type: "string", pattern: "^0x([0-9a-fA-F]{2}, ){7}[0-9a-fA-F]{2}$" },  // 16 caractères hex
+        devAddr_: { type: "string", pattern: "^0x[0-9a-fA-F]{8}$" },  // 8 caractères hex
+        nwkSKey_: { type: "string", pattern: "^([0-9a-fA-F]{2}, ){31}[0-9a-fA-F]{2}$" },  // 32 caractères hex
+        appSKey_: { type: "string", pattern: "^([0-9a-fA-F]{2}, ){31}[0-9a-fA-F]{2}$" },  // 32 caractères hex
+        ADMIN_SENSOR_ENABLED: { type: "string", enum: ["true", "false"] },
+        MLR003_SIMU: { type: "string", enum: ["true", "false"] },
+        MLR003_APP_PORT: { type: "string", pattern: "^[0-9]+$" },
+        ADMIN_GEN_APP_KEY: { type: "string", pattern: "^([0-9a-fA-F]{2}, ){31}[0-9a-fA-F]{2}$" }
+    },
+    required: [
+        "ACTIVATION_MODE", "CLASS", "SPREADING_FACTOR", "ADAPTIVE_DR", "CONFIRMED",
+        "APP_PORT", "SEND_BY_PUSH_BUTTON", "FRAME_DELAY", "PAYLOAD_1234",
+        "PAYLOAD_TEMPERATURE", "PAYLOAD_HUMIDITY", "LOW_POWER", "CAYENNE_LPP_",
+        "devEUI_", "appKey_", "appEUI_", "devAddr_", "nwkSKey_", "appSKey_",
+        "ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "MLR003_APP_PORT", "ADMIN_GEN_APP_KEY"
+    ]
+};
+
 /**
  * Compile main function used through API
  */
-async function compile(clientId,compileId,jsonConfig, fileName) {
+async function compile(clientId, compileId, jsonConfig, fileName) {
     console.log(`Compiling with id : ${compileId}`)
     let configPath = `/${volName}/configs/${compileId}` // Path for compiler files
     let resultPath = `/${volName}/results/${compileId}` // Path for .bin compiled files
 
     // Split input json for the 2 config files
     // Put General_Setup.h keys in separate json
+
+    console.log("jsonConfig", jsonConfig)
+    validateJson(jsonConfig, expectedSchema)
+
     jsonConfigApplication = jsonConfig;
     jsonGeneralSetup = {};
     for (let key of generalSetupKeys) {
@@ -44,26 +84,26 @@ async function compile(clientId,compileId,jsonConfig, fileName) {
     }
 
     // Create folders, copy compiler files and modify .h files
-    await setupFiles(configPath,resultPath,jsonConfigApplication,jsonGeneralSetup);
+    await setupFiles(configPath, resultPath, jsonConfigApplication, jsonGeneralSetup);
 
     // Start Compiling
-    let status = await startCompilerContainer(compileId,configPath,resultPath,fileName,clientId)
-    if(status == 0){
+    let status = await startCompilerContainer(compileId, configPath, resultPath, fileName, clientId)
+    if (status == 0) {
         console.log(`Compiled successfully : ${compileId}`)
-    } else if(status == 137){
+    } else if (status == 137) {
         console.log(`Compiling stopped successfully : ${compileId}`)
     } else {
         console.log(`Error while compiling : ${compileId}`)
     }
     delete containerIdMap[compileId];
-    
+
     // Clean up : Remove compiler files
     await deleteDir(configPath);
 
     return status;
 }
 
-async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig){
+async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig) {
     console.log(`Multiple compilation id : ${multipleCompileId}`)
     let resultPath = `/${volName}/results/${multipleCompileId}` // Path for .zip with .bin and .csv files
     let configPath = `/${volName}/configs` // Path for all compiler files
@@ -88,16 +128,16 @@ async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig){
         jsonConfig.fileName = generateBinFileName(element)
         jsonIdsConfig[randomId()] = jsonConfig;
     })
-    await setupFilesMulti(configPath,resultPath,jsonIdsConfig);
+    await setupFilesMulti(configPath, resultPath, jsonIdsConfig);
 
     // Compilation
     let status = 0;
     for (let id in jsonIdsConfig) {
         console.log(`${id} ${resultPath}`)
-        status = await startCompilerContainer(id,`${configPath}/${id}`,resultPath,jsonIdsConfig[id].fileName, clientId);
-        if(status == 0){
+        status = await startCompilerContainer(id, `${configPath}/${id}`, resultPath, jsonIdsConfig[id].fileName, clientId);
+        if (status == 0) {
             console.log(`Compiled successfully : ${id}`)
-        } else if(status == 137){
+        } else if (status == 137) {
             console.log(`Compiling stopped successfully : ${multipleCompileId}`)
             break;
         } else {
@@ -107,14 +147,14 @@ async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig){
     }
 
     // Clean up : Remove compiler files
-    for(let id in jsonIdsConfig) {
+    for (let id in jsonIdsConfig) {
         await deleteDir(`${configPath}/${id}`);
         delete containerIdMap[id];
     }
 
     // Zip file
-    if(status == 0){
-        await zipDirectory(resultPath,`${resultPath}.zip`)
+    if (status == 0) {
+        await zipDirectory(resultPath, `${resultPath}.zip`)
     }
     return status;
 }
@@ -125,7 +165,7 @@ async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig){
  * Return the status of the container execution
  * 0 if everything went well
  */
-async function startCompilerContainer(compileId, configPath, resultPath, fileName, clientId){
+async function startCompilerContainer(compileId, configPath, resultPath, fileName, clientId) {
     try {
         // Start compiler with custom CMD
         const container = await docker.createContainer({
@@ -144,7 +184,7 @@ async function startCompilerContainer(compileId, configPath, resultPath, fileNam
         console.log(`Container started: ${container.id}`);
 
         // Handle logs
-        containerLogs(compileId,container,clientId);
+        containerLogs(compileId, container, clientId);
 
         // Wait for the container to stop
         const waitResult = await container.wait();
@@ -171,7 +211,7 @@ function containerLogs(compileId, container, clientId) {
     var logStream = new stream.PassThrough();
     logStream.on('data', function (chunk) {
         let str = chunk.toString('utf8');
-        if(str != ' \n'){
+        if (str != ' \n') {
             const logMessage = `[${compileId}] ${str}`
             sendLogToClient(clientId, logMessage)
             process.stdout.write(logMessage);
@@ -191,6 +231,58 @@ function containerLogs(compileId, container, clientId) {
         });
     });
 }
+
+/**
+    Checks that all expected keys are present and checks that there are no extra keys.
+ */
+function validateJson(receivedJson, expectedSchema) {
+    const receivedKeys = Object.keys(receivedJson);
+    const expectedKeys = Object.keys(expectedSchema.properties);
+
+    const missingKeys = expectedKeys.filter(key => !receivedKeys.includes(key));
+    const extraKeys = receivedKeys.filter(key => !expectedKeys.includes(key));
+
+    if (missingKeys.length > 0) {
+        console.warn(`⚠️ Missing keys in the received JSON: ${missingKeys.join(", ")}`);
+    }
+
+    if (extraKeys.length > 0) {
+        console.warn(`⚠️ Unexpected keys in the received JSON: ${extraKeys.join(", ")}`);
+    }
+
+    let isValid = missingKeys.length === 0 && extraKeys.length === 0;
+
+    // Vérification des formats
+    // for (const key of expectedKeys) {
+    //     if (receivedJson[key] !== undefined) {
+    //         const value = receivedJson[key];
+    //         const schema = expectedSchema.properties[key];
+
+    //         if (schema.type === "string" && typeof value !== "string") {
+    //             console.warn(`⚠️ Key "${key}" should be a string but got ${typeof value}`);
+    //             isValid = false;
+    //         }
+
+    //         if (schema.pattern && !new RegExp(schema.pattern).test(value)) {
+    //             console.warn(`⚠️ Key "${key}" does not match expected format: ${value}`);
+    //             isValid = false;
+    //         }
+
+    //         if (schema.enum && !schema.enum.includes(value)) {
+    //             console.warn(`⚠️ Key "${key}" should be one of [${schema.enum.join(", ")}] but got "${value}"`);
+    //             isValid = false;
+    //         }
+
+    //         if (schema.minimum !== undefined && value < schema.minimum) {
+    //             console.warn(`⚠️ Key "${key}" should be >= ${schema.minimum} but got ${value}`);
+    //             isValid = false;
+    //         }
+    //     }
+    // }
+
+    return isValid;
+}
+
 
 module.exports = {
     randomId,
