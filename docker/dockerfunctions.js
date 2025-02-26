@@ -201,6 +201,9 @@ function containerLogs(compileId, container, clientId) {
     });
 }
 
+/**
+  Validate the length of LoRaWAN keys
+ */
 function validateLoRaWANKeys(clientId, config) {
     const expectedLengths = {
         devEUI_: 8,
@@ -228,6 +231,9 @@ function validateLoRaWANKeys(clientId, config) {
     return true;
 }
 
+/**
+ Validate general configuration keys
+ */
 function validateGeneralConfig(clientId, config) {
     const keyTypes = {
         boolean: [
