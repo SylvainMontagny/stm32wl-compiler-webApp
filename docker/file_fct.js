@@ -34,35 +34,39 @@ function generateMultipleCompileFileName(nbFirmware, jsonConfig) {
  */
 async function modifyHFile(source, jsonConfig) {
     try {
-        // Read async
         let data = await fs.readFile(source, 'utf8');
         let modifiedData = data;
 
         for (let [key, value] of Object.entries(jsonConfig)) {
-            // Special case : { 0x00, ... }
+            let regex;
+            
             if (key == "devEUI_" || key == "appEUI_") {
-                let regex = new RegExp(`(#define ${key}\\s+{ ).+[0-9]`, 'm');
-                newData = modifiedData.replace(regex, `$1${value}`);
-                // Special case : ( uint32_t )0x00...
+                regex = new RegExp(`(#define ${key}\\s+{ ).+[0-9]`, 'm');
             } else if (key == "devAddr_") {
-                let regex = new RegExp(`(#define ${key}\\s+.*)0x[0-9]+`, 'm')
-                newData = modifiedData.replace(regex, `$1${value}`);
-                // Default case
+                regex = new RegExp(`(#define ${key}\\s+.*)0x[0-9]+`, 'm')
             } else {
-                let regex = new RegExp(`(#define ${key}\\s+)[a-zA-Z0-9_,]+`, 'm');
-                newData = modifiedData.replace(regex, `$1${value}`);
+                regex = new RegExp(`(#define ${key}\\s+)[a-zA-Z0-9_,]+`, 'm');
             }
 
-            if (newData === modifiedData) {
+            // Vérifier si la clé existe
+            if (!regex.test(modifiedData)) {
                 console.warn(`Warning: Key "${key}" not found in the file.`);
+                continue;
             }
 
-            modifiedData = newData;
+            // Vérifier si la valeur est déjà correcte
+            let currentValue = modifiedData.match(regex)?.[0];
+            if (currentValue && currentValue.includes(value)) {
+                continue;
+            }
+
+            // Appliquer la modification
+            modifiedData = modifiedData.replace(regex, `$1${value}`);
         }
-        // Write changes to file
+
         await writeFileAsync(source, modifiedData);
     } catch (err) {
-        console.error(`Error reading or writing in file : ${err}`);
+        console.error(`Error reading or writing in file: ${err}`);
     }
 }
 
@@ -93,6 +97,7 @@ async function setupFiles(configPath, resultPath, jsonConfigApplication, jsonGen
     await copyDir(compilerPath, configPath);
 
     // Modify .h files with json
+    console.log(`${configPath}${configApplicationPath}/config_application.h`)
     await modifyHFile(`${configPath}${configApplicationPath}/config_application.h`, jsonConfigApplication);
     await modifyHFile(`${configPath}${generalSetupPath}/General_Setup.h`, jsonGeneralSetup);
 }
