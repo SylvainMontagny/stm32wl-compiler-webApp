@@ -1,6 +1,6 @@
-import { elements } from './elements.js';
-import { genRandomEUI, genRandomKey } from './generators.js';
-import { otaaAbp } from './formHandlers.js';
+import { elements } from "./elements.js";
+import { genRandomEUI, genRandomKey } from "./generators.js";
+import { otaaAbp } from "./formHandlers.js";
 
 // Save form data to localStorage
 export function saveFormData() {
@@ -28,7 +28,6 @@ export function saveFormData() {
     appSKey: elements.appsKey.value,
     adminAppKey: elements.adminAppKey.value,
     mlrSim: document.querySelector('input[name="mlr003-sim"]:checked').value,
-    mlrAppPort: elements.mlrAppPort.value,
   };
   localStorage.setItem("formData", JSON.stringify(formData));
 }
@@ -50,7 +49,8 @@ export function restoreFormData() {
     ).checked = true;
     elements.appPort.value = formData.appPort || "15";
     document.querySelector(
-      `input[name="send-mode"][value="${formData.sendMode || "every-frame-delay"
+      `input[name="send-mode"][value="${
+        formData.sendMode || "every-frame-delay"
       }"]`
     ).checked = true;
     elements.frameDelay.value = formData.frameDelay || "10";
@@ -60,8 +60,7 @@ export function restoreFormData() {
     document.querySelector(
       `input[name="cayenne-lpp"][value="${formData.cayenneLpp || "disabled"}"]`
     ).checked = true;
-    elements.devEui.value =
-      formData.devEui || genRandomEUI(elements.devEui);
+    elements.devEui.value = formData.devEui || genRandomEUI(elements.devEui);
     elements.appKey.value =
       formData.appKey || genRandomKey(32, elements.appKey);
     elements.appEui.value =
@@ -77,7 +76,6 @@ export function restoreFormData() {
     document.querySelector(
       `input[name="mlr003-sim"][value="${formData.mlrSim || "off"}"]`
     ).checked = true;
-    elements.mlrAppPort.value = formData.mlrAppPort || "30";
   }
   otaaAbp();
 }
