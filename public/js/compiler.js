@@ -62,17 +62,17 @@ export function getFormJson() {
   };
 
   if (elements.simOff.checked) {
-    formData.DEVICE_SIMULATION = false;
-    formData.USMB_VALVE = false;
-    formData.ATIM_THAQ = false;
-    formData.WATTECO_TEMPO = false;
-    formData.TCT_EGREEN = false;
+    formData.DEVICE_SIMULATION = "false";
+    formData.USMB_VALVE = "false";
+    formData.ATIM_THAQ = "false";
+    formData.WATTECO_TEMPO = "false";
+    formData.TCT_EGREEN = "false";
   } else if (elements.simOn.checked) {
-    formData.DEVICE_SIMULATION = true;
-    formData.USMB_VALVE = document.getElementById("usmb-valve").checked;
-    formData.ATIM_THAQ = document.getElementById("atim-thaq").checked;
-    formData.WATTECO_TEMPO = document.getElementById("watteco-tempo").checked;
-    formData.TCT_EGREEN = document.getElementById("tct-egreen").checked;
+    formData.DEVICE_SIMULATION = "true";
+    formData.USMB_VALVE = document.getElementById("usmb-valve").checked.toString();
+    formData.ATIM_THAQ = document.getElementById("atim-thaq").checked.toString();
+    formData.WATTECO_TEMPO = document.getElementById("watteco-tempo").checked.toString();
+    formData.TCT_EGREEN = document.getElementById("tct-egreen").checked.toString();
   }
 
   return formData;
@@ -127,17 +127,17 @@ export function getMultipleFormJson(nbFirmware) {
     };
 
     if (elements.simOff.checked) {
-      formData.DEVICE_SIMULATION = false;
-      formData.USMB_VALVE = false;
-      formData.ATIM_THAQ = false;
-      formData.WATTECO_TEMPO = false;
-      formData.TCT_EGREEN = false;
+      formData.DEVICE_SIMULATION = "false";
+      formData.USMB_VALVE = "false";
+      formData.ATIM_THAQ = "false";
+      formData.WATTECO_TEMPO = "false";
+      formData.TCT_EGREEN = "false";
     } else if (elements.simOn.checked) {
-      formData.DEVICE_SIMULATION = true;
-      formData.USMB_VALVE = document.getElementById("usmb-valve").checked;
-      formData.ATIM_THAQ = document.getElementById("atim-thaq").checked;
-      formData.WATTECO_TEMPO = document.getElementById("watteco-tempo").checked;
-      formData.TCT_EGREEN = document.getElementById("tct-egreen").checked;
+      formData.DEVICE_SIMULATION = "true";
+      formData.USMB_VALVE = document.getElementById("usmb-valve").checked.toString();
+      formData.ATIM_THAQ = document.getElementById("atim-thaq").checked.toString();
+      formData.WATTECO_TEMPO = document.getElementById("watteco-tempo").checked.toString();
+      formData.TCT_EGREEN = document.getElementById("tct-egreen").checked.toString();
     }
 
     firmwareData.push(formData);

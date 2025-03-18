@@ -5,6 +5,8 @@ const compilerPath = '/STM32WL' // Path to the STM32WL compiler files
 const generalSetupPath = process.env.GENERAL_SETUP_PATH;
 const configApplicationPath = process.env.CONFIG_APPLICATION_PATH;
 const archiver = require('archiver');
+const { sendLogToClient } = require('../sockets/socketInstance');
+
 
 /**
  * Generates the file name based on the config
@@ -32,10 +34,12 @@ function generateMultipleCompileFileName(nbFirmware, jsonConfig) {
 /**
  * Modify the .h file with the json using regex
  */
-async function modifyHFile(source, jsonConfig) {
+async function modifyHFile(source, jsonConfig, compileId, clientId) {
     try {
         let data = await fs.readFile(source, 'utf8');
         let modifiedData = data;
+
+        console.log(modifiedData)
 
         for (let [key, value] of Object.entries(jsonConfig)) {
             let regex;
@@ -50,7 +54,9 @@ async function modifyHFile(source, jsonConfig) {
 
             // Vérifier si la clé existe
             if (!regex.test(modifiedData)) {
-                console.warn(`Warning: Key "${key}" not found in the file.`);
+                let msg = `Warning: Key "${key}" not found in the file.`
+                console.warn(msg);
+                containerLogs(compileId, msg, clientId);
                 continue;
             }
 
@@ -63,7 +69,7 @@ async function modifyHFile(source, jsonConfig) {
             // Appliquer la modification
             modifiedData = modifiedData.replace(regex, `$1${value}`);
         }
-
+        console.log(modifiedData)
         await writeFileAsync(source, modifiedData);
     } catch (err) {
         console.error(`Error reading or writing in file: ${err}`);
@@ -88,7 +94,7 @@ async function initSharedVolume(volName) {
 /**
  * Setup the files for the compilation process
  */
-async function setupFiles(configPath, resultPath, jsonConfigApplication, jsonGeneralSetup) {
+async function setupFiles(configPath, resultPath, jsonConfigApplication, jsonGeneralSetup, compileId, clientId) {
     // Creating folders
     await createDir(configPath)
     await createDir(resultPath)
@@ -98,8 +104,8 @@ async function setupFiles(configPath, resultPath, jsonConfigApplication, jsonGen
 
     // Modify .h files with json
     console.log(`${configPath}${configApplicationPath}/config_application.h`)
-    await modifyHFile(`${configPath}${configApplicationPath}/config_application.h`, jsonConfigApplication);
-    await modifyHFile(`${configPath}${generalSetupPath}/General_Setup.h`, jsonGeneralSetup);
+    await modifyHFile(`${configPath}${configApplicationPath}/config_application.h`, jsonConfigApplication, compileId, clientId);
+    await modifyHFile(`${configPath}${generalSetupPath}/General_Setup.h`, jsonGeneralSetup, compileId, clientId);
 }
 
 /**

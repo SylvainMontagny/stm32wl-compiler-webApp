@@ -5,7 +5,7 @@ const { sendLogToClient } = require('../sockets/socketInstance');
 const { generateBinFileName, setupFiles, deleteDir, setupFilesMulti, zipDirectory } = require('./file_fct.js');
 
 //keys to set into General_Setup.h
-const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "MLR003_APP_PORT", "ADMIN_GEN_APP_KEY"]
+const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "ADMIN_GEN_APP_KEY"]
 
 const imageName = 'montagny/arm-compiler:1.0' // image of the compiler
 const volName = 'shared-vol' // name of the volume used to store configs and results
@@ -53,7 +53,7 @@ async function compile(clientId, compileId, jsonConfig, fileName) {
     }
 
     // Create folders, copy compiler files and modify .h files
-    await setupFiles(configPath, resultPath, jsonConfigApplication, jsonGeneralSetup);
+    await setupFiles(configPath, resultPath, jsonConfigApplication, jsonGeneralSetup, compileId, clientId);
 
     // Start Compiling
     let status = await startCompilerContainer(compileId, configPath, resultPath, fileName, clientId)
@@ -67,7 +67,7 @@ async function compile(clientId, compileId, jsonConfig, fileName) {
     delete containerIdMap[compileId];
 
     // Clean up : Remove compiler files
-    await deleteDir(configPath);
+    // await deleteDir(configPath);
 
     return status;
 }
@@ -239,10 +239,11 @@ function validateGeneralConfig(clientId, config) {
         boolean: [
             "ADAPTIVE_DR", "CONFIRMED", "SEND_BY_PUSH_BUTTON", "PAYLOAD_1234", 
             "PAYLOAD_TEMPERATURE", "PAYLOAD_HUMIDITY", "LOW_POWER", "CAYENNE_LPP_", 
-            "ADMIN_SENSOR_ENABLED", "MLR003_SIMU"
+            "ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "TCT_EGREEN", "DEVICE_SIMULATION", "USMB_VALVE",
+            "ATIM_THAQ", "WATTECO_TEMPO"
         ],
         string: ["ACTIVATION_MODE", "CLASS", "SPREADING_FACTOR"],
-        number: ["APP_PORT", "FRAME_DELAY", "MLR003_APP_PORT"]
+        number: ["APP_PORT", "FRAME_DELAY"]
     };
     
     for (const key of keyTypes.boolean) {
