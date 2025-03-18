@@ -12,7 +12,7 @@
   "NwkSKey": "Network Session Key used for authentication.",
   "AppEUI-JoinEUI": "AppEUI-JoinEUI have different names but are the same EUI. It's a A 64 bit value to identity your Join Server. If you don't use a Join Server, you can set it to zero.",
   "IKS01A3Sensors": "If you have an IKS01A3 sensor board from ST, then you will have real temperature and humidity values instead of simulated ones.",
-  "Thermostaticvalvesimulation": "This is a specific application to simulate a thermostatic valve.",
+  "DeviceSimulation": "Enable this option to simulate a device. Then select the type of device to simulate from the available options.",
   "GenAppKey(Multicast)": "Specific Key only for Multicast applications.",
   "GeneratemultipleFirmwares": "You can generate multiple firmware at once. All firmwares will have the same application settings but have their own set of DevEUI and Keys. The output is a zip file with the firmware and a csv file to facilitate the provisioning.",
   "Sendtodeviceaftercompilation": "You can upload the firmware to the device, but this feature is only supported on Google Chrome and Microsoft Edge."
