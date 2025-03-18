@@ -67,7 +67,7 @@ async function compile(clientId, compileId, jsonConfig, fileName) {
     delete containerIdMap[compileId];
 
     // Clean up : Remove compiler files
-    // await deleteDir(configPath);
+    await deleteDir(configPath);
 
     return status;
 }
