@@ -28,6 +28,12 @@ export function saveFormData() {
     appSKey: elements.appsKey.value,
     adminAppKey: elements.adminAppKey.value,
     mlrSim: document.querySelector('input[name="mlr003-sim"]:checked').value,
+    deviceOptions: {
+      usmbValve: document.getElementById("usmb-valve").checked,
+      atimThaq: document.getElementById("atim-thaq").checked,
+      wattecoTempo: document.getElementById("watteco-tempo").checked,
+      tctEgreen: document.getElementById("tct-egreen").checked,
+    },
   };
   localStorage.setItem("formData", JSON.stringify(formData));
 }
@@ -76,6 +82,23 @@ export function restoreFormData() {
     document.querySelector(
       `input[name="mlr003-sim"][value="${formData.mlrSim || "off"}"]`
     ).checked = true;
+
+    // Restore device options
+    document.getElementById("usmb-valve").checked =
+      formData.deviceOptions.usmbValve || false;
+    document.getElementById("atim-thaq").checked =
+      formData.deviceOptions.atimThaq || false;
+    document.getElementById("watteco-tempo").checked =
+      formData.deviceOptions.wattecoTempo || false;
+    document.getElementById("tct-egreen").checked =
+      formData.deviceOptions.tctEgreen || false;
+
+    // Show or hide device options based on mlrSim value
+    if (formData.mlrSim === "on") {
+      document.getElementById("device-options").style.display = "block";
+    } else {
+      document.getElementById("device-options").style.display = "none";
+    }
   }
   otaaAbp();
 }
