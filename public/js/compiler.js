@@ -123,9 +123,23 @@ export function getMultipleFormJson(nbFirmware) {
       MLR003_SIMU: (
         document.querySelector('input[name="mlr003-sim"]:checked').value == "on"
       ).toString(),
-      MLR003_APP_PORT: elements.mlrAppPort.value,
       ADMIN_GEN_APP_KEY: formatKey(genRandomKey(32, elements.adminAppKey)),
     };
+
+    if (elements.simOff.checked) {
+      formData.DEVICE_SIMULATION = false;
+      formData.USMB_VALVE = false;
+      formData.ATIM_THAQ = false;
+      formData.WATTECO_TEMPO = false;
+      formData.TCT_EGREEN = false;
+    } else if (elements.simOn.checked) {
+      formData.DEVICE_SIMULATION = true;
+      formData.USMB_VALVE = document.getElementById("usmb-valve").checked;
+      formData.ATIM_THAQ = document.getElementById("atim-thaq").checked;
+      formData.WATTECO_TEMPO = document.getElementById("watteco-tempo").checked;
+      formData.TCT_EGREEN = document.getElementById("tct-egreen").checked;
+    }
+
     firmwareData.push(formData);
   }
   return firmwareData;

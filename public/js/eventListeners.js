@@ -310,12 +310,15 @@ export function initializeEventListeners() {
         let nbFirmware = document.getElementById("firmware-nb").value;
         let jsonConfig = getMultipleFormJson(nbFirmware);
         compileMultipleFirmware(jsonConfig).then(hideLoadBar);
-      } else {
-        let jsonConfig = getFormJson();
-        compileFirmware(jsonConfig).then(hideLoadBar);
         console.log("jsonConfig : ");
 
         console.log(jsonConfig);
+      } else {
+        let jsonConfig = getFormJson();
+        compileFirmware(jsonConfig).then(hideLoadBar);
+        // console.log("jsonConfig : ");
+
+        // console.log(jsonConfig);
       }
       const compilerContainer = document.querySelector(".compiler-container");
       const pageContainer = document.querySelector(".page-container");
