@@ -5,7 +5,7 @@ const { sendLogToClient } = require('../sockets/socketInstance');
 const { generateBinFileName, setupFiles, deleteDir, setupFilesMulti, zipDirectory } = require('./file_fct.js');
 
 //keys to set into General_Setup.h
-const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "ADMIN_GEN_APP_KEY"]
+const generalSetupKeys = ["ADMIN_SENSOR_ENABLED", "USMB_VALVE", "ADMIN_GEN_APP_KEY", "ATIM_TAHQ", "WATTECO_TEMPO", "TCT_EGREEN"]
 
 const imageName = 'montagny/arm-compiler:1.0' // image of the compiler
 const volName = 'shared-vol' // name of the volume used to store configs and results
@@ -239,8 +239,8 @@ function validateGeneralConfig(clientId, config) {
         boolean: [
             "ADAPTIVE_DR", "CONFIRMED", "SEND_BY_PUSH_BUTTON", "PAYLOAD_1234", 
             "PAYLOAD_TEMPERATURE", "PAYLOAD_HUMIDITY", "LOW_POWER", "CAYENNE_LPP_", 
-            "ADMIN_SENSOR_ENABLED", "MLR003_SIMU", "TCT_EGREEN", "DEVICE_SIMULATION", "USMB_VALVE",
-            "ATIM_THAQ", "WATTECO_TEMPO"
+            "ADMIN_SENSOR_ENABLED", "TCT_EGREEN", "USMB_VALVE",
+            "ATIM_TAHQ", "WATTECO_TEMPO"
         ],
         string: ["ACTIVATION_MODE", "CLASS", "SPREADING_FACTOR"],
         number: ["APP_PORT", "FRAME_DELAY"]

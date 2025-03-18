@@ -39,8 +39,6 @@ async function modifyHFile(source, jsonConfig, compileId, clientId) {
         let data = await fs.readFile(source, 'utf8');
         let modifiedData = data;
 
-        console.log(modifiedData)
-
         for (let [key, value] of Object.entries(jsonConfig)) {
             let regex;
             
@@ -56,7 +54,7 @@ async function modifyHFile(source, jsonConfig, compileId, clientId) {
             if (!regex.test(modifiedData)) {
                 let msg = `Warning: Key "${key}" not found in the file.`
                 console.warn(msg);
-                containerLogs(compileId, msg, clientId);
+                //containerLogs(compileId, msg, clientId);
                 continue;
             }
 
@@ -69,7 +67,6 @@ async function modifyHFile(source, jsonConfig, compileId, clientId) {
             // Appliquer la modification
             modifiedData = modifiedData.replace(regex, `$1${value}`);
         }
-        console.log(modifiedData)
         await writeFileAsync(source, modifiedData);
     } catch (err) {
         console.error(`Error reading or writing in file: ${err}`);
