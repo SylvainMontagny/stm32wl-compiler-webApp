@@ -67,7 +67,7 @@ export function getFormJson() {
   } else if (elements.simOn.checked) {
     //formData.DEVICE_SIMULATION = "true";
     formData.USMB_VALVE = document.getElementById("usmb-valve").checked.toString();
-    formData.ATIM_TAHQ = document.getElementById("atim-thaq").checked.toString();
+    formData.ATIM_TAHQ = document.getElementById("atim-tahq").checked.toString();
     formData.WATTECO_TEMPO = document.getElementById("watteco-tempo").checked.toString();
     formData.TCT_EGREEN = document.getElementById("tct-egreen").checked.toString();
   }
@@ -132,7 +132,7 @@ export function getMultipleFormJson(nbFirmware) {
     } else if (elements.simOn.checked) {
       //formData.DEVICE_SIMULATION = "true";
       formData.USMB_VALVE = document.getElementById("usmb-valve").checked.toString();
-      formData.ATIM_TAHQ = document.getElementById("atim-tagq").checked.toString();
+      formData.ATIM_TAHQ = document.getElementById("atim-tahq").checked.toString();
       formData.WATTECO_TEMPO = document.getElementById("watteco-tempo").checked.toString();
       formData.TCT_EGREEN = document.getElementById("tct-egreen").checked.toString();
     }
