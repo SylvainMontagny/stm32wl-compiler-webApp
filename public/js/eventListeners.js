@@ -313,6 +313,9 @@ export function initializeEventListeners() {
       } else {
         let jsonConfig = getFormJson();
         compileFirmware(jsonConfig).then(hideLoadBar);
+        console.log("jsonConfig : ");
+
+        console.log(jsonConfig);
       }
       const compilerContainer = document.querySelector(".compiler-container");
       const pageContainer = document.querySelector(".page-container");
