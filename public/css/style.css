@@ -332,6 +332,29 @@ button.generate-appskey {
   align-items: center;
 }
 
+#device-options {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f8fafc;
+  border: 1px solid var(--gray-color);
+  border-radius: 4px;
+}
+
+#device-options .radio-button {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+#device-options .radio-button label {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+#device-options .radio-button input[type="radio"] {
+  cursor: pointer;
+}
+
 #mlr003-app-port {
   width: 20%;
 }
