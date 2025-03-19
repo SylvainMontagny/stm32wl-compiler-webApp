@@ -37,8 +37,6 @@ async function compile(clientId, compileId, jsonConfig, fileName) {
     // Split input json for the 2 config files
     // Put General_Setup.h keys in separate json
 
-    console.log("jsonConfig", jsonConfig)
-
     if (!validateLoRaWANKeys(clientId, jsonConfig) || !validateGeneralConfig(clientId,jsonConfig)) {
         console.error("Invalid configuration, stopping compilation.");
         sendLogToClient(clientId,"Invalid configuration, stopping compilation.")
@@ -80,6 +78,14 @@ async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig) {
     console.log(`Multiple compilation id : ${multipleCompileId}`)
     let resultPath = `/${volName}/results/${multipleCompileId}` // Path for .zip with .bin and .csv files
     let configPath = `/${volName}/configs` // Path for all compiler files
+
+    for(let jsonConfig of jsonArrayConfig){
+        if (!validateLoRaWANKeys(clientId, jsonConfig) || !validateGeneralConfig(clientId,jsonConfig)) {
+            console.error("Invalid configuration, stopping compilation.");
+            sendLogToClient(clientId,"Invalid configuration, stopping compilation.")
+            return 404;
+        }
+    }
 
     // JSON with compiler ID as key and splitted json as value
     let jsonIdsConfig = []

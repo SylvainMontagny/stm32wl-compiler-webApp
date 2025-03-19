@@ -117,9 +117,6 @@ export function getMultipleFormJson(nbFirmware) {
         document.querySelector('input[name="admin-sensor"]:checked').value ==
         "enabled"
       ).toString(),
-      MLR003_SIMU: (
-        document.querySelector('input[name="mlr003-sim"]:checked').value == "on"
-      ).toString(),
       ADMIN_GEN_APP_KEY: formatKey(genRandomKey(32, elements.adminAppKey)),
     };
 

@@ -39,16 +39,16 @@ async function modifyHFile(source, jsonConfig) {
         let data = await fs.readFile(source, 'utf8');
         let modifiedData = data;
         let missingKeys = [];
-        
-        console.log(data);
-
+    
         for (let [key, value] of Object.entries(jsonConfig)) {
             let regex;
             
             if (key == "devEUI_" || key == "appEUI_") {
                 regex = new RegExp(`(#define ${key}\\s+{ ).+[0-9]`, 'm');
             } else if (key == "devAddr_") {
-                regex = new RegExp(`(#define ${key}\\s+.*)0x[0-9]+`, 'm')
+                regex = new RegExp(`(#define ${key}\\s+.*)0x[0-9]+`, 'm');
+            } else if (key == "name") {
+                continue
             } else {
                 regex = new RegExp(`(#define ${key}\\s+)[a-zA-Z0-9_,]+`, 'm');
             }
