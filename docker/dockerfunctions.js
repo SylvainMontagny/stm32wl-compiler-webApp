@@ -53,7 +53,11 @@ async function compile(clientId, compileId, jsonConfig, fileName) {
     }
 
     // Create folders, copy compiler files and modify .h files
-    await setupFiles(configPath, resultPath, jsonConfigApplication, jsonGeneralSetup, compileId, clientId);
+    let setupSuccess = await setupFiles(configPath, resultPath, jsonConfigApplication, jsonGeneralSetup, compileId, clientId);
+    if (!setupSuccess) {
+        console.log(`Compilation aborted due to missing keys.`);
+        return;
+    }
 
     // Start Compiling
     let status = await startCompilerContainer(compileId, configPath, resultPath, fileName, clientId)
@@ -97,7 +101,12 @@ async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig) {
         jsonConfig.fileName = generateBinFileName(element)
         jsonIdsConfig[randomId()] = jsonConfig;
     })
-    await setupFilesMulti(configPath, resultPath, jsonIdsConfig);
+    let setupSuccess = await setupFilesMulti(configPath, resultPath, jsonIdsConfig, clientId);
+
+    if (!setupSuccess) {
+        console.log(`Compilation aborted due to missing keys.`);
+        return;
+    }
 
     // Compilation
     let status = 0;

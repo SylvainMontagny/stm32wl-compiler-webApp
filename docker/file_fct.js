@@ -34,10 +34,13 @@ function generateMultipleCompileFileName(nbFirmware, jsonConfig) {
 /**
  * Modify the .h file with the json using regex
  */
-async function modifyHFile(source, jsonConfig, compileId, clientId) {
+async function modifyHFile(source, jsonConfig) {
     try {
         let data = await fs.readFile(source, 'utf8');
         let modifiedData = data;
+        let missingKeys = [];
+        
+        console.log(data);
 
         for (let [key, value] of Object.entries(jsonConfig)) {
             let regex;
@@ -50,26 +53,29 @@ async function modifyHFile(source, jsonConfig, compileId, clientId) {
                 regex = new RegExp(`(#define ${key}\\s+)[a-zA-Z0-9_,]+`, 'm');
             }
 
-            // Vérifier si la clé existe
+            // If the key is no found
             if (!regex.test(modifiedData)) {
-                let msg = `Warning: Key "${key}" not found in the file.`
-                console.warn(msg);
-                //containerLogs(compileId, msg, clientId);
+                missingKeys.push(key);
                 continue;
             }
 
-            // Vérifier si la valeur est déjà correcte
+            // If the value is already exists
             let currentValue = modifiedData.match(regex)?.[0];
             if (currentValue && currentValue.includes(value)) {
                 continue;
             }
 
-            // Appliquer la modification
             modifiedData = modifiedData.replace(regex, `$1${value}`);
         }
+
+        if (missingKeys.length > 0) {
+            throw new Error(`Missing keys: ${missingKeys.join(', ')}`);
+        }
+
         await writeFileAsync(source, modifiedData);
     } catch (err) {
         console.error(`Error reading or writing in file: ${err}`);
+        throw err;
     }
 }
 
@@ -92,41 +98,52 @@ async function initSharedVolume(volName) {
  * Setup the files for the compilation process
  */
 async function setupFiles(configPath, resultPath, jsonConfigApplication, jsonGeneralSetup, compileId, clientId) {
-    // Creating folders
-    await createDir(configPath)
-    await createDir(resultPath)
+    try {
+        await createDir(configPath);
+        await createDir(resultPath);
+        await copyDir(compilerPath, configPath);
 
-    // Copy compiler files
-    await copyDir(compilerPath, configPath);
-
-    // Modify .h files with json
-    console.log(`${configPath}${configApplicationPath}/config_application.h`)
-    await modifyHFile(`${configPath}${configApplicationPath}/config_application.h`, jsonConfigApplication, compileId, clientId);
-    await modifyHFile(`${configPath}${generalSetupPath}/General_Setup.h`, jsonGeneralSetup, compileId, clientId);
+        console.log(`${configPath}${configApplicationPath}/config_application.h`);
+        
+        await modifyHFile(`${configPath}${configApplicationPath}/config_application.h`, jsonConfigApplication);
+        await modifyHFile(`${configPath}${generalSetupPath}/General_Setup.h`, jsonGeneralSetup);
+    } catch (err) {
+        console.error(`Setup failed: ${err.message}`);
+        sendLogToClient(clientId, `Setup failed: ${err.message}`);
+        return false;
+    }
+    return true;
 }
 
 /**
  * Setup the files for the multi-compilation process
  */
-async function setupFilesMulti(configPath, resultPath, jsonIdsConfig) {
-    // Result folder and CSV creation
-    const csvName = 'tts-end-devices.csv'
-    let csvPath = `${resultPath}/${csvName}`;
-    await createDir(resultPath) // 
-    await setupCsv(csvPath, jsonIdsConfig)
+async function setupFilesMulti(configPath, resultPath, jsonIdsConfig, clientId) {
+    try {
+        // Result folder and CSV creation
+        const csvName = 'tts-end-devices.csv'
+        let csvPath = `${resultPath}/${csvName}`;
+        await createDir(resultPath) // 
+        await setupCsv(csvPath, jsonIdsConfig)
 
-    // Configs folders for compilers
-    for (let id in jsonIdsConfig) {
-        let path = `${configPath}/${id}`
-        await createDir(path);
+        // Configs folders for compilers
+        for (let id in jsonIdsConfig) {
+            let path = `${configPath}/${id}`
+            await createDir(path);
 
-        // Copy compiler files
-        await copyDir(compilerPath, path);
+            // Copy compiler files
+            await copyDir(compilerPath, path);
 
-        // Modify .h files with json
-        await modifyHFile(`${path}${configApplicationPath}/config_application.h`, jsonIdsConfig[id].configApplication);
-        await modifyHFile(`${path}${generalSetupPath}/General_Setup.h`, jsonIdsConfig[id].generalSetup);
+            // Modify .h files with json
+            await modifyHFile(`${path}${configApplicationPath}/config_application.h`, jsonIdsConfig[id].configApplication);
+            await modifyHFile(`${path}${generalSetupPath}/General_Setup.h`, jsonIdsConfig[id].generalSetup);
+        }
+    } catch (err) {
+        console.error(`Setup failed: ${err.message}`);
+        sendLogToClient(clientId, `Setup failed: ${err.message}`);
+        return false;
     }
+    return true;
 }
 
 async function setupCsv(csvPath, jsonIdsConfig) {
