@@ -418,4 +418,12 @@ export function initializeEventListeners() {
       elements.frameDelay.value = 8;
     }
   });
+
+  // firmware number negative value
+  elements.firmwareNumber.addEventListener("change", function () {
+    let value = parseFloat(elements.firmwareNumber.value);
+    if (isNaN(value) || value < 1 || !Number.isInteger(value)) {
+      elements.firmwareNumber.value = 2;
+    }
+  });
 }
