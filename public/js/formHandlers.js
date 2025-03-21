@@ -1,5 +1,5 @@
-import { elements } from './elements.js';
-import { saveFormData } from './storage.js';
+import { elements } from "./elements.js";
+import { saveFormData } from "./storage.js";
 
 // Display OTAA ABP
 export function otaaAbp() {
@@ -128,6 +128,7 @@ export function simOnError() {
     });
 
     elements.cayenne2.checked = true;
+    elements.deviceOptions.style.display = "block";
 
     saveFormData();
   }
@@ -157,7 +158,9 @@ export function simOffError() {
     });
 
     elements.hello.checked = true;
+    elements.deviceOptions.style.display = "none";
     helloError();
+
     saveFormData();
   }
 }

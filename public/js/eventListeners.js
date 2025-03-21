@@ -87,7 +87,6 @@ export function initializeEventListeners() {
   // Restore default settings for Advanced
   elements.rAdvance.addEventListener("click", function () {
     document.getElementById("admin-sensor-disabled").checked = true;
-    elements.mlrAppPort.value = "30";
     if (elements.simOn.checked) {
       elements.simOff.checked = true;
       simOffError();
@@ -290,19 +289,6 @@ export function initializeEventListeners() {
     }
   });
 
-  // Add event listeners for Device Simulation radio buttons
-  elements.simOn.addEventListener("change", async function () {
-    if (elements.simOn.checked) {
-      elements.deviceOptions.style.display = "block";
-    }
-  });
-
-  elements.simOff.addEventListener("change", async function () {
-    if (elements.simOff.checked) {
-      elements.deviceOptions.style.display = "none";
-    }
-  });
-
   document
     .getElementById("generate-firmware")
     .addEventListener("click", async function () {
@@ -316,9 +302,6 @@ export function initializeEventListeners() {
       } else {
         let jsonConfig = getFormJson();
         compileFirmware(jsonConfig).then(hideLoadBar);
-        // console.log("jsonConfig : ");
-
-        // console.log(jsonConfig);
       }
       const compilerContainer = document.querySelector(".compiler-container");
       const pageContainer = document.querySelector(".page-container");

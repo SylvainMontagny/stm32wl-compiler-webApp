@@ -30,7 +30,7 @@ export function saveFormData() {
     mlrSim: document.querySelector('input[name="mlr003-sim"]:checked').value,
     deviceOptions: {
       usmbValve: document.getElementById("usmb-valve").checked,
-      atimTahq: document.getElementById("atim-tahq").checked,
+      atimThaq: document.getElementById("atim-thaq").checked,
       wattecoTempo: document.getElementById("watteco-tempo").checked,
       tctEgreen: document.getElementById("tct-egreen").checked,
     },
@@ -86,8 +86,8 @@ export function restoreFormData() {
     // Restore device options
     document.getElementById("usmb-valve").checked =
       formData.deviceOptions?.usmbValve || false;
-    document.getElementById("atim-tahq").checked =
-      formData.deviceOptions?.atimTahq || false;
+    document.getElementById("atim-thaq").checked =
+      formData.deviceOptions?.atimThaq || false;
     document.getElementById("watteco-tempo").checked =
       formData.deviceOptions?.wattecoTempo || false;
     document.getElementById("tct-egreen").checked =
