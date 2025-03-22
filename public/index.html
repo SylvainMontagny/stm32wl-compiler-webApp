@@ -182,10 +182,10 @@
 
               <div class="payload-configuration">
                 <h3>Payload Configuration</h3>
-                <div class="radio-buttons">
+                <div class="radio-buttons-payload">
                   <div class="radio-button">
                     <input
-                      type="checkbox"
+                      type="radio"
                       id="hello"
                       name="payload-configuration"
                       value="hello"
@@ -193,23 +193,135 @@
                     />
                     <label for="hello">(hexa) 01 02 03 04</label>
                   </div>
+
                   <div class="radio-button">
                     <input
-                      type="checkbox"
-                      id="temperature"
+                      type="radio"
+                      id="simulated-temp-humidity"
                       name="payload-configuration"
-                      value="temperature"
+                      value="simulated-temp-humidity"
                     />
-                    <label for="temperature">Temperature</label>
+                    <label for="simulated-temp-humidity"
+                      >Simulated Temp and/or Humidity</label
+                    >
+                    <div class="checkbox-group">
+                      <div class="checkbox-item">
+                        <input
+                          type="checkbox"
+                          id="temperature"
+                          name="simulated-options"
+                          value="temperature"
+                        />
+                        <label for="temperature">Temperature</label>
+                      </div>
+                      <div class="checkbox-item">
+                        <input
+                          type="checkbox"
+                          id="humidity"
+                          name="simulated-options"
+                          value="humidity"
+                        />
+                        <label for="humidity">Humidity</label>
+                      </div>
+                    </div>
                   </div>
+
                   <div class="radio-button">
                     <input
-                      type="checkbox"
-                      id="humidity"
+                      type="radio"
+                      id="read-iks01a3-sensors"
                       name="payload-configuration"
-                      value="humidity"
+                      value="read-iks01a3-sensors"
                     />
-                    <label for="humidity">Humidity</label>
+                    <label for="read-iks01a3-sensors"
+                      >Read value from IKS01A3 sensors</label
+                    >
+                    <div class="checkbox-group">
+                      <div class="checkbox-item">
+                        <input
+                          type="checkbox"
+                          id="iks01a3-temperature"
+                          name="iks01a3-options"
+                          value="temperature"
+                        />
+                        <label for="iks01a3-temperature"
+                          >Temperature (STTS 7S1)</label
+                        >
+                      </div>
+                      <div class="checkbox-item">
+                        <input
+                          type="checkbox"
+                          id="iks01a3-humidity"
+                          name="iks01a3-options"
+                          value="humidity"
+                        />
+                        <label for="iks01a3-humidity">Humidity (HTS 221)</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="radio-button">
+                    <input
+                      type="radio"
+                      id="simulated-lorawan-devices"
+                      name="payload-configuration"
+                      value="simulated-lorawan-devices"
+                    />
+                    <label for="simulated-lorawan-devices">
+                      Simulated LoRaWAN devices
+                      <i class="fa-regular fa-circle-question"></i>
+                    </label>
+                    <div class="checkbox-group">
+                      <div class="radio-item">
+                        <input
+                          type="radio"
+                          id="usmb-valve"
+                          name="device-option"
+                          value="USMB_VALVE"
+                          checked
+                        />
+                        <label for="usmb-valve"
+                          >USMB_valve (Thermostatic value)
+                          <i class="fa-regular fa-circle-question"></i>
+                        </label>
+                      </div>
+                      <div class="radio-item">
+                        <input
+                          type="radio"
+                          id="atim-thaq"
+                          name="device-option"
+                          value="ATIM_THAQ"
+                        />
+                        <label for="atim-thaq"
+                          >ATIM_Thaq (Air quality)
+                          <i class="fa-regular fa-circle-question"></i>
+                        </label>
+                      </div>
+                      <div class="radio-item">
+                        <input
+                          type="radio"
+                          id="watteco-tempo"
+                          name="device-option"
+                          value="WATTECO_TEMPO"
+                        />
+                        <label for="watteco-tempo"
+                          >WATTECO_tempo (Temperature)
+                          <i class="fa-regular fa-circle-question"></i>
+                        </label>
+                      </div>
+                      <div class="radio-item">
+                        <input
+                          type="radio"
+                          id="tct-egreen"
+                          name="device-option"
+                          value="TCT_EGREEN"
+                        />
+                        <label for="tct-egreen"
+                          >TCT_egreen (Current sensor)
+                          <i class="fa-regular fa-circle-question"></i>
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -391,99 +503,6 @@
             </div>
 
             <div class="advanced-settings-form">
-              <div class="admin-sensor">
-                <h3>
-                  IKS01A3 Sensors <i class="fa-regular fa-circle-question"></i>
-                </h3>
-                <div class="radio-buttons">
-                  <div class="radio-button">
-                    <input
-                      type="radio"
-                      id="admin-sensor-enabled"
-                      name="admin-sensor"
-                      value="enabled"
-                    />
-                    <label for="admin-sensor-enabled">Enabled</label>
-                  </div>
-                  <div class="radio-button">
-                    <input
-                      type="radio"
-                      id="admin-sensor-disabled"
-                      name="admin-sensor"
-                      value="disabled"
-                      checked
-                    />
-                    <label for="admin-sensor-disabled">Disabled</label>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mlr003-sim">
-                <h3>
-                  Device Simulation
-                  <i class="fa-regular fa-circle-question"></i>
-                </h3>
-                <div class="radio-buttons">
-                  <div class="radio-button">
-                    <input
-                      type="radio"
-                      id="mlr003-sim-on"
-                      name="mlr003-sim"
-                      value="on"
-                    />
-                    <label for="mlr003-sim-on">On</label>
-                  </div>
-                  <div class="radio-button">
-                    <input
-                      type="radio"
-                      id="mlr003-sim-off"
-                      name="mlr003-sim"
-                      value="off"
-                      checked
-                    />
-                    <label for="mlr003-sim-off">Off</label>
-                  </div>
-                </div>
-                <div id="device-options" style="display: none">
-                  <div class="radio-button">
-                    <input
-                      type="radio"
-                      id="usmb-valve"
-                      name="device-option"
-                      value="USMB_VALVE"
-                    />
-                    <label for="usmb-valve">USMB_VALVE</label>
-                  </div>
-                  <div class="radio-button">
-                    <input
-                      type="radio"
-                      id="atim-thaq"
-                      name="device-option"
-                      value="ATIM_THAQ"
-                    />
-                    <label for="atim-thaq">ATIM_THAQ</label>
-                  </div>
-                  <div class="radio-button">
-                    <input
-                      type="radio"
-                      id="watteco-tempo"
-                      name="device-option"
-                      value="WATTECO_TEMPO"
-                    />
-                    <label for="watteco-tempo">WATTECO_TEMPO</label>
-                  </div>
-                  <div class="radio-button">
-                    <input
-                      type="radio"
-                      id="tct-egreen"
-                      name="device-option"
-                      value="TCT_EGREEN"
-                    />
-                    <label for="tct-egreen">TCT_EGREEN</label>
-                  </div>
-                </div>
-              </div>
-
               <div class="admin-gen-app-key">
                 <h3>
                   GenAppKey

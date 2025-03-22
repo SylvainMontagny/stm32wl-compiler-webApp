@@ -1,14 +1,5 @@
 import { elements } from "./elements.js";
-import {
-  otaaAbp,
-  helloError,
-  humidityError,
-  temperatureError,
-  cayenne1Error,
-  cayenne2Error,
-  simOnError,
-  simOffError,
-} from "./formHandlers.js";
+import { otaaAbp, cayenne1Error, cayenne2Error } from "./formHandlers.js";
 import { saveFormData, restoreFormData } from "./storage.js";
 import {
   compileFirmware,
@@ -42,19 +33,9 @@ export function initializeEventListeners() {
 
   elements.activationMode.addEventListener("change", otaaAbp);
 
-  elements.hello.addEventListener("change", helloError);
-
-  elements.humidity.addEventListener("change", humidityError);
-
-  elements.temperature.addEventListener("change", temperatureError);
-
   elements.cayenne1.addEventListener("change", cayenne1Error);
 
   elements.cayenne2.addEventListener("change", cayenne2Error);
-
-  elements.simOn.addEventListener("change", simOnError);
-
-  elements.simOff.addEventListener("change", simOffError);
 
   // Restore default settings for LoRaWAN
   elements.rLorawan.addEventListener("click", function () {
@@ -237,12 +218,8 @@ export function initializeEventListeners() {
 
   window.addEventListener("load", function () {
     // Transmission mode onload
-    helloError();
-    humidityError();
-    temperatureError();
     cayenne1Error();
     cayenne2Error();
-    simOnError();
 
     // gen keys
     if (!localStorage.getItem("formData")) {

@@ -79,9 +79,6 @@ export function restoreFormData() {
       formData.appSKey || genRandomKey(32, elements.appsKey);
     elements.adminAppKey.value =
       formData.adminAppKey || genRandomKey(32, elements.adminAppKey);
-    document.querySelector(
-      `input[name="mlr003-sim"][value="${formData.mlrSim || "off"}"]`
-    ).checked = true;
 
     // Restore device options
     document.getElementById("usmb-valve").checked =
@@ -92,13 +89,6 @@ export function restoreFormData() {
       formData.deviceOptions?.wattecoTempo || false;
     document.getElementById("tct-egreen").checked =
       formData.deviceOptions?.tctEgreen || false;
-
-    // Show or hide device options based on mlrSim value
-    if (formData.mlrSim === "on") {
-      document.getElementById("device-options").style.display = "block";
-    } else {
-      document.getElementById("device-options").style.display = "none";
-    }
   }
   otaaAbp();
 }

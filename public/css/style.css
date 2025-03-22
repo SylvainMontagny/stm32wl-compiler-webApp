@@ -208,7 +208,27 @@ select {
   display: grid;
   gap: 2vw;
   margin: 20px;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.radio-buttons-payload {
+  display: flex;
+  flex-direction: column;
+}
+
+.radio-buttons-payload .radio-button {
+  margin-bottom: 2%;
+
+}
+
+.radio-buttons-payload .checkbox-group {
+  margin-left: 10%;
+  margin-top: 1%;
+}
+
+.radio-buttons-payload .checkbox-item,
+.radio-buttons-payload .radio-item {
+  margin-top: 1%;
 }
 
 .send-mode,
@@ -217,11 +237,6 @@ select {
 .dev-eui {
   display: flex;
   flex-direction: column;
-}
-
-.send-mode,
-.dev-eui {
-  grid-column: span 2;
 }
 
 .send-mode .radio-buttons {
