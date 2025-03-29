@@ -1,12 +1,16 @@
 import { elements } from "./elements.js";
-import { otaaAbp, cayenne1Error, cayenne2Error } from "./formHandlers.js";
+import {
+  otaaAbp,
+  cayenne1Error,
+  cayenne2Error,
+  updatePayloadConfiguration,
+} from "./formHandlers.js";
 import { saveFormData, restoreFormData } from "./storage.js";
 import {
   compileFirmware,
   compileMultipleFirmware,
   getFormJson,
   getMultipleFormJson,
-  sendToUSBDevice,
 } from "./compiler.js";
 import { genRandomEUI, genRandomKey } from "./generators.js";
 import { hideLoadBar } from "./loadBar.js";
@@ -22,11 +26,9 @@ export function initializeEventListeners() {
       elements.advancedForm.style.display === "none"
     ) {
       elements.advancedForm.style.display = "grid";
-      elements.restore.style.display = "block";
       elements.svgArrow.style.transform = "rotate(90deg)";
     } else {
       elements.advancedForm.style.display = "none";
-      elements.restore.style.display = "none";
       elements.svgArrow.style.transform = "rotate(0deg)";
     }
   });
@@ -53,31 +55,12 @@ export function initializeEventListeners() {
   elements.rApp.addEventListener("click", function () {
     document.getElementById("send-every-frame-delay").checked = true;
     elements.frameDelay.value = "10";
-    if (!elements.simOn.checked) {
-      elements.temperature.checked = false;
-      elements.humidity.checked = false;
-      elements.cayenne2.checked = true;
-      elements.hello.disabled = false;
-      elements.helloLabel.style.color = "#000";
-      elements.hello.checked = true;
-      helloError();
-    }
-    saveFormData();
-  });
 
-  // Restore default settings for Advanced
-  elements.rAdvance.addEventListener("click", function () {
-    document.getElementById("admin-sensor-disabled").checked = true;
-    if (elements.simOn.checked) {
-      elements.simOff.checked = true;
-      simOffError();
-    }
-    if (elements.multipleFirmware.checked) {
-      elements.multipleFirmware.checked = false;
-      elements.multipleFirmware.dispatchEvent(new Event("change"));
-    }
-    elements.firmwareNumber.value = "2";
-    elements.firmwareNameInput.value = "device";
+    elements.hello.checked = true;
+    elements.usmbValve.checked = true;
+
+    updatePayloadConfiguration();
+
     saveFormData();
   });
 
@@ -220,6 +203,7 @@ export function initializeEventListeners() {
     // Transmission mode onload
     cayenne1Error();
     cayenne2Error();
+    updatePayloadConfiguration();
 
     // gen keys
     if (!localStorage.getItem("formData")) {
@@ -385,5 +369,9 @@ export function initializeEventListeners() {
     if (isNaN(value) || value < 1 || !Number.isInteger(value)) {
       elements.firmwareNumber.value = 2;
     }
+  });
+
+  elements.payloadRadioButtons.forEach((radio) => {
+    radio.addEventListener("change", updatePayloadConfiguration);
   });
 }

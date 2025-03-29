@@ -15,9 +15,6 @@ export function saveFormData() {
     appPort: elements.appPort.value,
     sendMode: document.querySelector('input[name="send-mode"]:checked').value,
     frameDelay: elements.frameDelay.value,
-    hello: elements.hello.checked,
-    temperature: elements.temperature.checked,
-    humidity: elements.humidity.checked,
     cayenneLpp: document.querySelector('input[name="cayenne-lpp"]:checked')
       .value,
     devEui: elements.devEui.value,
@@ -27,13 +24,6 @@ export function saveFormData() {
     nwkSKey: elements.nwksKey.value,
     appSKey: elements.appsKey.value,
     adminAppKey: elements.adminAppKey.value,
-    mlrSim: document.querySelector('input[name="mlr003-sim"]:checked').value,
-    deviceOptions: {
-      usmbValve: document.getElementById("usmb-valve").checked,
-      atimThaq: document.getElementById("atim-thaq").checked,
-      wattecoTempo: document.getElementById("watteco-tempo").checked,
-      tctEgreen: document.getElementById("tct-egreen").checked,
-    },
   };
   localStorage.setItem("formData", JSON.stringify(formData));
 }
@@ -60,9 +50,7 @@ export function restoreFormData() {
       }"]`
     ).checked = true;
     elements.frameDelay.value = formData.frameDelay || "10";
-    elements.hello.checked = formData.hello || false;
-    elements.temperature.checked = formData.temperature || false;
-    elements.humidity.checked = formData.humidity || false;
+    elements.hello.checked = true;
     document.querySelector(
       `input[name="cayenne-lpp"][value="${formData.cayenneLpp || "disabled"}"]`
     ).checked = true;
@@ -79,16 +67,6 @@ export function restoreFormData() {
       formData.appSKey || genRandomKey(32, elements.appsKey);
     elements.adminAppKey.value =
       formData.adminAppKey || genRandomKey(32, elements.adminAppKey);
-
-    // Restore device options
-    document.getElementById("usmb-valve").checked =
-      formData.deviceOptions?.usmbValve || false;
-    document.getElementById("atim-thaq").checked =
-      formData.deviceOptions?.atimThaq || false;
-    document.getElementById("watteco-tempo").checked =
-      formData.deviceOptions?.wattecoTempo || false;
-    document.getElementById("tct-egreen").checked =
-      formData.deviceOptions?.tctEgreen || false;
   }
   otaaAbp();
 }

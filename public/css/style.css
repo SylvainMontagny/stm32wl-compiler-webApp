@@ -226,6 +226,14 @@ select {
   margin-top: 1%;
 }
 
+.radio-buttons-payload .checkbox-group-h {
+  margin-left: 10%;
+  margin-top: 1%;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
 .radio-buttons-payload .checkbox-item,
 .radio-buttons-payload .radio-item {
   margin-top: 1%;
@@ -570,7 +578,6 @@ button.generate-appskey {
   }
 
   .lorawan-form,
-  .application-form,
   .advance-container {
     grid-template-columns: repeat(2, 1fr);
     /* Passe à 2 colonnes */
@@ -588,7 +595,6 @@ button.generate-appskey {
   }
 
   .lorawan-form,
-  .application-form,
   .advanced-container {
     grid-template-columns: 1fr;
     /* 1 colonne pour les petits écrans */

@@ -1,6 +1,5 @@
 import { elements } from "./elements.js";
 import { showLoadBar } from "./loadBar.js";
-import { genRandomEUI, genRandomKey } from "./generators.js";
 import { socket } from "./socket.js";
 import { store } from "./store.js";
 import { showSnackBar, hideSnackBar } from "./snackBar.js";
@@ -38,8 +37,19 @@ export function getFormJson() {
     ).toString(),
     FRAME_DELAY: elements.frameDelay.value * 1000,
     PAYLOAD_1234: elements.hello.checked.toString(),
-    PAYLOAD_TEMPERATURE: elements.temperature.checked.toString(),
-    PAYLOAD_HUMIDITY: elements.humidity.checked.toString(),
+    ADMIN_SENSOR_ENABLED: elements.ikssensor.checked.toString(),
+    PAYLOAD_TEMPERATURE:
+      elements.temperature.checked || elements.ikstemperature.checked
+        ? "true"
+        : "false",
+    PAYLOAD_HUMIDITY:
+      elements.humidity.checked || elements.ikshumidity.checked
+        ? "true"
+        : "false",
+    USMB_VALVE: elements.usmbValve.checked.toString(),
+    ATIM_THAQ: elements.atimThaq.checked.toString(),
+    WATTECO_TEMPO: elements.wattecoTempo.checked.toString(),
+    TCT_EGREEN: elements.tctEgreen.checked.toString(),
     LOW_POWER: "false",
     CAYENNE_LPP_: (
       document.querySelector('input[name="cayenne-lpp"]:checked').value ==
@@ -51,35 +61,8 @@ export function getFormJson() {
     devAddr_: formatAddr(elements.devAddr.value),
     nwkSKey_: formatKey(elements.nwksKey.value),
     appSKey_: formatKey(elements.appsKey.value),
-    ADMIN_SENSOR_ENABLED: (
-      document.querySelector('input[name="admin-sensor"]:checked').value ==
-      "enabled"
-    ).toString(),
     ADMIN_GEN_APP_KEY: formatKey(elements.adminAppKey.value),
   };
-
-  if (elements.simOff.checked) {
-    //formData.DEVICE_SIMULATION = "false";
-    formData.USMB_VALVE = "false";
-    formData.ATIM_THAQ = "false";
-    formData.WATTECO_TEMPO = "false";
-    formData.TCT_EGREEN = "false";
-  } else if (elements.simOn.checked) {
-    //formData.DEVICE_SIMULATION = "true";
-    formData.USMB_VALVE = document
-      .getElementById("usmb-valve")
-      .checked.toString();
-    formData.ATIM_THAQ = document
-      .getElementById("atim-thaq")
-      .checked.toString();
-    formData.WATTECO_TEMPO = document
-      .getElementById("watteco-tempo")
-      .checked.toString();
-    formData.TCT_EGREEN = document
-      .getElementById("tct-egreen")
-      .checked.toString();
-  }
-
   return formData;
 }
 
@@ -108,48 +91,32 @@ export function getMultipleFormJson(nbFirmware) {
       ).toString(),
       FRAME_DELAY: elements.frameDelay.value * 1000,
       PAYLOAD_1234: elements.hello.checked.toString(),
-      PAYLOAD_TEMPERATURE: elements.temperature.checked.toString(),
-      PAYLOAD_HUMIDITY: elements.humidity.checked.toString(),
+      ADMIN_SENSOR_ENABLED: elements.ikssensor.checked.toString(),
+      PAYLOAD_TEMPERATURE:
+        elements.temperature.checked || elements.ikstemperature.checked
+          ? "true"
+          : "false",
+      PAYLOAD_HUMIDITY:
+        elements.humidity.checked || elements.ikshumidity.checked
+          ? "true"
+          : "false",
+      USMB_VALVE: elements.usmbValve.checked.toString(),
+      ATIM_THAQ: elements.atimThaq.checked.toString(),
+      WATTECO_TEMPO: elements.wattecoTempo.checked.toString(),
+      TCT_EGREEN: elements.tctEgreen.checked.toString(),
       LOW_POWER: "false",
       CAYENNE_LPP_: (
         document.querySelector('input[name="cayenne-lpp"]:checked').value ==
         "enabled"
       ).toString(),
-      devEUI_: formatEUI(genRandomEUI(elements.devEui)),
-      appKey_: formatKey(genRandomKey(32, elements.appKey).toUpperCase()),
-      appEUI_: formatEUI(genRandomKey(16, elements.appEui)),
-      devAddr_: formatAddr(genRandomKey(8, elements.devAddr)),
-      nwkSKey_: formatKey(genRandomKey(32, elements.nwksKey)),
-      appSKey_: formatKey(genRandomKey(32, elements.appsKey)),
-      ADMIN_SENSOR_ENABLED: (
-        document.querySelector('input[name="admin-sensor"]:checked').value ==
-        "enabled"
-      ).toString(),
-      ADMIN_GEN_APP_KEY: formatKey(genRandomKey(32, elements.adminAppKey)),
+      devEUI_: formatEUI(elements.devEui.value),
+      appKey_: formatKey(elements.appKey.value.toUpperCase()),
+      appEUI_: formatEUI(elements.appEui.value),
+      devAddr_: formatAddr(elements.devAddr.value),
+      nwkSKey_: formatKey(elements.nwksKey.value),
+      appSKey_: formatKey(elements.appsKey.value),
+      ADMIN_GEN_APP_KEY: formatKey(elements.adminAppKey.value),
     };
-
-    if (elements.simOff.checked) {
-      //formData.DEVICE_SIMULATION = "false";
-      formData.USMB_VALVE = "false";
-      formData.ATIM_THAQ = "false";
-      formData.WATTECO_TEMPO = "false";
-      formData.TCT_EGREEN = "false";
-    } else if (elements.simOn.checked) {
-      //formData.DEVICE_SIMULATION = "true";
-      formData.USMB_VALVE = document
-        .getElementById("usmb-valve")
-        .checked.toString();
-      formData.ATIM_THAQ = document
-        .getElementById("atim-thaq")
-        .checked.toString();
-      formData.WATTECO_TEMPO = document
-        .getElementById("watteco-tempo")
-        .checked.toString();
-      formData.TCT_EGREEN = document
-        .getElementById("tct-egreen")
-        .checked.toString();
-    }
-
     firmwareData.push(formData);
   }
   return firmwareData;
