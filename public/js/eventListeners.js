@@ -351,9 +351,9 @@ export function initializeEventListeners() {
   });
 
   elements.cancel.addEventListener("click", function () {
-    let message = document.getElementById("container-id").textContent;
-    let id = message.match(/\[([^\]]+)\]/)[1];
-    socket.emit("cancel_compilation", { id: id });
+    const firmwareLog = document.getElementById("log-container");
+    const firmwareId = firmwareLog.getAttribute("data-firmware-id");
+    socket.emit("cancel_compilation", { id: firmwareId });
   });
 
   elements.frameDelay.addEventListener("change", function () {

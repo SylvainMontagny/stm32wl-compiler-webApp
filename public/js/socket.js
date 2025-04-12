@@ -4,7 +4,6 @@ import { elements } from "./elements.js";
 const logContainer = elements.console;
 
 let socket;
-let lastParagraph = null;
 
 export function initializeSocket() {
     socket = io(window.location.location, { path:  window.location.pathname+`socket.io` });
@@ -12,20 +11,20 @@ export function initializeSocket() {
     socket.on("compilation_log", (data) => {
         loadBar(data.message);
 
-        const p = document.createElement("p");
-        p.textContent = data.message;
+        const match = data.message.match(/\[([^\]]+)\]/);
+        let displayText = data.message;
 
-        if (lastParagraph) {
-            lastParagraph.removeAttribute("id");
+        if (match && match[1]) {
+            logContainer.setAttribute("data-firmware-id", match[1]);
+            displayText = data.message.replace(/\[[^\]]+\]\s*/, "");
         }
 
-        p.setAttribute("id", "container-id");
-
-        lastParagraph = p;
-
+        const p = document.createElement("p");
+        p.textContent = displayText;
         logContainer.appendChild(p);
         logContainer.scrollTop = logContainer.scrollHeight;
     });
 }
 
 export { socket };
+

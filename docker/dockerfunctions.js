@@ -248,7 +248,7 @@ function containerLogs(compileId, container, clientId) {
   logStream.on("data", function (chunk) {
     let str = chunk.toString("utf8");
     if (str != " \n") {
-      const logMessage = `${str}`;
+      const logMessage = `[${compileId}] ${str}`;
       sendLogToClient(clientId, logMessage);
       process.stdout.write(logMessage);
     }
