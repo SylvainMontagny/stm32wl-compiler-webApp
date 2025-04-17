@@ -154,7 +154,6 @@ async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig) {
   // Compilation
   let status = 0;
   for (let id in jsonIdsConfig) {
-    console.log(`${id} ${resultPath}`);
     status = await startCompilerContainer(
       id,
       `${configPath}/${id}`,

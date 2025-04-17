@@ -3,6 +3,8 @@ import { showLoadBar } from "./loadBar.js";
 import { socket } from "./socket.js";
 import { store } from "./store.js";
 import { showSnackBar, hideSnackBar } from "./snackBar.js";
+import { genRandomEUI, genRandomKey } from "./generators.js";
+
 
 function formatEUI(str) {
   return `0x${str.match(/.{1,2}/g).join(", 0x")}`;
@@ -118,6 +120,13 @@ export function getMultipleFormJson(nbFirmware) {
       ADMIN_GEN_APP_KEY: formatKey(elements.adminAppKey.value),
     };
     firmwareData.push(formData);
+    genRandomEUI(elements.devEui);
+    genRandomKey(32, elements.appKey);
+    genRandomKey(16, elements.appEui);
+    genRandomKey(8, elements.devAddr);
+    genRandomKey(32, elements.nwksKey);
+    genRandomKey(32, elements.appsKey);
+    genRandomKey(32, elements.adminAppKey);
   }
   return firmwareData;
 }
