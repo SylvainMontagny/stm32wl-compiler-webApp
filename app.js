@@ -30,29 +30,10 @@ app.post('/compile', async (req, res) => {
 
     sendLogToClient(clientId, 'Compilation is starting...')
 
-    let id = randomId();
+    let compileId = randomId();
     let fileName = generateBinFileName(jsonConfig);
-    let compiledPath = `/${volName}/results/${id}/${fileName}`;
 
-    let status = await compile(clientId, id, jsonConfig, fileName);
-
-    if (status === 0) {
-        // Send compiled file data and name to client
-        res.setHeader('compiler-status', status);
-        res.setHeader('X-File-Name', fileName);
-        res.download(compiledPath, (err) => {
-            if (err) {
-                console.error(err);
-                res.status(500).send('Error downloading the file');
-            }
-        });
-    } else if (status === 137) {
-        res.setHeader('compiler-status', status);
-        res.status(200).send();
-    } else {
-        // Send an error response
-        res.status(400).send('Compilation Error');
-    }
+    compile(clientId, compileId, jsonConfig, fileName);
 });
 
 // Route compile multiple
@@ -65,25 +46,46 @@ app.post('/compile-multiple', async (req, res) => {
     let compileId = randomId();
     let zipName = generateMultipleCompileFileName(jsonConfig.length, jsonConfig[0]);
     let zipPath = `/${volName}/results/${compileId}.zip`;
-    let status = await compileMultiple(clientId, compileId, jsonConfig);
+    compileMultiple(clientId, compileId, jsonConfig, zipName, zipPath);
+});
 
-    if (status === 0) {
-        // Send zip file data and name to client
-        res.setHeader('X-File-Name', zipName);
-        res.setHeader('compiler-status', status);
-        res.download(zipPath, (err) => {
-            if (err) {
-                console.error(err);
-                res.status(500).send('Error downloading the file');
-            }
+// Download the result for the compileId
+// Type = single or multiple
+app.get('/download', async (req, res) => {
+    const { id, type, filename } = req.query;
+
+    if (!id || !type || !filename) {
+        return res.status(400).send({
+            status: 400,
+            error: 'Bad Request',
+            message: 'Missing required query parameters: id, type, or filename'
         });
-    } else if (status === 137) {
-        res.setHeader('compiler-status', status);
-        res.status(200).send();
-    } else {
-        // Send an error response
-        res.status(400).send('Compilation Error');
     }
+
+    let filePath = '';
+    if(type === 'multiple') {
+        filePath = `/${volName}/results/${id}.zip`;
+    } else if (type === 'single') {
+        filePath = `/${volName}/results/${id}/${filename}`;
+    } else {
+        return res.status(400).send({
+            status: 400,
+            error: 'Bad Request',
+            message: 'Invalid type. Expected "single" or "multiple".'
+        });
+    }
+
+    res.setHeader('X-File-Name', filename);
+    res.download(filePath, (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(404).send({
+                status: 404,
+                error: 'Not found',
+                message: 'File not found'
+            });
+        }
+    });
 });
 
 /* INIT */

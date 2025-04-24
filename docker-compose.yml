@@ -11,20 +11,12 @@ services:
     environment:
       - GENERAL_SETUP_PATH=/LoRaWAN/App # General_Setup.h path in compiler folder
       - CONFIG_APPLICATION_PATH=/LoRaWAN # config_application.h path in compiler folder
-    networks:
-      - reverse-proxy
 
   compiler:
     image: montagny/arm-compiler:1.0 # Image used for compilation
     deploy:
       replicas: 0
-    networks:
-      - reverse-proxy
       
 volumes:
   shared-vol:
     name: "shared-vol"
-
-networks:
-  reverse-proxy:
-    external: true

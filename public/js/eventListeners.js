@@ -13,7 +13,6 @@ import {
   getMultipleFormJson,
 } from "./compiler.js";
 import { genRandomEUI, genRandomKey } from "./generators.js";
-import { hideLoadBar } from "./loadBar.js";
 import { socket } from "./socket.js";
 import { store } from "./store.js";
 import { showSnackBar } from "./snackBar.js";
@@ -256,13 +255,13 @@ export function initializeEventListeners() {
       if (elements.multipleFirmware.checked) {
         let nbFirmware = document.getElementById("firmware-nb").value;
         let jsonConfig = getMultipleFormJson(nbFirmware);
-        compileMultipleFirmware(jsonConfig).then(hideLoadBar);
+        compileMultipleFirmware(jsonConfig)
         console.log("jsonConfig : ");
 
         console.log(jsonConfig);
       } else {
         let jsonConfig = getFormJson();
-        compileFirmware(jsonConfig).then(hideLoadBar);
+        compileFirmware(jsonConfig)
       }
       const compilerContainer = document.querySelector(".compiler-container");
       const pageContainer = document.querySelector(".page-container");

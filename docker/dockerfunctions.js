@@ -1,7 +1,7 @@
 const Docker = require("dockerode");
 const docker = new Docker({ socketPath: "/var/run/docker.sock" });
 var stream = require("stream");
-const { sendLogToClient } = require("../sockets/socketInstance");
+const { sendLogToClient, sendCompileCompleteToClient } = require("../sockets/socketInstance");
 const {
   generateBinFileName,
   setupFiles,
@@ -56,7 +56,8 @@ async function compile(clientId, compileId, jsonConfig, fileName) {
   ) {
     console.error("Invalid configuration, stopping compilation.");
     sendLogToClient(clientId, "Invalid configuration, stopping compilation.");
-    return 404;
+    sendCompileCompleteToClient(clientId, compileId, "single", 400, fileName);
+    return 400;
   }
 
   jsonConfigApplication = jsonConfig;
@@ -99,11 +100,12 @@ async function compile(clientId, compileId, jsonConfig, fileName) {
 
   // Clean up : Remove compiler files
   await deleteDir(configPath);
-
+  
+  sendCompileCompleteToClient(clientId, compileId, "single", status, fileName);
   return status;
 }
 
-async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig) {
+async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig, zipName, zipPath) {
   console.log(`Multiple compilation id : ${multipleCompileId}`);
   let resultPath = `/${volName}/results/${multipleCompileId}`; // Path for .zip with .bin and .csv files
   let configPath = `/${volName}/configs`; // Path for all compiler files
@@ -115,6 +117,7 @@ async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig) {
     ) {
       console.error("Invalid configuration, stopping compilation.");
       sendLogToClient(clientId, "Invalid configuration, stopping compilation.");
+      sendCompileCompleteToClient(clientId, multipleCompileId, "multiple", 400, fileName);
       return 404;
     }
   }
@@ -182,6 +185,8 @@ async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig) {
   if (status == 0) {
     await zipDirectory(resultPath, `${resultPath}.zip`);
   }
+
+  sendCompileCompleteToClient(clientId, multipleCompileId, "multiple", status, zipName);
   return status;
 }
 

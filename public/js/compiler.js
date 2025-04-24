@@ -6,6 +6,8 @@ import { showSnackBar, hideSnackBar } from "./snackBar.js";
 import { genRandomEUI, genRandomKey } from "./generators.js";
 
 
+let numberOfFirmware = 1; // Number of firmware for loadbar
+
 function formatEUI(str) {
   return `0x${str.match(/.{1,2}/g).join(", 0x")}`;
 }
@@ -133,6 +135,7 @@ export function getMultipleFormJson(nbFirmware) {
 
 // Compile firmware from jsonString of all form data
 export async function compileFirmware(jsonConfig) {
+  numberOfFirmware = 1;
   showLoadBar();
   elements.console.innerHTML = "";
   try {
@@ -141,62 +144,59 @@ export async function compileFirmware(jsonConfig) {
       formData: jsonConfig,
     };
 
-    const response = await fetch(`./compile`, {
+    fetch(`./compile`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(requestData, null, 2),
     });
-
-    if (response.ok) {
-      const status = parseInt(response.headers.get("compiler-status"), 10);
-      switch (status) {
-        case 0:
-          console.log("Compilation successful");
-          const blob = await response.blob();
-          const fileName = response.headers.get("X-File-Name");
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          store.compiledFile = blob;
-          store.compiledFileName = fileName;
-
-          if (elements.usbAutoSend.checked) {
-            showSnackBar(
-              "Program device ?",
-              (confirm) => {
-                if (confirm) {
-                  sendToUSBDevice(
-                    store.compiledFileName,
-                    store.compiledFile,
-                    store.usbPathHandle
-                  );
-                }
-              },
-              false
-            );
-          }
-
-          break;
-        case 137:
-          console.log("Container stopped");
-          break;
-        default:
-          console.error("Unknown status:", status);
-          break;
-      }
-    } else {
-      const errorText = await response.text();
-      showSnackBar("Error: " + errorText);
-    }
   } catch (error) {
     console.error("Error:", error);
     showSnackBar("An error occurred while compiling the code");
+  }
+}
+
+export async function downloadFirmware(compileId, type, fileName) {
+  try {
+    const response = await fetch(`./download?id=${compileId}&type=${type}&filename=${fileName}`, {
+      method: "GET"
+  });
+
+    if (response.ok) {
+      const blob = await response.blob();
+      const fileName = response.headers.get("X-File-Name");
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      store.compiledFile = blob;
+      store.compiledFileName = fileName;
+      if(type === "single" && elements.usbAutoSend.checked) {
+        showSnackBar(
+          "Program device ?",
+          (confirm) => {
+            if (confirm) {
+              sendToUSBDevice(
+                store.compiledFileName,
+                store.compiledFile,
+                store.usbPathHandle
+              );
+            }
+          },
+          false
+        );
+      }
+    } else {
+      const errorText = await response.json();
+      console.log(errorText);
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    showSnackBar("An error occurred while downloading the firmware");
   }
 }
 
@@ -222,8 +222,6 @@ export async function sendToUSBDevice(fileName, blob, usbPathHandle) {
   }
 }
 
-let numberOfFirmware = 1;
-
 // function compile multiple firmware from jsonString of all form data
 export async function compileMultipleFirmware(jsonConfig) {
   showLoadBar();
@@ -235,45 +233,17 @@ export async function compileMultipleFirmware(jsonConfig) {
       formData: jsonConfig,
     };
 
-    const response = await fetch(`./compile-multiple`, {
+    fetch(`./compile-multiple`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(requestData, null, 2),
     });
-
-    if (response.ok) {
-      const status = parseInt(response.headers.get("compiler-status"), 10);
-      switch (status) {
-        case 0:
-          console.log("Compilation successful");
-          const blob = await response.blob();
-          const fileName = response.headers.get("X-File-Name");
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          break;
-        case 137:
-          console.log("Container stopped");
-          break;
-        default:
-          console.error("Unknown status:", status);
-          break;
-      }
-    } else {
-      const errorText = await response.text();
-      showSnackBar("Error: " + errorText);
-    }
   } catch (error) {
     console.error("Error:", error);
     showSnackBar("An error occurred while compiling the code");
   }
-  numberOfFirmware = 1;
 }
 
 export { numberOfFirmware };

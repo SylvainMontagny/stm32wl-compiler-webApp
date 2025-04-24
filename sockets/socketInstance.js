@@ -55,9 +55,15 @@ function sendLogToClient(clientId, logMessage) {
     io.to(clientId).emit('compilation_log', { message: logMessage });
 }
 
+// Send a message to the client when the compilation is complete
+function sendCompileCompleteToClient(clientId, compileId, compilationType, status, fileName) {
+    io.to(clientId).emit('compile_complete', { id: compileId, type: compilationType, status: status, fileName: fileName });
+}
+
 module.exports = {
     initSocket,
     getSocketInstance,
-    sendLogToClient
+    sendLogToClient,
+    sendCompileCompleteToClient
 };
 
