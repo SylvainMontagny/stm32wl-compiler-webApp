@@ -15,7 +15,7 @@ To setup the webapp, you will need a few steps :
 1. Clone the STM32WL and Webapp Git
 
 ```shell
-git clone https://github.com/SylvainMontagny/STM32WL.git
+git clone https://github.com/SylvainMontagny/stm32wl-compiler-webApp.git
 git clone https://github.com/elias-qzo/LoRaWAN-Compiler-Webapp.git
 ```
 
@@ -50,7 +50,7 @@ docker compose up
 Here is the *docker-compose.yml* used :
 ```yml
 services:
-  web:
+  compiler-web:
     build: . # Docker build current folder
     image: lorawan-compiler-webapp # Webapp image
     ports:
@@ -88,29 +88,34 @@ POST /compile
 Content-Type: application/json
 
 {
-  "ACTIVATION_MODE": "OTAA",
-  "CLASS": "CLASS_A",
-  "SPREADING_FACTOR": "7",
-  "ADAPTIVE_DR": "false",
-  "CONFIRMED": "false",
-  "APP_PORT": "15",
-  "SEND_BY_PUSH_BUTTON": "false",
-  "FRAME_DELAY": 10000,
-  "PAYLOAD_1234": "true",
-  "PAYLOAD_TEMPERATURE": "false",
-  "PAYLOAD_HUMIDITY": "false",
-  "LOW_POWER": "false",
-  "CAYENNE_LPP_": "false",
-  "devEUI_": "0x4d, 0xcb, 0x22, 0x06, 0x1b, 0xf6, 0xfe, 0x0f",
-  "appKey_": "6D,0A,64,F9,0A,6F,F3,D0,46,0B,28,C5,F7,3D,B7,9B",
-  "appEUI_": "0x3e, 0xb9, 0x38, 0x35, 0x84, 0xce, 0xe3, 0x07",
-  "devAddr_": "0x0ad959fa",
-  "nwkSKey_": "fc,8b,60,7a,6c,e0,13,1c,56,fd,ef,d4,3a,73,55,89",
-  "appSKey_": "85,79,7f,05,06,e3,41,2e,e5,f0,a6,cb,c0,f7,86,92",
-  "ADMIN_SENSOR_ENABLED": "false",
-  "MLR003_SIMU": "false",
-  "MLR003_APP_PORT": "30",
-  "ADMIN_GEN_APP_KEY": "6f,92,b6,59,95,9f,9f,b5,50,0f,f1,3d,e7,eb,07,65"
+    "clientId": "9LeRkByYjp8opfXQAAAB",
+    "formData": {
+        "ACTIVATION_MODE": "OTAA",
+        "CLASS": "CLASS_A",
+        "SPREADING_FACTOR": "7",
+        "ADAPTIVE_DR": "false",
+        "CONFIRMED": "false",
+        "APP_PORT": "15",
+        "SEND_BY_PUSH_BUTTON": "false",
+        "FRAME_DELAY": 10000,
+        "PAYLOAD_1234": "true",
+        "ADMIN_SENSOR_ENABLED": "false",
+        "PAYLOAD_TEMPERATURE": "false",
+        "PAYLOAD_HUMIDITY": "false",
+        "USMB_VALVE": "false",
+        "ATIM_THAQ": "false",
+        "WATTECO_TEMPO": "false",
+        "TCT_EGREEN": "false",
+        "LOW_POWER": "false",
+        "CAYENNE_LPP_": "false",
+        "devEUI_": "0xec, 0xdb, 0x86, 0xff, 0xfd, 0x70, 0xc0, 0x21",
+        "appKey_": "89,21,B1,3A,37,1C,69,C7,81,1C,DD,D5,7D,CE,E3,3C",
+        "appEUI_": "0x28, 0x67, 0x66, 0xcb, 0x86, 0xf6, 0xb6, 0x51",
+        "devAddr_": "0xda3425c0",
+        "nwkSKey_": "09,aa,08,30,30,46,bb,5a,bd,56,59,ae,b9,c8,1e,12",
+        "appSKey_": "e2,27,f8,af,d1,1e,bc,14,ae,b3,23,c7,e7,00,74,c3",
+        "ADMIN_GEN_APP_KEY": "c7,6b,98,bb,80,96,57,40,30,a0,74,5f,f6,20,c5,d2"
+    }
 }
 ```
 
@@ -154,39 +159,44 @@ After that, we can launch the container with this function :
 const imageName = 'montagny/arm-compiler:1.0' // image of the compiler
 const volName = 'shared-vol' // name of the volume used to store configs and results
 
-async function startCompilerContainer(compileId, configPath, resultPath, fileName, clientId){
-    try {
-        // Start compiler with custom CMD
-        const container = await docker.createContainer({
-            Image: imageName, // Compiler image
-            HostConfig: {
-                Binds: [`${volName}:/${volName}`] // Volume that stores configs and results data
-            },
-            // Move to compiler, make, and then put .bin into resultpath with new name
-            Cmd: [`/bin/bash`, `-c`, `cd ..${configPath} && make && mv ${compiledFile} ${resultPath}/${fileName}`]
-        });
+async function startCompilerContainer(compileId, configPath, resultPath, fileName, clientId) {
+  try {
+    // Start compiler with custom CMD
+    const container = await docker.createContainer({
+      Image: imageName, // Compiler image
+      HostConfig: {
+        Binds: [`${volName}:/${volName}`], // Volume that stores configs and results data
+      },
+      // Move to compiler, make, and then put .bin into resultpath with new name
+      Cmd: [
+        `/bin/bash`,
+        `-c`,
+        `cd ..${configPath} && make && mv ${compiledFile} ${resultPath}/${fileName}`,
+      ],
+    });
 
-        // Start container
-        await container.start();
-        console.log(`Container started: ${container.id}`);
+    containerIdMap[compileId] = container.id;
 
-        // Handle logs
-        containerLogs(compileId,container,clientId);
+    // Start container
+    await container.start();
+    console.log(`Container started: ${container.id}`);
 
-        // Wait for the container to stop
-        const waitResult = await container.wait();
-        console.log('Container stopped with status:', waitResult.StatusCode);
+    // Handle logs
+    containerLogs(compileId, container, clientId);
 
-        // Clean up: remove the container
-        await container.remove({ force: true });
-        console.log("Container removed");
+    // Wait for the container to stop
+    const waitResult = await container.wait();
+    console.log("Container stopped with status:", waitResult.StatusCode);
 
-        // Return if the container had an error or not
-        return waitResult.StatusCode
+    // Clean up: remove the container
+    await container.remove({ force: true });
+    console.log("Container removed");
 
-    } catch (error) {
-        console.error('Error starting container :', error);
-    }
+    // Return if the container had an error or not
+    return waitResult.StatusCode;
+  } catch (error) {
+    console.error("Error starting container :", error);
+  }
 }
 ```
 It will :
@@ -205,50 +215,63 @@ shared-vol/
 │   │   ├── ecdb86fffde224af-OTAA-CLASS_A-SF7-Unconfirmed.bin
 ```
 
-We can now send the status result and the file as a **blob** through the **/compile API Route** .
-A blob is a sendable version of the data inside a file.
-
 **Step 5:** Receive the file
-We can now receive the blob *client-side*, and store it into a file with a custom name.
-This is the client function that send the request and get the file result :
-```js
-export async function compileFirmware(jsonConfig) {
-    showLoadBar();
-    try {
-        const requestData = {
-            clientId: socket.id,
-            formData: jsonConfig,
-        };
-
-        const response = await fetch("/compile", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(requestData, null, 2),
-        });
-
-        // Receive the blob and store it as a file
-        if (response.ok) {
-            const blob = await response.blob();
-            const fileName = response.headers.get("X-File-Name");
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        } else {
-            const errorText = await response.text();
-            alert("Error: " + errorText);
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred while compiling the code");
-    }
+At the end of the compilation, we send a message through the websocket to the client containing informations about the compilation :
+```json
+{
+    "id": "e324p",
+    "type": "single", //single or multiple
+    "status": 0,
+    "fileName": "ecdb86fffd70c021-OTAA-CLASS_A-SF7-Unconfirmed.bin"
 }
 ```
+Based on this message, we can **GET** the file as a **blob** through the **/download API Route** .
+A blob is a sendable version of the data inside a file.
+```js
+export async function downloadFirmware(compileId, type, fileName) {
+  try {
+    const response = await fetch(`./download?id=${compileId}&type=${type}&filename=${fileName}`, {
+      method: "GET"
+  });
+
+    if (response.ok) {
+      const blob = await response.blob();
+      const fileName = response.headers.get("X-File-Name");
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      store.compiledFile = blob;
+      store.compiledFileName = fileName;
+      if(type === "single" && elements.usbAutoSend.checked) {
+        showSnackBar(
+          "Program device ?",
+          (confirm) => {
+            if (confirm) {
+              sendToUSBDevice(
+                store.compiledFileName,
+                store.compiledFile,
+                store.usbPathHandle
+              );
+            }
+          },
+          false
+        );
+      }
+    } else {
+      const errorText = await response.json();
+      console.log(errorText);
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    showSnackBar("An error occurred while downloading the firmware");
+  }
+}
+```
+The file can also automatically be sent to the connected device.
 
 **Multi-compilation**\
-For multi-compilation, the process in almost the same. We use the **/compile-multiple** API Route, sending a JSON array containing all the parameters with randomly generated keys. We launch containers one after the other, and then send a *.zip* with all the *bin* files, and a *tts-end-device.csv* file with all the keys of the firmwares.
+For multi-compilation, the process in almost the same. We use the **/compile-multiple** API Route, sending a JSON array containing all the parameters with randomly generated keys. We launch containers one after the other, and then we can download a *.zip* with all the *bin* files, and a *tts-end-device.csv* file with all the keys of the firmwares.
