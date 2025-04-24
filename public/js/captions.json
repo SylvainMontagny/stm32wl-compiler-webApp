@@ -15,5 +15,11 @@
   "DeviceSimulation": "Enable this option to simulate a device. Then select the type of device to simulate from the available options.",
   "GenAppKey(Multicast)": "Specific Key only for Multicast applications.",
   "GeneratemultipleFirmwares": "You can generate multiple firmware at once. All firmwares will have the same application settings but have their own set of DevEUI and Keys. The output is a zip file with the firmware and a csv file to facilitate the provisioning.",
-  "Sendtodeviceaftercompilation": "You can upload the firmware to the device, but this feature is only supported on Google Chrome and Microsoft Edge."
+  "Sendtodeviceaftercompilation": "You can upload the firmware to the device, but this feature is only supported on Google Chrome and Microsoft Edge.",
+  "SimulatedLoRaWANdevices": "This option uses the payload format of real devices, however the values are simulated.",
+  "USMB_valve(Thermostaticvalue)": "USMB_valve : USMB thermostatic valve",
+  "ATIM_Thaq(Airquality)": "ATIM Thaq Air qualité sensor. Only the temperature values varies (19.91°C > 20.42°C)",
+  "WATTECO_tempo(Temperature)": "WATTECO Tempo temperature sensor with 32 bytes fixed payload.",
+  "TCT_egreen(Currentsensor)": "TCT egreen Current sensor. Current (1.13A and 1.07A) and voltage (4543 mV and 4798 mV) vary.",
+  "ReadvaluefromIKS01A3sensors": "Only available when using a X-NUCLEO-IKS01A3 hat sensor board from ST."
 }
