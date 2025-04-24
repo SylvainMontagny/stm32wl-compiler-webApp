@@ -89,6 +89,7 @@ async function initSharedVolume(volName) {
         console.log(`Init : configs folder created or already there`);
         await fs.mkdir(`/${volName}/results`, { recursive: true });
         console.log(`Init : results folder created or already there`);
+        await clearVolumeFolders(volName);
     } catch (err) {
         console.error(`Error initiating shared volume '${volName}':`, err);
     }
@@ -209,6 +210,27 @@ async function zipDirectory(sourceDir, outPath) {
         archive.finalize();
     });
 }
+async function clearVolumeFolders(volName){
+    clearDir(`/${volName}/results/`);
+    clearDir(`/${volName}/configs/`);
+}
+async function clearDir(path) {
+    try {
+        const files = await fs.readdir(path);
+        for (const file of files) {
+            const filePath = `${path}/${file}`;
+            const stat = await fs.stat(filePath);
+            if (stat.isDirectory()) {
+                await fs.remove(filePath); // Remove subdirectory and its contents
+            } else {
+                await fs.unlink(filePath); // Remove file
+            }
+        }
+        console.log(`All content in ${path} has been cleared.`);
+    } catch (err) {
+        console.error(`Error clearing folder ${path}:`, err);
+    }
+}
 
 async function copyDir(source, destination) {
     console.log(`Copying ${source} to ${destination}`)
@@ -257,5 +279,6 @@ module.exports = {
     setupFiles,
     deleteDir,
     setupFilesMulti,
-    zipDirectory
+    zipDirectory,
+    clearVolumeFolders
 };

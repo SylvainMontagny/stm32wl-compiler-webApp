@@ -206,7 +206,7 @@ It will :
 - Return the status (0 if everything went well)
 
 At the end of the execution, we will also remove all the compilation files from the *shared-vol* volume.
-
+The results folder is entirely cleared every dat at 03:00, or at launch.
 ```
 shared-vol/
 ├── configs/

@@ -3,9 +3,10 @@ const express = require('express');
 const path = require('path');
 const http = require('http');
 const cors = require('cors');
+const cron = require('node-cron');
 const { initSocket, sendLogToClient } = require('./sockets/socketInstance');
 const { randomId, compile, compileMultiple, volName, stopContainer, containerIdMap } = require('./docker/dockerfunctions');
-const { generateBinFileName, generateMultipleCompileFileName, initSharedVolume } = require('./docker/file_fct.js');
+const { generateBinFileName, generateMultipleCompileFileName, initSharedVolume, clearVolumeFolders } = require('./docker/file_fct.js');
 
 const app = express();
 const port = process.env.PORT || 4050;
@@ -15,6 +16,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(cors());
 app.set('trust proxy', true);
+
+/* CRON */
+
+cron.schedule('0 3 * * *', () => {
+    console.log(`CRON volume clean up started at ${new Date().toLocaleString()}`);
+    clearVolumeFolders(volName);
+}, {
+    timezone: "Europe/Paris"
+});
 
 /* ROUTES */
 

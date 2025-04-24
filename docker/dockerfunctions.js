@@ -196,13 +196,7 @@ async function compileMultiple(clientId, multipleCompileId, jsonArrayConfig, zip
  * Return the status of the container execution
  * 0 if everything went well
  */
-async function startCompilerContainer(
-  compileId,
-  configPath,
-  resultPath,
-  fileName,
-  clientId
-) {
+async function startCompilerContainer(compileId, configPath, resultPath, fileName, clientId) {
   try {
     // Start compiler with custom CMD
     const container = await docker.createContainer({
