@@ -3,7 +3,7 @@ import { showLoadBar } from "./loadBar.js";
 import { socket } from "./socket.js";
 import { store } from "./store.js";
 import { showSnackBar, hideSnackBar } from "./snackBar.js";
-import { genRandomEUI, genRandomKey } from "./generators.js";
+import { genRandomEUI, genRandomKey, randomEUI, randomKey } from "./generators.js";
 
 
 let numberOfFirmware = 1; // Number of firmware for loadbar
@@ -113,22 +113,15 @@ export function getMultipleFormJson(nbFirmware) {
         document.querySelector('input[name="cayenne-lpp"]:checked').value ==
         "enabled"
       ).toString(),
-      devEUI_: formatEUI(elements.devEui.value),
-      appKey_: formatKey(elements.appKey.value.toUpperCase()),
-      appEUI_: formatEUI(elements.appEui.value),
-      devAddr_: formatAddr(elements.devAddr.value),
-      nwkSKey_: formatKey(elements.nwksKey.value),
-      appSKey_: formatKey(elements.appsKey.value),
-      ADMIN_GEN_APP_KEY: formatKey(elements.adminAppKey.value),
+      devEUI_: formatEUI(randomEUI()),
+      appKey_: formatKey(randomKey(32).toUpperCase()),
+      appEUI_: formatEUI(randomKey(16)),
+      devAddr_: formatAddr(randomKey(8)),
+      nwkSKey_: formatKey(randomKey(32)),
+      appSKey_: formatKey(randomKey(32)),
+      ADMIN_GEN_APP_KEY: formatKey(randomKey(32)),
     };
     firmwareData.push(formData);
-    genRandomEUI(elements.devEui);
-    genRandomKey(32, elements.appKey);
-    genRandomKey(16, elements.appEui);
-    genRandomKey(8, elements.devAddr);
-    genRandomKey(32, elements.nwksKey);
-    genRandomKey(32, elements.appsKey);
-    genRandomKey(32, elements.adminAppKey);
   }
   return firmwareData;
 }
