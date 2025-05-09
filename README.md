@@ -57,7 +57,7 @@ sudo docker compose up -d --build
 1. The source firmware project path is preset to `../STM32WL/STM32WL-standalone` in the `docker-compose.yml` file. The project folder is mounted as a volume to the stm32wl-compiler-webapp container. If you want to specify an alternative path, rename the environment template file *.env.example*:
 
 ```bash
-mv .env.example .env
+cp .env.example .env
 ```
 
 Edit the .env file and define your custom path:
@@ -158,11 +158,12 @@ shared-vol/
 ├── results/
 │   ├── Rt3LE/
 ```
-5. *config_application.h* and *General_Setup.h* files are modified according to *jsonConfig*.
-6. A new container based on the stm32wl-arm-compiler starts: 
+**Step 5.** *config_application.h* and *General_Setup.h* files are modified according to *jsonConfig*.
+**Step 6.** A new container based on the stm32wl-arm-compiler starts: 
 - shared-vol is the volume to get the firwmare source to be compiled (shared/configs/Rt3LE).
 - the correspondance between the folder ID (Rt3LE) and the container id saved to keep track when several compilation are processed.
-7. We wait for the end of the compilation process, store the binary file in the `result` folder, then delete the containter and `config/Rt3LE`.
+  
+**Step 7.** We wait for the end of the compilation process, store the binary file in the `result` folder, then delete the containter and `config/Rt3LE`.
 ```
 shared-vol/
 ├── configs/
@@ -170,8 +171,9 @@ shared-vol/
 │   ├── Rt3LE/
 │   │   ├── ecdb86fffde224af-OTAA-CLASS_A-SF7-Unconfirmed.bin
 ```
-8. We download the binary file by sending a message through the websocket to the client with informations about the compilation :
-```json
+
+**Step 8.** We download the binary file by sending a message through the websocket to the client with informations about the compilation :
+```js
 {
     "id": "e324p",
     "type": "single", //single or multiple
