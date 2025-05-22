@@ -1,7 +1,7 @@
 services:
-  compiler-web:
+  stm32-compiler-webapp:
     build: . # Docker build current folder
-    image: lorawan-compiler-webapp # Webapp image
+    image: stm32wl-compiler-webapp # Webapp image
     ports:
       - "4050:4050" # Webapp port
     volumes:
@@ -12,7 +12,7 @@ services:
       - GENERAL_SETUP_PATH=/LoRaWAN/App # General_Setup.h path in compiler folder
       - CONFIG_APPLICATION_PATH=/LoRaWAN # config_application.h path in compiler folder
 
-  compiler:
+  stm32wl-arm-compiler:
     image: montagny/arm-compiler:1.0 # Image used for compilation
     deploy:
       replicas: 0
